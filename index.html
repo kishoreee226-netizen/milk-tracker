@@ -21,6 +21,7 @@
     header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
     .header-top h1 { font-size: 1.2rem; font-weight: 700; }
+    .user-badge { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 6px; }
     .date-badge { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
     
     .mode-switcher { display: flex; background: #e2e8f0; border-radius: 10px; padding: 4px; margin-bottom: 16px; gap: 4px; }
@@ -50,96 +51,163 @@
     .history-list { margin-top: 16px; font-size: 0.85rem; }
     .history-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
 
-    .btn-whatsapp { background-color: #25d366; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-top: 14px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+    .btn-whatsapp { background-color: #25d366; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-top: 14px; font-size: 0.95rem; font-weight: 600; }
 
     .add-form { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .form-group { margin-bottom: 10px; }
     .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
-    .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
     .btn-add { background: var(--primary); color: white; width: 100%; padding: 10px; border-radius: 8px; }
+    .btn-secondary { background: #e2e8f0; color: #334155; width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="header-top">
-      <h1>🥛 పాల ట్రాకర్</h1>
-      <span style="font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 6px;">Live</span>
-    </div>
-    <div class="date-badge" id="currentDateDisplay">తేదీ: ...</div>
-  </header>
-
-  <div class="mode-switcher">
-    <button class="mode-btn active" id="btnVendor" onclick="switchMode('vendor')">పాలబ్బాయి మోడ్ (Vendor)</button>
-    <button class="mode-btn" id="btnCustomer" onclick="switchMode('customer')">కస్టమర్ వ్యూ (Bill)</button>
-  </div>
-
-  <!-- VENDOR VIEW -->
-  <section id="vendorSection">
-    <div id="vendorApp">
-      <div style="text-align:center; padding: 20px; color:#64748b;">లోడ్ అవుతోంది...</div>
+  <!-- AUTH SECTION (లాగిన్ & సైన్ అప్) -->
+  <section id="authSection" class="hidden" style="max-width: 400px; margin: 30px auto;">
+    <div style="text-align: center; margin-bottom: 24px;">
+      <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 6px;">🥛 పాల ట్రాకర్</h1>
+      <p style="color: #64748b; font-size: 0.9rem;">మీ స్వంత వ్యాపార ఖాతాలోకి లాగిన్ అవ్వండి</p>
     </div>
 
-    <!-- కొత్త కస్టమర్ చేర్చే ఫారం -->
-    <details style="margin-top: 16px; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
-      <summary style="font-weight: 600; cursor: pointer; color: var(--primary);">+ కొత్త కస్టమర్‌ని చేర్చండి</summary>
-      <form id="newCustomerForm" onsubmit="addCustomer(event)" style="margin-top: 12px;">
-        <div class="form-group">
-          <label>పేరు *</label>
-          <input type="text" id="custName" required placeholder="ఉదా: రాము గారు">
-        </div>
-        <div class="form-group">
-          <label>ఫ్లాట్ / ఇంటి నంబర్ *</label>
-          <input type="text" id="custFlat" required placeholder="ఉదా: 204">
-        </div>
-        <div class="form-group">
-          <label>రోజూ తీసుకునే పాలు (లీటర్లలో) *</label>
-          <input type="number" step="0.5" id="custQty" required placeholder="1.0" value="1.0">
-        </div>
-        <div class="form-group">
-          <label>లీటర్ ధర (₹) *</label>
-          <input type="number" id="custPrice" required placeholder="70" value="70">
-        </div>
-        <div class="form-group">
-          <label>ఫోన్ నంబర్</label>
-          <input type="tel" id="custPhone" placeholder="9876543210">
-        </div>
-        <button type="submit" class="btn-add">కస్టమర్‌ని సేవ్ చేయి</button>
-      </form>
-    </details>
+    <div class="add-form">
+      <div class="form-group">
+        <label>ఈమెయిల్ (Email)</label>
+        <input type="email" id="authEmail" placeholder="name@example.com" required>
+      </div>
+      <div class="form-group">
+        <label>పాస్‌వర్డ్ (Password)</label>
+        <input type="password" id="authPassword" placeholder="కనీసం 6 అక్షరాలు" required>
+      </div>
+      <button class="btn-add" onclick="handleLogin()">లాగిన్ (Login)</button>
+      <button class="btn-secondary" onclick="handleSignUp()">కొత్త అకౌంట్ క్రియేట్ చేయి (Sign Up)</button>
+    </div>
   </section>
 
-  <!-- CUSTOMER VIEW -->
-  <section id="customerSection" class="hidden">
-    <div class="add-form">
-      <label style="font-size: 0.85rem; font-weight: 600; display:block; margin-bottom: 6px;">కస్టమర్‌ని ఎంచుకోండి:</label>
-      <select id="custSelect" onchange="renderCustomerBill()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem;">
-        <option value="">-- ఎంచుకోండి --</option>
-      </select>
+  <!-- MAIN APP SECTION -->
+  <section id="mainAppSection" class="hidden">
+    <header>
+      <div class="header-top">
+        <h1>🥛 పాల ట్రాకర్</h1>
+        <div>
+          <span class="user-badge" id="userEmailBadge"></span>
+          <button onclick="handleLogout()" style="background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">Logout</button>
+        </div>
+      </div>
+      <div class="date-badge" id="currentDateDisplay">తేదీ: ...</div>
+    </header>
+
+    <div class="mode-switcher">
+      <button class="mode-btn active" id="btnVendor" onclick="switchMode('vendor')">పాలబ్బాయి మోడ్ (Vendor)</button>
+      <button class="mode-btn" id="btnCustomer" onclick="switchMode('customer')">కస్టమర్ వ్యూ (Bill)</button>
     </div>
 
-    <div id="billDisplay"></div>
+    <!-- VENDOR VIEW -->
+    <div id="vendorSection">
+      <div id="vendorApp">
+        <div style="text-align:center; padding: 20px; color:#64748b;">లోడ్ అవుతోంది...</div>
+      </div>
+
+      <details style="margin-top: 16px; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
+        <summary style="font-weight: 600; cursor: pointer; color: var(--primary);">+ కొత్త కస్టమర్‌ని చేర్చండి</summary>
+        <form id="newCustomerForm" onsubmit="addCustomer(event)" style="margin-top: 12px;">
+          <div class="form-group">
+            <label>పేరు *</label>
+            <input type="text" id="custName" required placeholder="ఉదా: రాము గారు">
+          </div>
+          <div class="form-group">
+            <label>ఫ్లాట్ / ఇంటి నంబర్ *</label>
+            <input type="text" id="custFlat" required placeholder="ఉదా: 204">
+          </div>
+          <div class="form-group">
+            <label>రోజూ తీసుకునే పాలు (లీటర్లలో) *</label>
+            <input type="number" step="0.5" id="custQty" required placeholder="1.0" value="1.0">
+          </div>
+          <div class="form-group">
+            <label>లీటర్ ధర (₹) *</label>
+            <input type="number" id="custPrice" required placeholder="70" value="70">
+          </div>
+          <div class="form-group">
+            <label>ఫోన్ నంబర్</label>
+            <input type="tel" id="custPhone" placeholder="9876543210">
+          </div>
+          <button type="submit" class="btn-add">కస్టమర్‌ని సేవ్ చేయి</button>
+        </form>
+      </details>
+    </div>
+
+    <!-- CUSTOMER VIEW -->
+    <div id="customerSection" class="hidden">
+      <div class="add-form">
+        <label style="font-size: 0.85rem; font-weight: 600; display:block; margin-bottom: 6px;">కస్టమర్‌ని ఎంచుకోండి:</label>
+        <select id="custSelect" onchange="renderCustomerBill()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem;">
+          <option value="">-- ఎంచుకోండి --</option>
+        </select>
+      </div>
+
+      <div id="billDisplay"></div>
+    </div>
   </section>
 
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
-    
-    let dbClient;
-    try {
-      dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch(e) {
-      console.error(e);
-    }
+    const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
 
+    let currentUser = null;
     let allCustomers = [];
     let todayDeliveries = {};
 
+    // AUTH FUNCTIONS
+    async function checkUserSession() {
+      const { data: { session } } = await dbClient.auth.getSession();
+      if (session && session.user) {
+        currentUser = session.user;
+        document.getElementById('authSection').classList.add('hidden');
+        document.getElementById('mainAppSection').classList.remove('hidden');
+        document.getElementById('userEmailBadge').innerText = currentUser.email.split('@')[0];
+        initApp();
+      } else {
+        document.getElementById('authSection').classList.remove('hidden');
+        document.getElementById('mainAppSection').classList.add('hidden');
+      }
+    }
+
+    async function handleLogin() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      if (!email || !password) return alert('ఈమెయిల్ మరియు పాస్‌వర్డ్ ఇవ్వండి.');
+
+      const { data, error } = await dbClient.auth.signInWithPassword({ email, password });
+      if (error) alert('లాగిన్ విఫలమైంది: ' + error.message);
+      else checkUserSession();
+    }
+
+    async function handleSignUp() {
+      const email = document.getElementById('authEmail').value.trim();
+      const password = document.getElementById('authPassword').value;
+      if (!email || !password) return alert('ఈమెయిల్ మరియు పాస్‌వర్డ్ ఇవ్వండి.');
+
+      const { data, error } = await dbClient.auth.signUp({ email, password });
+      if (error) alert('సైన్ అప్ విఫలమైంది: ' + error.message);
+      else {
+        alert('ఖాతా విజయవంతంగా సృష్టించబడింది! లాగిన్ అవుతున్నారు...');
+        checkUserSession();
+      }
+    }
+
+    async function handleLogout() {
+      await dbClient.auth.signOut();
+      currentUser = null;
+      checkUserSession();
+    }
+
+    // APP CORE FUNCTIONS
     function switchMode(mode) {
       const vendorSec = document.getElementById('vendorSection');
       const custSec = document.getElementById('customerSection');
@@ -160,13 +228,9 @@
       }
     }
 
-    async function init() {
+    async function initApp() {
       try {
-        const { data: customers, error: errC } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
-        if (errC) {
-          document.getElementById('vendorApp').innerHTML = `<p style="color:red; text-align:center;">Error: ${errC.message}</p>`;
-          return;
-        }
+        const { data: customers } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
         allCustomers = customers || [];
 
         const { data: deliveries } = await dbClient.from('deliveries').select('*').eq('delivery_date', today);
@@ -186,7 +250,7 @@
       app.innerHTML = '';
 
       if (allCustomers.length === 0) {
-        app.innerHTML = '<p style="text-align:center; padding: 20px;">కస్టమర్లు ఎవరూ లేరు.</p>';
+        app.innerHTML = '<p style="text-align:center; padding: 20px; color:#64748b;">ఇంకా కస్టమర్లు ఎవరూ లేరు. కింద ఉన్న బటన్ ద్వారా కస్టమర్లను జోడించండి.</p>';
         return;
       }
 
@@ -239,13 +303,13 @@
         status: status
       }, { onConflict: 'customer_id,delivery_date' });
 
-      if (!error) init();
+      if (!error) initApp();
       else alert('Error: ' + error.message);
     }
 
     async function resetDelivery(recordId) {
       const { error } = await dbClient.from('deliveries').delete().eq('id', recordId);
-      if (!error) init();
+      if (!error) initApp();
       else alert('Error: ' + error.message);
     }
 
@@ -256,7 +320,8 @@
         flat_no: document.getElementById('custFlat').value,
         default_qty: parseFloat(document.getElementById('custQty').value),
         price_per_ltr: parseFloat(document.getElementById('custPrice').value),
-        phone: document.getElementById('custPhone').value
+        phone: document.getElementById('custPhone').value,
+        user_id: currentUser.id
       };
 
       const { error } = await dbClient.from('customers').insert([newCust]);
@@ -265,7 +330,7 @@
       } else {
         alert('కస్టమర్ వివరాలు సేవ్ అయ్యాయి!');
         document.getElementById('newCustomerForm').reset();
-        init();
+        initApp();
       }
     }
 
@@ -350,7 +415,8 @@
       `;
     }
 
-    window.onload = init;
+    // START CHECKING SESSION ON LOAD
+    window.onload = checkUserSession;
   </script>
 </body>
 </html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="te">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>పాల లెక్కల ట్రాకర్ - Milk Count</title>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    :root {
+      --primary: #2563eb;
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #1e293b;
+      --border: #e2e8f0;
+      --success: #16a34a;
+      --danger: #dc2626;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 80px; }
+    header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header h1 { font-size: 1.25rem; font-weight: 700; }
+    .date-badge { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
+    .customer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .customer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+    .customer-name { font-size: 1.1rem; font-weight: 600; }
+    .flat-badge { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
+    .details { font-size: 0.85rem; color: #64748b; margin-bottom: 14px; }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    button { padding: 10px 14px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-deliver { background-color: var(--success); color: white; }
+    .btn-skip { background-color: #fee2e2; color: var(--danger); }
+    .status-badge { text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+    .status-delivered { background-color: #dcfce7; color: var(--success); }
+    .status-skipped { background-color: #fee2e2; color: var(--danger); }
+    .loading { text-align: center; color: #64748b; padding: 40px 0; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h1>🥛 పాల డెలివరీ ట్రాకర్</h1>
+    <div class="date-badge" id="currentDateDisplay">తేదీ: ...</div>
+  </header>
+
+  <main id="app">
+    <div class="loading">కస్టమర్ల వివరాలు లోడ్ అవుతున్నాయి...</div>
+  </main>
+
+  <script>
+    const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
+    const SUPABASE_ANON_KEY = 'sb_publishable_3w6UewjeN5ZhC-u_5bXSQg_whVgIJTt';
+
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
+
+    async function loadData() {
+      const app = document.getElementById('app');
+
+      // 1. Fetch Customers
+      const { data: customers, error: custError } = await supabase
+        .from('customers')
+        .select('*')
+        .order('flat_no', { ascending: true });
+
+      if (custError) {
+        app.innerHTML = `<p style="color: red; text-align: center;">డేటా లోడ్ కాలేదు: ${custError.message}</p>`;
+        return;
+      }
+
+      // 2. Fetch Today's Deliveries
+      const { data: deliveries } = await supabase
+        .from('deliveries')
+        .select('*')
+        .eq('delivery_date', today);
+
+      const deliveryMap = {};
+      if (deliveries) {
+        deliveries.forEach(d => {
+          deliveryMap[d.customer_id] = d;
+        });
+      }
+
+      renderList(customers, deliveryMap);
+    }
+
+    function renderList(customers, deliveryMap) {
+      const app = document.getElementById('app');
+      app.innerHTML = '';
+
+      if (customers.length === 0) {
+        app.innerHTML = '<p style="text-align:center;">కస్టమర్లు ఎవరూ లేరు.</p>';
+        return;
+      }
+
+      customers.forEach(customer => {
+        const record = deliveryMap[customer.id];
+        const card = document.createElement('div');
+        card.className = 'customer-card';
+
+        let actionArea = '';
+        if (record) {
+          if (record.status === 'delivered') {
+            actionArea = `<div class="status-badge status-delivered">✅ డెలివరీ పూర్తయింది (${record.quantity} Ltr)</div>`;
+          } else {
+            actionArea = `<div class="status-badge status-skipped">❌ ఈ రోజు ఆపేశారు (Skipped)</div>`;
+          }
+        } else {
+          actionArea = `
+            <div class="action-grid">
+              <button class="btn-deliver" onclick="recordDelivery('${customer.id}', ${customer.default_qty}, 'delivered')">
+                ఇచ్చాము (${customer.default_qty} L)
+              </button>
+              <button class="btn-skip" onclick="recordDelivery('${customer.id}', 0, 'skipped')">
+                ఆపేశారు (Skip)
+              </button>
+            </div>
+          `;
+        }
+
+        card.innerHTML = `
+          <div class="customer-header">
+            <div>
+              <div class="customer-name">${customer.name}</div>
+              <div class="details">ధర: ₹${customer.price_per_ltr}/లీ | ఫోన్: ${customer.phone || 'లేదు'}</div>
+            </div>
+            <span class="flat-badge">${customer.flat_no}</span>
+          </div>
+          ${actionArea}
+        `;
+
+        app.appendChild(card);
+      });
+    }
+
+    async function recordDelivery(customerId, qty, status) {
+      const { error } = await supabase
+        .from('deliveries')
+        .upsert({
+          customer_id: customerId,
+          delivery_date: today,
+          quantity: qty,
+          status: status
+        }, { onConflict: 'customer_id,delivery_date' });
+
+      if (error) {
+        alert('ఎర్రర్: ' + error.message);
+      } else {
+        loadData();
+      }
+    }
+
+    loadData();
+  </script>
+</body>
+</html>

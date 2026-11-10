@@ -6,7 +6,8 @@
   <title>MilkCount - పాల లెక్క (B2C Delivery Tracker)</title>
 
   <!-- PWA Web App Settings -->
-  <link rel="manifest" href="data:application/manifest+json;charset=utf-8,%7B%22name%22%3A%22MilkCount%20%E0%B0%AA%E0%B0%BE%E0%B0%B2%20%E0%B0%B2%E0%B1%86%E0%B0%95%E0%B1%8D%E0%B0%95%22%2C%22short_name%22%3A%22MilkCount%22%2C%22start_url%22%3A%22.%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%23ffffff%22%2C%22theme_color%22%3A%22%230284c7%22%7D">
+  <link rel="manifest" href="./manifest.json">
+  <meta name="theme-color" content="#0284c7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
 
@@ -667,12 +668,10 @@
       const isCurrentlySkipped = (item && item.status === 'skipped');
 
       if (isCurrentlySkipped) {
-        // రేపు వద్దు ఆపేస్తే, భవిష్యత్తు రోజు కాబట్టి దాన్ని డేటాబేస్ నుండి తీసేసి ఖాళీగా (Empty) ఉంచాలి
         await db.from('customer_milk_logs').delete().eq('user_id', currentUser.id).eq('log_date', logDate);
         delete monthRecords[dayNum];
         showToast(`రేపు (${dayNum}న) తిరిగి సాధారణ స్థితికి మారింది!`);
       } else {
-        // రేపు వద్దు అని సెట్ చేయడం
         await db.from('customer_milk_logs').upsert({
           user_id: currentUser.id,
           log_date: logDate,
@@ -736,7 +735,6 @@
 
         if (item) {
           if (item.status === 'delivered' && item.liters > 0) {
-            // భవిష్యత్తు తేదీ అయితే లెక్కలోకి రాదు, గడిచిన/నేటి రోజు మాత్రమే కలుస్తుంది
             if (isPastOrToday) {
               deliveredDays++;
               totalLiters += item.liters;
@@ -826,7 +824,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         if (item) {
           if (item.status === 'delivered') {
             if (isPastOrToday) {
-              // గడిచిన లేదా నేటి రోజు మాత్రమే లెక్కలోకి వస్తుంది
               deliveredCount++;
               totalLiters += item.liters;
 
@@ -841,7 +838,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
                 </span>
               `;
             } else {
-              // భవిష్యత్తు తేదీలో ఎక్స్‌ట్రా పాలు ప్లాన్ చేసుకుంటే మాత్రమే లైట్ బ్లూలో పడుతుంది (బిల్లులో ఇంకా కలవదు)
               statusClass = "bg-sky-50 border-sky-300 text-sky-900";
               statusBadge = `<span class="text-[10px] font-bold text-sky-600 leading-none">${item.liters}L</span>`;
             }
@@ -851,7 +847,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
             statusBadge = `<span class="text-[9px] font-bold text-rose-600 leading-none">వద్దు</span>`;
           }
         } else if (isPastOrToday) {
-          // గడిచిన లేదా నేటి రోజుకు ఆటోమేటిక్ గా డిఫాల్ట్ కోటా పడుతుంది
           deliveredCount++;
           totalLiters += defaultDailyQuota;
           statusClass = "bg-emerald-50/70 border-emerald-300 text-emerald-900";
@@ -893,10 +888,12 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('billFinalAmount').innerText = totalBill.toLocaleString('en-IN');
     }
 
-    window.onload = checkAuth;
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('./sw.js');
-    }
+    window.onload = function() {
+      checkAuth();
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('./sw.js');
+      }
+    };
   </script>
 </body>
 </html>

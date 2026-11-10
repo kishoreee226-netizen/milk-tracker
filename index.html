@@ -224,7 +224,7 @@
               <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                 <i class="ph-fill ph-calendar text-sky-600"></i> రోజువారీ క్యాలెండర్ (Delivery Grid)
               </h2>
-              <p class="text-[10px] text-slate-500">ఆటోమేటిక్‌గా పాలు రికార్డ్ అవుతాయి. వద్దు అనుకున్న రోజు తాకండి.</p>
+              <p class="text-[10px] text-slate-500">గడిచిన రోజులు ఆటో-రికార్డ్ అవుతాయి. వద్దు అనుకున్న రోజు తాకండి.</p>
             </div>
 
             <!-- Color Legend Indicator -->
@@ -359,9 +359,12 @@
           </div>
         </div>
 
-        <div class="pt-2 border-t border-slate-100">
+        <div class="pt-2 border-t border-slate-100 space-y-2">
           <button onclick="setModalDayValue(0)" class="w-full py-2.5 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
             <i class="ph-bold ph-prohibit"></i> ఈ రోజు పాలు రాలేదు / వద్దు (Skip / No Milk)
+          </button>
+          <button id="clearEntryBtn" onclick="clearDayEntry()" class="w-full py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-600 font-semibold text-xs flex items-center justify-center gap-1 transition-colors">
+            <i class="ph-bold ph-arrow-counter-clockwise"></i> రీసెట్ / ఖాళీగా ఉంచు (Reset)
           </button>
         </div>
       </div>
@@ -419,7 +422,7 @@
 
   </div>
 
-  <!-- APPLICATION LOGIC WITH AUTO-FILL DEFAULT QUOTA -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
@@ -520,7 +523,7 @@
       const nextMonthStr = String(nextMonthDate.getMonth() + 1).padStart(2, '0');
       const endDate = `${nextYear}-${nextMonthStr}-01`;
 
-      const { data, error } = await db.from('customer_milk_logs')
+      const { data } = await db.from('customer_milk_logs')
         .select('*')
         .eq('user_id', currentUser.id)
         .gte('log_date', startDate)
@@ -588,11 +591,8 @@
       const item = monthRecords[day];
       const customInput = document.getElementById('customLitersInput');
       
-      // If manual record exists and delivered, or default
       if (item && item.status === 'delivered') {
         customInput.value = item.liters;
-      } else if (!item) {
-        customInput.value = defaultDailyQuota;
       } else {
         customInput.value = '';
       }
@@ -632,6 +632,20 @@
       closeDayModal();
     }
 
+    async function clearDayEntry() {
+      if (!selectedDayForModal) return;
+      const y = currentViewingDate.getFullYear();
+      const m = String(currentViewingDate.getMonth() + 1).padStart(2, '0');
+      const d = String(selectedDayForModal).padStart(2, '0');
+      const logDate = `${y}-${m}-${d}`;
+
+      await db.from('customer_milk_logs').delete().eq('user_id', currentUser.id).eq('log_date', logDate);
+      delete monthRecords[selectedDayForModal];
+      showToast(`${selectedDayForModal}వ తేదీ రీసెట్ చేయబడింది!`);
+      closeDayModal();
+      renderApp();
+    }
+
     function applyCustomLiters() {
       const val = parseFloat(document.getElementById('customLitersInput').value);
       if (!isNaN(val) && val >= 0) {
@@ -651,18 +665,25 @@
 
       const item = monthRecords[dayNum];
       const isCurrentlySkipped = (item && item.status === 'skipped');
-      const newStatus = isCurrentlySkipped ? 'taken' : 'skipped';
-      const newQty = isCurrentlySkipped ? defaultDailyQuota : 0;
 
-      await db.from('customer_milk_logs').upsert({
-        user_id: currentUser.id,
-        log_date: logDate,
-        quantity: newQty,
-        status: newStatus
-      }, { onConflict: 'user_id,log_date' });
+      if (isCurrentlySkipped) {
+        // రేపు వద్దు ఆపేస్తే, భవిష్యత్తు రోజు కాబట్టి దాన్ని డేటాబేస్ నుండి తీసేసి ఖాళీగా (Empty) ఉంచాలి
+        await db.from('customer_milk_logs').delete().eq('user_id', currentUser.id).eq('log_date', logDate);
+        delete monthRecords[dayNum];
+        showToast(`రేపు (${dayNum}న) తిరిగి సాధారణ స్థితికి మారింది!`);
+      } else {
+        // రేపు వద్దు అని సెట్ చేయడం
+        await db.from('customer_milk_logs').upsert({
+          user_id: currentUser.id,
+          log_date: logDate,
+          quantity: 0,
+          status: 'skipped'
+        }, { onConflict: 'user_id,log_date' });
+        monthRecords[dayNum] = { status: 'skipped', liters: 0 };
+        showToast(`రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
+      }
 
-      fetchMonthData();
-      showToast(isCurrentlySkipped ? `రేపు (${dayNum}న) ${defaultDailyQuota}L పాలు డెలివరీ అవుతాయి!` : `రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
+      renderApp();
     }
 
     async function addExtraTomorrow() {
@@ -688,8 +709,9 @@
         status: 'taken'
       }, { onConflict: 'user_id,log_date' });
 
-      fetchMonthData();
+      monthRecords[dayNum] = { status: 'delivered', liters: newVal };
       showToast(`రేపు (${dayNum}న) +0.5L జోడించాం! మొత్తం: ${newVal}L`);
+      renderApp();
     }
 
     function scrollToBill() {
@@ -714,13 +736,15 @@
 
         if (item) {
           if (item.status === 'delivered' && item.liters > 0) {
-            deliveredDays++;
-            totalLiters += item.liters;
+            // భవిష్యత్తు తేదీ అయితే లెక్కలోకి రాదు, గడిచిన/నేటి రోజు మాత్రమే కలుస్తుంది
+            if (isPastOrToday) {
+              deliveredDays++;
+              totalLiters += item.liters;
+            }
           } else if (item.status === 'skipped') {
             skippedDays++;
           }
         } else if (isPastOrToday) {
-          // Automatic default milk
           deliveredDays++;
           totalLiters += defaultDailyQuota;
         }
@@ -747,7 +771,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.location.href = `whatsapp://send?text=${encoded}`;
     }
 
-    // MAIN RENDER (WITH AUTO DEFAULT LOGIC)
+    // MAIN RENDER FUNCTION
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -801,26 +825,33 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
         if (item) {
           if (item.status === 'delivered') {
-            deliveredCount++;
-            totalLiters += item.liters;
+            if (isPastOrToday) {
+              // గడిచిన లేదా నేటి రోజు మాత్రమే లెక్కలోకి వస్తుంది
+              deliveredCount++;
+              totalLiters += item.liters;
 
-            const isExtra = item.liters > defaultDailyQuota;
-            statusClass = isExtra 
-              ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
-              : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
+              const isExtra = item.liters > defaultDailyQuota;
+              statusClass = isExtra 
+                ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
+                : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
 
-            statusBadge = `
-              <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
-                ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
-              </span>
-            `;
+              statusBadge = `
+                <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
+                  ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
+                </span>
+              `;
+            } else {
+              // భవిష్యత్తు తేదీలో ఎక్స్‌ట్రా పాలు ప్లాన్ చేసుకుంటే మాత్రమే లైట్ బ్లూలో పడుతుంది (బిల్లులో ఇంకా కలవదు)
+              statusClass = "bg-sky-50 border-sky-300 text-sky-900";
+              statusBadge = `<span class="text-[10px] font-bold text-sky-600 leading-none">${item.liters}L</span>`;
+            }
           } else if (item.status === 'skipped') {
             skippedCount++;
             statusClass = "bg-rose-50/80 border-rose-300 text-rose-900";
             statusBadge = `<span class="text-[9px] font-bold text-rose-600 leading-none">వద్దు</span>`;
           }
         } else if (isPastOrToday) {
-          // AUTO DEFAULT QUOTA: డేటాబేస్ లో రికార్డు లేకపోయినా, గడిచిన/నేటి రోజులకు ఆటోమేటిక్ గా డిఫాల్ట్ లీటర్లు పడతాయి
+          // గడిచిన లేదా నేటి రోజుకు ఆటోమేటిక్ గా డిఫాల్ట్ కోటా పడుతుంది
           deliveredCount++;
           totalLiters += defaultDailyQuota;
           statusClass = "bg-emerald-50/70 border-emerald-300 text-emerald-900";

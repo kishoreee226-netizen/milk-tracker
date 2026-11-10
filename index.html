@@ -53,8 +53,8 @@
 
   <!-- Mobile App Wrapper Frame -->
   <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-2xl relative border-x border-slate-200">
-    
-    <!-- 1. AUTH SCREEN -->
+
+    <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
     <section id="authSection" class="p-6 flex-1 flex flex-col justify-center items-center">
       <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 mb-4 shadow-sm">
         <i class="ph-bold ph-drop text-3xl"></i>
@@ -62,24 +62,56 @@
       <h2 class="text-xl font-extrabold text-slate-800 text-center">MilkCount - పాల లెక్క</h2>
       <p class="text-xs text-slate-500 mb-6 text-center">మీ రోజువారీ పాల లెక్కలు భద్రపరుచుకోండి</p>
 
-      <div class="w-full space-y-3.5 bg-slate-50 border border-slate-200/80 p-5 rounded-2xl">
-        <div>
-          <label class="text-xs font-bold text-slate-600 block mb-1">మొబైల్ నంబర్ (10 అంకెలు)</label>
-          <input type="tel" id="loginPhone" placeholder="ఉదా: 9876543210" maxlength="10" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600">
-        </div>
-        <div>
-          <label class="text-xs font-bold text-slate-600 block mb-1">4-అంకెల సెక్యూరిటీ పిన్ (PIN)</label>
-          <input type="password" id="loginPin" placeholder="ఉదా: 1234" maxlength="4" inputmode="numeric" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600 tracking-widest">
-        </div>
+      <div class="w-full bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-xs">
         
-        <div class="pt-2 space-y-2">
-          <button onclick="handleUserAuth('login')" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-95 text-white py-3 rounded-xl font-bold text-sm shadow-md transition-all">
-            లాగిన్ (Login)
+        <!-- Quick PIN Lock Container (గతంలో లాగిన్ అయిన నంబర్ కోసం) -->
+        <div id="quickPinContainer" class="hidden-force text-center space-y-3">
+          <div class="w-12 h-12 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center mx-auto text-lg font-bold">
+            <i class="ph-bold ph-user"></i>
+          </div>
+          <div>
+            <h3 id="savedUserNameText" class="font-bold text-slate-800 text-base">User</h3>
+            <p id="savedUserPhoneText" class="text-xs text-slate-500 font-medium">9876543210</p>
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">4-అంకెల పిన్ (PIN) నమోదు చేయండి</label>
+            <input type="password" id="quickPinInput" placeholder="••••" maxlength="4" inputmode="numeric" class="w-full text-center tracking-widest text-lg py-2.5 bg-white border border-slate-300 rounded-xl font-black focus:outline-none focus:border-brand-600">
+          </div>
+          <button onclick="handleQuickPinLogin()" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-95 text-white py-3 rounded-xl font-bold text-sm shadow-md transition-all">
+            అన్‌లాక్ / లాగిన్
           </button>
-          <button onclick="handleUserAuth('register')" class="w-full bg-white border border-slate-200 hover:bg-slate-100 active:scale-95 text-slate-700 py-3 rounded-xl font-bold text-xs transition-all">
-            కొత్త ఖాతా రిజిస్టర్ అవ్వండి (Sign Up)
+          <button onclick="showFullLoginForm()" class="text-xs text-brand-600 font-semibold hover:underline block mx-auto pt-1">
+            వేరే నంబర్‌తో లాగిన్ అవ్వండి (Switch Account)
           </button>
         </div>
+
+        <!-- Full Login / Sign-up Container -->
+        <div id="fullAuthContainer" class="space-y-3.5">
+          <div id="nameInputGroup" class="hidden-force">
+            <label class="text-xs font-bold text-slate-600 block mb-1">మీ పేరు (Name)</label>
+            <input type="text" id="authName" placeholder="ఉదా: కిషోర్" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600">
+          </div>
+
+          <div>
+            <label class="text-xs font-bold text-slate-600 block mb-1">మొబైల్ నంబర్ (10 అంకెలు)</label>
+            <input type="tel" id="authPhone" placeholder="ఉదా: 9876543210" maxlength="10" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600">
+          </div>
+
+          <div>
+            <label id="pinLabel" class="text-xs font-bold text-slate-600 block mb-1">4-అంకెల సెక్యూరిటీ పిన్ (PIN)</label>
+            <input type="password" id="authPin" placeholder="••••" maxlength="4" inputmode="numeric" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600 tracking-widest">
+          </div>
+
+          <div class="pt-2 space-y-2">
+            <button id="authPrimaryBtn" onclick="handleAuthSubmit()" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-95 text-white py-3 rounded-xl font-bold text-sm shadow-md transition-all">
+              లాగిన్ (Login)
+            </button>
+            <button id="authToggleBtn" onclick="toggleAuthMode()" class="w-full bg-white border border-slate-200 hover:bg-slate-100 active:scale-95 text-slate-700 py-2.5 rounded-xl font-bold text-xs transition-all">
+              కొత్త ఖాతా? రిజిస్టర్ అవ్వండి (Sign Up)
+            </button>
+          </div>
+        </div>
+
       </div>
     </section>
 
@@ -97,7 +129,7 @@
                 MilkCount <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">పాల లెక్క</span>
               </h1>
               <div class="flex items-center gap-2 mt-0.5">
-                <span id="userPhoneBadge" class="text-[11px] text-sky-100 font-medium">9876543210</span>
+                <span id="userPhoneBadge" class="text-[11px] text-sky-100 font-medium">User</span>
                 <button onclick="logoutCustomer()" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white transition-colors">లాగౌట్</button>
               </div>
             </div>
@@ -317,7 +349,7 @@
 
     <!-- MODAL 1: EDIT SINGLE DAY -->
     <div id="dayModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center hidden-force p-0 sm:p-4">
-      <div class="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-200">
+      <div class="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl space-y-4">
         <div class="flex justify-between items-center pb-2 border-b border-slate-100">
           <div>
             <h4 class="font-bold text-slate-800 text-base" id="modalDateTitle">తేదీ</h4>
@@ -425,6 +457,7 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // 1. SUPABASE CLIENT
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -435,64 +468,157 @@
     let currentViewingDate = new Date();
     let selectedDayForModal = null;
 
-    let currentUser = JSON.parse(localStorage.getItem('milk_self_customer') || 'null');
+    let currentUser = null;
+    let savedUserCache = null;
+    let isSignUpMode = false;
     let ratePerLiter = 70;
     let defaultDailyQuota = 1.0;
     let monthRecords = {};
 
+    // 2. LIFECYCLE & AUTHENTICATION
+    window.onload = function() {
+      checkAuth();
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {
+          console.log('SW registration skipped or file missing:', err);
+        });
+      }
+    };
+
     function checkAuth() {
-      if (currentUser && currentUser.id) {
-        document.getElementById('authSection').classList.add('hidden-force');
-        document.getElementById('mainAppSection').classList.remove('hidden-force');
-        document.getElementById('userPhoneBadge').innerText = currentUser.phone;
-        ratePerLiter = parseFloat(currentUser.price_per_ltr || 70);
-        defaultDailyQuota = parseFloat(currentUser.daily_qty || 1.0);
-        fetchMonthData();
+      const session = localStorage.getItem('milk_self_customer');
+      const lastAccount = localStorage.getItem('milkcount_last_account');
+
+      // ఎగ్జిట్ అయ్యి మళ్లీ ఓపెన్ చేస్తే డైరెక్ట్ హోమ్‌పేజ్
+      if (session) {
+        try {
+          currentUser = JSON.parse(session);
+          setupUserSession(currentUser);
+          return;
+        } catch (e) {
+          localStorage.removeItem('milk_self_customer');
+        }
+      }
+
+      // లాగౌట్ అయి ఉంటే, కేవలం PIN అడిగే స్క్రీన్ చూపించడం
+      if (lastAccount) {
+        try {
+          savedUserCache = JSON.parse(lastAccount);
+          document.getElementById('savedUserNameText').innerText = savedUserCache.name || 'User';
+          document.getElementById('savedUserPhoneText').innerText = savedUserCache.phone;
+          document.getElementById('quickPinContainer').classList.remove('hidden-force');
+          document.getElementById('fullAuthContainer').classList.add('hidden-force');
+          document.getElementById('authSection').classList.remove('hidden-force');
+          document.getElementById('mainAppSection').classList.add('hidden-force');
+          return;
+        } catch(e) {}
+      }
+
+      showFullLoginForm();
+    }
+
+    function showFullLoginForm() {
+      document.getElementById('quickPinContainer').classList.add('hidden-force');
+      document.getElementById('fullAuthContainer').classList.remove('hidden-force');
+      document.getElementById('authSection').classList.remove('hidden-force');
+      document.getElementById('mainAppSection').classList.add('hidden-force');
+    }
+
+    function toggleAuthMode() {
+      isSignUpMode = !isSignUpMode;
+      const nameGroup = document.getElementById('nameInputGroup');
+      const primaryBtn = document.getElementById('authPrimaryBtn');
+      const toggleBtn = document.getElementById('authToggleBtn');
+      const pinLabel = document.getElementById('pinLabel');
+
+      if (isSignUpMode) {
+        nameGroup.classList.remove('hidden-force');
+        pinLabel.innerText = "కొత్త 4-అంకెల పిన్ సెట్ చేసుకోండి (Set PIN)";
+        primaryBtn.innerText = "ఖాతా సృష్టించండి (Sign Up)";
+        toggleBtn.innerText = "ఇప్పటికే ఖాతా ఉందా? లాగిన్ అవ్వండి";
       } else {
-        document.getElementById('authSection').classList.remove('hidden-force');
-        document.getElementById('mainAppSection').classList.add('hidden-force');
+        nameGroup.classList.add('hidden-force');
+        pinLabel.innerText = "4-అంకెల సెక్యూరిటీ పిన్ (PIN)";
+        primaryBtn.innerText = "లాగిన్ (Login)";
+        toggleBtn.innerText = "కొత్త ఖాతా? రిజిస్టర్ అవ్వండి (Sign Up)";
       }
     }
 
-    async function handleUserAuth(type) {
-      const phone = document.getElementById('loginPhone').value.trim();
-      const pin = document.getElementById('loginPin').value.trim();
+    async function handleAuthSubmit() {
+      const phone = document.getElementById('authPhone').value.trim();
+      const pin = document.getElementById('authPin').value.trim();
+      const name = document.getElementById('authName').value.trim();
 
       if (phone.length !== 10 || isNaN(phone)) return alert('దయచేసి 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.');
       if (pin.length !== 4 || isNaN(pin)) return alert('దయచేసి 4 అంకెల పిన్ నమోదు చేయండి.');
 
-      if (type === 'register') {
-        const { data: exist } = await db.from('customer_users').select('*').eq('phone', phone).single();
+      if (isSignUpMode) {
+        if (!name) return alert('దయచేసి మీ పేరు నమోదు చేయండి.');
+        const { data: exist } = await db.from('customer_users').select('*').eq('phone', phone).maybeSingle();
         if (exist) return alert('ఈ మొబైల్ నంబర్ ఇప్పటికే రిజిస్టర్ అయి ఉంది. లాగిన్ అవ్వండి.');
 
         const { data, error } = await db.from('customer_users').insert([{
+          name: name,
           phone: phone,
           pin: pin,
           daily_qty: 1.0,
           price_per_ltr: 70
         }]).select().single();
 
-        if (error) alert('Error: ' + error.message);
-        else {
+        if (error) {
+          alert('Error: ' + error.message);
+        } else {
           alert('ఖాతా విజయవంతంగా సృష్టించబడింది!');
-          currentUser = data;
-          localStorage.setItem('milk_self_customer', JSON.stringify(data));
-          checkAuth();
+          setupUserSession(data);
         }
       } else {
-        const { data, error } = await db.from('customer_users').select('*').eq('phone', phone).eq('pin', pin).single();
-        if (error || !data) alert('మొబైల్ నంబర్ లేదా 4-డిజిట్ పిన్ తప్పుగా నమోదు చేశారు!');
-        else {
-          currentUser = data;
-          localStorage.setItem('milk_self_customer', JSON.stringify(data));
-          checkAuth();
+        const { data, error } = await db.from('customer_users').select('*').eq('phone', phone).eq('pin', pin).maybeSingle();
+        if (error || !data) {
+          alert('మొబైల్ నంబర్ లేదా 4-డిజిట్ పిన్ తప్పుగా నమోదు చేశారు!');
+        } else {
+          setupUserSession(data);
         }
       }
+    }
+
+    async function handleQuickPinLogin() {
+      const pin = document.getElementById('quickPinInput').value.trim();
+      if (pin.length !== 4 || isNaN(pin)) return alert('దయచేసి 4 అంకెల పిన్ నమోదు చేయండి.');
+
+      const { data, error } = await db.from('customer_users').select('*').eq('phone', savedUserCache.phone).eq('pin', pin).maybeSingle();
+      if (error || !data) {
+        alert('పిన్ తప్పుగా నమోదు చేశారు!');
+      } else {
+        setupUserSession(data);
+      }
+    }
+
+    function setupUserSession(user) {
+      currentUser = user;
+      localStorage.setItem('milk_self_customer', JSON.stringify(user));
+      localStorage.setItem('milkcount_last_account', JSON.stringify({ phone: user.phone, name: user.name }));
+
+      document.getElementById('authSection').classList.add('hidden-force');
+      document.getElementById('mainAppSection').classList.remove('hidden-force');
+      document.getElementById('userPhoneBadge').innerText = `${user.name || 'User'} (${user.phone})`;
+      
+      ratePerLiter = parseFloat(user.price_per_ltr || 70);
+      defaultDailyQuota = parseFloat(user.daily_qty || 1.0);
+
+      document.getElementById('ratePerLiterText').innerText = ratePerLiter;
+      document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
+
+      fetchMonthData();
     }
 
     function logoutCustomer() {
       localStorage.removeItem('milk_self_customer');
       currentUser = null;
+      document.getElementById('mainAppSection').classList.add('hidden-force');
+      document.getElementById('authSection').classList.remove('hidden-force');
+      if (document.getElementById('quickPinInput')) {
+        document.getElementById('quickPinInput').value = '';
+      }
       checkAuth();
     }
 
@@ -508,6 +634,7 @@
       }, 2200);
     }
 
+    // 3. MONTH NAVIGATION & DATA FETCHING
     function changeMonth(delta) {
       currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
       fetchMonthData();
@@ -518,7 +645,7 @@
       const month = currentViewingDate.getMonth();
       const monthStr = String(month + 1).padStart(2, '0');
       const startDate = `${year}-${monthStr}-01`;
-      
+
       const nextMonthDate = new Date(year, month + 1, 1);
       const nextYear = nextMonthDate.getFullYear();
       const nextMonthStr = String(nextMonthDate.getMonth() + 1).padStart(2, '0');
@@ -544,6 +671,7 @@
       renderApp();
     }
 
+    // 4. SETTINGS MODALS (PRICE & QUOTA)
     function openPriceModal() {
       document.getElementById('rateInput').value = ratePerLiter;
       document.getElementById('priceModal').classList.remove('hidden-force');
@@ -584,14 +712,15 @@
       }
     }
 
+    // 5. DAY MODAL & ACTIONS
     function openDayModal(day) {
       selectedDayForModal = day;
       const monthName = TELUGU_MONTHS[currentViewingDate.getMonth()];
       document.getElementById('modalDateTitle').innerText = `తేదీ: ${day} ${monthName}`;
-      
+
       const item = monthRecords[day];
       const customInput = document.getElementById('customLitersInput');
-      
+
       if (item && item.status === 'delivered') {
         customInput.value = item.liters;
       } else {
@@ -654,10 +783,11 @@
       }
     }
 
+    // 6. QUICK ACTIONS (TOMORROW'S PLAN)
     async function toggleSkipTomorrow() {
       const now = new Date();
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      
+
       const y = tomorrow.getFullYear();
       const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
       const d = String(tomorrow.getDate()).padStart(2, '0');
@@ -688,7 +818,7 @@
     async function addExtraTomorrow() {
       const now = new Date();
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-      
+
       const y = tomorrow.getFullYear();
       const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
       const d = String(tomorrow.getDate()).padStart(2, '0');
@@ -755,6 +885,7 @@
       const textMessage = 
 `🥛 *పాల లెక్క వివరాలు (Milk Delivery Bill)* 🥛
 -------------------------------------
+👤 *కస్టమర్:* ${currentUser.name || 'User'} (${currentUser.phone})
 📅 *నెల:* ${monthNameTel} (${monthNameEng}) ${year}
 ✅ *పాలు తీసుకున్న రోజులు:* ${deliveredDays} రోజులు
 ❌ *సెలవులు (ఆపిన రోజులు):* ${skippedDays} రోజులు
@@ -769,7 +900,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.location.href = `whatsapp://send?text=${encoded}`;
     }
 
-    // MAIN RENDER FUNCTION
+    // 7. CALENDAR & BILL STATEMENT RENDER
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -801,7 +932,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
       const tomorrowDay = tomorrow.getDate();
       const isTomorrowSkipped = monthRecords[tomorrowDay] && monthRecords[tomorrowDay].status === 'skipped';
-      
+
       const skipBadge = document.getElementById('skipTomorrowBadge');
       if (isTomorrowSkipped) {
         skipBadge.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse';
@@ -860,7 +991,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         const dayCard = document.createElement('button');
         dayCard.onclick = () => openDayModal(day);
         dayCard.className = `relative h-14 sm:h-16 rounded-xl border p-1.5 flex flex-col justify-between items-center transition-all active:scale-95 cursor-pointer shadow-xs ${statusClass} ${isToday ? 'ring-2 ring-sky-500 ring-offset-1 font-bold' : ''}`;
-        
+
         dayCard.innerHTML = `
           <div class="w-full flex items-center justify-between text-[11px] leading-none">
             <span class="${isToday ? 'bg-sky-600 text-white w-4 h-4 rounded-full flex items-center justify-center font-bold' : 'font-semibold text-slate-700'}">${day}</span>
@@ -887,13 +1018,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('billTotalLiters').innerText = `${totalLiters.toFixed(1)} L`;
       document.getElementById('billFinalAmount').innerText = totalBill.toLocaleString('en-IN');
     }
-
-    window.onload = function() {
-      checkAuth();
-      if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('./sw.js');
-      }
-    };
   </script>
 </body>
 </html>

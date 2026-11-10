@@ -162,7 +162,11 @@
 
     async function init() {
       try {
-        const { data: customers } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
+        const { data: customers, error: errC } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
+        if (errC) {
+          document.getElementById('vendorApp').innerHTML = `<p style="color:red; text-align:center;">Error: ${errC.message}</p>`;
+          return;
+        }
         allCustomers = customers || [];
 
         const { data: deliveries } = await dbClient.from('deliveries').select('*').eq('delivery_date', today);
@@ -323,6 +327,10 @@
       const totalBill = totalLiters * customer.price_per_ltr;
       const shareText = encodeURIComponent(`🥛 *పాల బిల్లు వివరాలు*\nకస్టమర్: ${customer.name} (${customer.flat_no})\nనెల: ${month}/${year}\nమొత్తం లీటర్లు: ${totalLiters} L\nలీటర్ ధర: ₹${customer.price_per_ltr}\n*మొత్తం బిల్లు: ₹${totalBill}*`);
 
+      const waLink = customer.phone 
+        ? `whatsapp://send?phone=91${customer.phone}&text=${shareText}` 
+        : `whatsapp://send?text=${shareText}`;
+
       display.innerHTML = `
         <div class="bill-card">
           <h3 style="margin-bottom: 12px; color: var(--primary);">${customer.name} - నెల లెక్క</h3>
@@ -332,7 +340,7 @@
           <div class="bill-row"><span>మొత్తం పాలు</span> <b>${totalLiters} లీటర్లు</b></div>
           <div class="bill-row total"><span>మొత్తం బిల్లు</span> <span>₹${totalBill}</span></div>
 
-          <a href="https://wa.me/${customer.phone ? '91' + customer.phone : ''}?text=${shareText}" target="_blank" style="text-decoration:none;">
+          <a href="${waLink}" style="text-decoration:none;">
             <button class="btn-whatsapp">📲 WhatsApp లో బిల్లు పంపండి</button>
           </a>
 

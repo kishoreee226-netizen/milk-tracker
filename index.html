@@ -3,432 +3,334 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>పాల ట్రాకర్ - Milk Tracker</title>
+  <title>నా పాల డైరీ - Milk Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
-      --primary: #2563eb;
+      --primary: #0284c7;
       --bg: #f8fafc;
       --card: #ffffff;
-      --text: #1e293b;
+      --text: #0f172a;
       --border: #e2e8f0;
       --success: #16a34a;
-      --danger: #dc2626;
+      --danger: #ef4444;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 80px; }
+    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 60px; max-width: 480px; margin: 0 auto; }
     
-    header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    header { background: var(--primary); color: white; padding: 18px; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
     .header-top { display: flex; justify-content: space-between; align-items: center; }
-    .header-top h1 { font-size: 1.2rem; font-weight: 700; }
-    .user-badge { font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 6px; }
-    .date-badge { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
+    .header-top h1 { font-size: 1.25rem; font-weight: 700; }
+    .user-pill { font-size: 0.8rem; background: rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 20px; }
+    .btn-logout { background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
+
+    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
     
-    .mode-switcher { display: flex; background: #e2e8f0; border-radius: 10px; padding: 4px; margin-bottom: 16px; gap: 4px; }
-    .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: transparent; color: #475569; }
-    .mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-
-    .customer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .customer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-    .customer-name { font-size: 1.05rem; font-weight: 600; }
-    .flat-badge { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
-    .details { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+    .today-box { text-align: center; padding: 14px 0; }
+    .today-date { font-size: 0.9rem; color: #64748b; font-weight: 500; margin-bottom: 12px; }
     
-    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-    button { padding: 10px; border: none; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
-    .btn-deliver { background-color: var(--success); color: white; }
-    .btn-skip { background-color: #fee2e2; color: var(--danger); }
-    .btn-reset { background-color: #f1f5f9; color: #475569; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border); }
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+    button { padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
+    .btn-take { background: var(--success); color: white; }
+    .btn-skip { background: #fee2e2; color: var(--danger); }
+    .btn-reset { background: #f1f5f9; color: #475569; padding: 8px; font-size: 0.85rem; border: 1px solid var(--border); margin-top: 10px; width: 100%; border-radius: 8px; }
 
-    .status-area { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
-    .status-delivered { background-color: #dcfce7; color: var(--success); }
-    .status-skipped { background-color: #fee2e2; color: var(--danger); }
+    .status-done { padding: 12px; border-radius: 10px; font-weight: 700; font-size: 1rem; }
+    .status-done.taken { background: #dcfce7; color: var(--success); }
+    .status-done.skipped { background: #fee2e2; color: var(--danger); }
 
-    .bill-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-    .bill-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 0.9rem; }
-    .bill-row.total { font-weight: 700; font-size: 1.15rem; border-bottom: none; color: var(--primary); padding-top: 12px; }
+    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+    .stat-item { background: #f1f5f9; padding: 12px; border-radius: 12px; text-align: center; }
+    .stat-val { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 4px; }
+    .stat-label { font-size: 0.75rem; color: #64748b; font-weight: 600; }
 
-    .history-list { margin-top: 16px; font-size: 0.85rem; }
-    .history-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+    .total-bill-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
+    .bill-amount { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
 
-    .btn-whatsapp { background-color: #25d366; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-top: 14px; font-size: 0.95rem; font-weight: 600; }
-
-    .add-form { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
+    
     .form-group { margin-bottom: 12px; }
     .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
-    .btn-add { background: var(--primary); color: white; width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; }
-    .btn-secondary { background: #e2e8f0; color: #334155; width: 100%; padding: 12px; border-radius: 8px; margin-top: 8px; font-weight: 600; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
+    .btn-primary { background: var(--primary); color: white; width: 100%; }
+    .btn-secondary { background: #e2e8f0; color: #334155; width: 100%; margin-top: 8px; }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- LOGIN / REGISTER SCREEN -->
-  <section id="authSection" class="hidden" style="max-width: 400px; margin: 40px auto 0;">
-    <div style="text-align: center; margin-bottom: 24px;">
-      <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 6px;">🥛 పాల ట్రాకర్</h1>
-      <p style="color: #64748b; font-size: 0.9rem;">మొబైల్ నంబర్ మరియు 4 అంకెల పిన్ ఎంటర్ చేయండి</p>
+  <!-- AUTH SCREEN -->
+  <section id="authSection" class="hidden">
+    <div style="text-align: center; margin: 40px 0 24px;">
+      <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 6px;">🥛 నా పాల డైరీ</h1>
+      <p style="color: #64748b; font-size: 0.9rem;">మీ రోజువారీ పాల లెక్కలు సులభంగా రాసుకోండి</p>
     </div>
 
-    <div class="add-form">
+    <div class="card">
       <div class="form-group">
         <label>మొబైల్ నంబర్ (10 అంకెలు)</label>
         <input type="tel" id="userPhone" placeholder="ఉదా: 9876543210" maxlength="10">
       </div>
       <div class="form-group">
-        <label>4-అంకెల సెక్యూరిటీ పిన్ (PIN)</label>
+        <label>4-అంకెల పిన్ (PIN)</label>
         <input type="password" id="userPin" placeholder="ఉదా: 1234" maxlength="4" inputmode="numeric">
       </div>
-      <button class="btn-add" onclick="handleAuth('login')">లాగిన్ (Login)</button>
-      <button class="btn-secondary" onclick="handleAuth('register')">కొత్తగా రిజిస్టర్ అవ్వండి (Register)</button>
+      <button class="btn-primary" onclick="handleAuth('login')">లాగిన్ (Login)</button>
+      <button class="btn-secondary" onclick="handleAuth('register')">కొత్తగా రిజిస్టర్ అవ్వండి</button>
     </div>
   </section>
 
-  <!-- MAIN APP SCREEN -->
+  <!-- MAIN CUSTOMER DASHBOARD -->
   <section id="mainAppSection" class="hidden">
     <header>
       <div class="header-top">
-        <h1>🥛 పాల ట్రాకర్</h1>
+        <h1>🥛 నా పాల డైరీ</h1>
         <div>
-          <span class="user-badge" id="phoneBadge"></span>
-          <button onclick="handleLogout()" style="background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">Logout</button>
+          <span class="user-pill" id="phoneBadge"></span>
+          <button class="btn-logout" onclick="handleLogout()">Logout</button>
         </div>
       </div>
-      <div class="date-badge" id="currentDateDisplay">తేదీ: ...</div>
     </header>
 
-    <div class="mode-switcher">
-      <button class="mode-btn active" id="btnVendor" onclick="switchMode('vendor')">పాలబ్బాయి మోడ్ (Vendor)</button>
-      <button class="mode-btn" id="btnCustomer" onclick="switchMode('customer')">కస్టమర్ వ్యూ (Bill)</button>
+    <!-- ఈ రోజు డెలివరీ స్థితి -->
+    <div class="card today-box">
+      <div class="today-date" id="currentDateDisplay">తేదీ: ...</div>
+      <div id="todayActionArea">లోడ్ అవుతోంది...</div>
     </div>
 
-    <!-- VENDOR VIEW -->
-    <div id="vendorSection">
-      <div id="vendorApp">
-        <div style="text-align:center; padding: 20px; color:#64748b;">లోడ్ అవుతోంది...</div>
+    <!-- నెల లెక్కల సమ్మరీ కార్డ్ -->
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
+        <h3 style="font-size: 1.05rem; color: #334155;">ఈ నెల లెక్కల సమ్మరీ</h3>
+        <span id="monthNameBadge" style="font-size:0.8rem; font-weight:600; color:var(--primary); background:#e0f2fe; padding:2px 8px; border-radius:6px;"></span>
       </div>
 
-      <details style="margin-top: 16px; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
-        <summary style="font-weight: 600; cursor: pointer; color: var(--primary);">+ కొత్త కస్టమర్‌ని చేర్చండి</summary>
-        <form id="newCustomerForm" onsubmit="addCustomer(event)" style="margin-top: 12px;">
-          <div class="form-group">
-            <label>పేరు *</label>
-            <input type="text" id="custName" required placeholder="ఉదా: రాము గారు">
-          </div>
-          <div class="form-group">
-            <label>ఫ్లాట్ / ఇంటి నంబర్ *</label>
-            <input type="text" id="custFlat" required placeholder="ఉదా: 204">
-          </div>
-          <div class="form-group">
-            <label>రోజూ తీసుకునే పాలు (లీటర్లలో) *</label>
-            <input type="number" step="0.5" id="custQty" required placeholder="1.0" value="1.0">
-          </div>
-          <div class="form-group">
-            <label>లీటర్ ధర (₹) *</label>
-            <input type="number" id="custPrice" required placeholder="70" value="70">
-          </div>
-          <div class="form-group">
-            <label>ఫోన్ నంబర్</label>
-            <input type="tel" id="custPhone" placeholder="9876543210">
-          </div>
-          <button type="submit" class="btn-add">కస్టమర్‌ని సేవ్ చేయి</button>
-        </form>
-      </details>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">పోసుకున్న రోజులు</div>
+          <div class="stat-val" id="takenDaysCount">0</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">ఆపేసిన రోజులు (Skip)</div>
+          <div class="stat-val" id="skippedDaysCount" style="color:var(--danger);">0</div>
+        </div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-item">
+          <div class="stat-label">రోజూ తీసుకునే పాలు</div>
+          <div class="stat-val" id="dailyQtyDisplay">0 L</div>
+        </div>
+        <div class="stat-item">
+          <div class="stat-label">మొత్తం పాలు</div>
+          <div class="stat-val" id="totalLitersCount">0 L</div>
+        </div>
+      </div>
+
+      <div class="total-bill-box">
+        <div>
+          <div style="font-size:0.8rem; color:#475569; font-weight:600;">ఈ నెల మొత్తం బిల్లు</div>
+          <div style="font-size:0.8rem; color:#64748b;">(ధర: ₹<span id="priceDisplay">0</span> / లీటర్)</div>
+        </div>
+        <div class="bill-amount" id="totalBillAmount">₹0</div>
+      </div>
     </div>
 
-    <!-- CUSTOMER VIEW -->
-    <div id="customerSection" class="hidden">
-      <div class="add-form">
-        <label style="font-size: 0.85rem; font-weight: 600; display:block; margin-bottom: 6px;">కస్టమర్‌ని ఎంచుకోండి:</label>
-        <select id="custSelect" onchange="renderCustomerBill()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem;">
-          <option value="">-- ఎంచుకోండి --</option>
-        </select>
-      </div>
+    <!-- రేట్ & రోజూ తీసుకునే పాల సెట్టింగ్స్ -->
+    <details class="card" style="padding: 12px 16px;">
+      <summary style="font-weight:600; cursor:pointer; color:var(--primary);">⚙️ నా పాల రేటు / క్వాంటిటీ మార్చుకోండి</summary>
+      <form onsubmit="updateSettings(event)" style="margin-top: 14px;">
+        <div class="form-group">
+          <label>రోజూ తీసుకునే పాలు (లీటర్లలో)</label>
+          <input type="number" step="0.25" id="settingQty" required>
+        </div>
+        <div class="form-group">
+          <label>లీటర్ ధర (₹)</label>
+          <input type="number" id="settingPrice" required>
+        </div>
+        <button type="submit" class="btn-primary" style="padding:10px; font-size:0.9rem;">సేవ్ చేయండి</button>
+      </form>
+    </details>
 
-      <div id="billDisplay"></div>
+    <!-- ఈ నెల హిస్టరీ -->
+    <div class="card">
+      <h3 style="font-size: 1rem; color: #334155; margin-bottom: 10px;">డెలివరీ హిస్టరీ (ఈ నెల)</h3>
+      <div id="historyList">లోడ్ అవుతోంది...</div>
     </div>
   </section>
 
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
-    const dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const today = new Date().toISOString().split('T')[0];
-    document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
+    const [currYear, currMonth] = today.split('-');
 
-    let currentVendor = JSON.parse(localStorage.getItem('milk_current_vendor') || 'null');
-    let allCustomers = [];
-    let todayDeliveries = {};
+    let user = JSON.parse(localStorage.getItem('milk_self_customer') || 'null');
 
     function checkAuth() {
-      if (currentVendor && currentVendor.id) {
+      if (user && user.id) {
         document.getElementById('authSection').classList.add('hidden');
         document.getElementById('mainAppSection').classList.remove('hidden');
-        document.getElementById('phoneBadge').innerText = currentVendor.phone;
-        initApp();
+        document.getElementById('phoneBadge').innerText = user.phone;
+        document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
+        document.getElementById('monthNameBadge').innerText = `${currMonth}/${currYear}`;
+        loadDashboard();
       } else {
         document.getElementById('authSection').classList.remove('hidden');
         document.getElementById('mainAppSection').classList.add('hidden');
       }
     }
 
-    async function handleAuth(action) {
+    async function handleAuth(type) {
       const phone = document.getElementById('userPhone').value.trim();
       const pin = document.getElementById('userPin').value.trim();
 
-      if (phone.length !== 10 || isNaN(phone)) {
-        return alert('దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి.');
-      }
-      if (pin.length !== 4 || isNaN(pin)) {
-        return alert('దయచేసి 4 అంకెల పిన్ (PIN) ఇవ్వండి.');
-      }
+      if (phone.length !== 10 || isNaN(phone)) return alert('10 అంకెల మొబైల్ నంబర్ ఇవ్వండి.');
+      if (pin.length !== 4 || isNaN(pin)) return alert('4 అంకెల పిన్ ఇవ్వండి.');
 
-      if (action === 'register') {
-        const { data: existing } = await dbClient.from('vendors').select('*').eq('phone', phone).single();
-        if (existing) {
-          return alert('ఈ మొబైల్ నంబర్ ఇప్పటికే రిజిస్టర్ అయింది. దయచేసి లాగిన్ అవ్వండి.');
-        }
+      if (type === 'register') {
+        const { data: exist } = await db.from('customer_users').select('*').eq('phone', phone).single();
+        if (exist) return alert('ఈ నంబర్ ఇప్పటికే ఉంది. లాగిన్ అవ్వండి.');
 
-        const { data, error } = await dbClient.from('vendors').insert([{ phone, pin }]).select().single();
-        if (error) {
-          alert('రిజిస్ట్రేషన్ ఎర్రర్: ' + error.message);
-        } else {
-          alert('ఖాతా విజయవంతంగా సృష్టించబడింది!');
-          currentVendor = data;
-          localStorage.setItem('milk_current_vendor', JSON.stringify(data));
+        const { data, error } = await db.from('customer_users').insert([{ phone, pin, daily_qty: 1.0, price_per_ltr: 70 }]).select().single();
+        if (error) alert('Error: ' + error.message);
+        else {
+          user = data;
+          localStorage.setItem('milk_self_customer', JSON.stringify(data));
           checkAuth();
         }
       } else {
-        const { data, error } = await dbClient.from('vendors').select('*').eq('phone', phone).eq('pin', pin).single();
-        if (error || !data) {
-          alert('మొబైల్ నంబర్ లేదా 4 అంకెల పిన్ తప్పుగా ఇచ్చారు!');
-        } else {
-          currentVendor = data;
-          localStorage.setItem('milk_current_vendor', JSON.stringify(data));
+        const { data, error } = await db.from('customer_users').select('*').eq('phone', phone).eq('pin', pin).single();
+        if (error || !data) alert('మొబైల్ నంబర్ లేదా పిన్ తప్పుగా ఉంది!');
+        else {
+          user = data;
+          localStorage.setItem('milk_self_customer', JSON.stringify(data));
           checkAuth();
         }
       }
     }
 
     function handleLogout() {
-      localStorage.removeItem('milk_current_vendor');
-      currentVendor = null;
+      localStorage.removeItem('milk_self_customer');
+      user = null;
       checkAuth();
     }
 
-    function switchMode(mode) {
-      const vendorSec = document.getElementById('vendorSection');
-      const custSec = document.getElementById('customerSection');
-      const btnV = document.getElementById('btnVendor');
-      const btnC = document.getElementById('btnCustomer');
+    async function loadDashboard() {
+      // లేటెస్ట్ యూజర్ డేటా
+      const { data: uData } = await db.from('customer_users').select('*').eq('id', user.id).single();
+      if (uData) user = uData;
 
-      if (mode === 'vendor') {
-        vendorSec.classList.remove('hidden');
-        custSec.classList.add('hidden');
-        btnV.classList.add('active');
-        btnC.classList.remove('active');
-      } else {
-        vendorSec.classList.add('hidden');
-        custSec.classList.remove('hidden');
-        btnV.classList.remove('active');
-        btnC.classList.add('active');
-        populateCustomerDropdown();
-      }
+      document.getElementById('dailyQtyDisplay').innerText = `${user.daily_qty} L`;
+      document.getElementById('priceDisplay').innerText = user.price_per_ltr;
+      document.getElementById('settingQty').value = user.daily_qty;
+      document.getElementById('settingPrice').value = user.price_per_ltr;
+
+      // ఈ రోజు రికార్డు
+      const { data: todayLog } = await db.from('customer_milk_logs').select('*').eq('user_id', user.id).eq('log_date', today).single();
+      renderTodayAction(todayLog);
+
+      // ఈ నెల రికార్డులు
+      const startOfMonth = `${currYear}-${currMonth}-01`;
+      const nextMonthStr = String(Number(currMonth) + 1).padStart(2, '0');
+      const startOfNextMonth = `${currYear}-${nextMonthStr}-01`;
+
+      const { data: logs } = await db.from('customer_milk_logs')
+        .select('*')
+        .eq('user_id', user.id)
+        .gte('log_date', startOfMonth)
+        .lt('log_date', startOfNextMonth)
+        .order('log_date', { ascending: false });
+
+      renderMonthlyStats(logs || []);
     }
 
-    async function initApp() {
-      try {
-        const { data: customers } = await dbClient
-          .from('customers')
-          .select('*')
-          .eq('vendor_id', currentVendor.id)
-          .order('flat_no', { ascending: true });
-        
-        allCustomers = customers || [];
-
-        const { data: deliveries } = await dbClient.from('deliveries').select('*').eq('delivery_date', today);
-        todayDeliveries = {};
-        if (deliveries) {
-          deliveries.forEach(d => { todayDeliveries[d.customer_id] = d; });
-        }
-
-        renderVendorList();
-      } catch (err) {
-        document.getElementById('vendorApp').innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`;
-      }
-    }
-
-    function renderVendorList() {
-      const app = document.getElementById('vendorApp');
-      app.innerHTML = '';
-
-      if (allCustomers.length === 0) {
-        app.innerHTML = '<p style="text-align:center; padding: 20px; color:#64748b;">ఇంకా కస్టమర్లు ఎవరూ లేరు. కింద ఉన్న బటన్ ద్వారా కస్టమర్లను జోడించండి.</p>';
-        return;
-      }
-
-      allCustomers.forEach(customer => {
-        const record = todayDeliveries[customer.id];
-        const card = document.createElement('div');
-        card.className = 'customer-card';
-
-        let actionArea = '';
-        if (record) {
-          const isDelivered = record.status === 'delivered';
-          actionArea = `
-            <div class="status-area ${isDelivered ? 'status-delivered' : 'status-skipped'}">
-              <span>${isDelivered ? `✅ ఇచ్చాము (${record.quantity} L)` : '❌ ఆపేశారు (Skip)'}</span>
-              <button class="btn-reset" onclick="resetDelivery('${record.id}')">మార్చు (Undo)</button>
-            </div>
+    function renderTodayAction(log) {
+      const area = document.getElementById('todayActionArea');
+      if (log) {
+        if (log.status === 'taken') {
+          area.innerHTML = `
+            <div class="status-done taken">🥛 ఈ రోజు తీసుకున్నాము (${log.quantity} L)</div>
+            <button class="btn-reset" onclick="resetLog('${log.id}')">మార్చు (Edit / Undo)</button>
           `;
         } else {
-          actionArea = `
-            <div class="action-grid">
-              <button class="btn-deliver" onclick="saveDelivery('${customer.id}', ${customer.default_qty}, 'delivered')">
-                ఇచ్చాము (${customer.default_qty} L)
-              </button>
-              <button class="btn-skip" onclick="saveDelivery('${customer.id}', 0, 'skipped')">
-                ఆపేశారు (Skip)
-              </button>
-            </div>
+          area.innerHTML = `
+            <div class="status-done skipped">❌ ఈ రోజు ఆపేశాము (Skipped)</div>
+            <button class="btn-reset" onclick="resetLog('${log.id}')">మార్చు (Edit / Undo)</button>
           `;
         }
-
-        card.innerHTML = `
-          <div class="customer-header">
-            <div>
-              <div class="customer-name">${customer.name}</div>
-              <div class="details">ఫ్లాట్: <b>${customer.flat_no}</b> | ₹${customer.price_per_ltr}/లీ</div>
-            </div>
-            <span class="flat-badge">${customer.default_qty} L/day</span>
+      } else {
+        area.innerHTML = `
+          <div class="action-grid">
+            <button class="btn-take" onclick="saveLog(${user.daily_qty}, 'taken')">తీసుకున్నాము (${user.daily_qty} L)</button>
+            <button class="btn-skip" onclick="saveLog(0, 'skipped')">ఆపేశాము (Skip)</button>
           </div>
-          ${actionArea}
         `;
-        app.appendChild(card);
-      });
+      }
     }
 
-    async function saveDelivery(customerId, qty, status) {
-      const { error } = await dbClient.from('deliveries').upsert({
-        customer_id: customerId,
-        delivery_date: today,
+    async function saveLog(qty, status) {
+      const { error } = await db.from('customer_milk_logs').upsert({
+        user_id: user.id,
+        log_date: today,
         quantity: qty,
         status: status
-      }, { onConflict: 'customer_id,delivery_date' });
+      }, { onConflict: 'user_id,log_date' });
 
-      if (!error) initApp();
+      if (!error) loadDashboard();
       else alert('Error: ' + error.message);
     }
 
-    async function resetDelivery(recordId) {
-      const { error } = await dbClient.from('deliveries').delete().eq('id', recordId);
-      if (!error) initApp();
+    async function resetLog(logId) {
+      const { error } = await db.from('customer_milk_logs').delete().eq('id', logId);
+      if (!error) loadDashboard();
       else alert('Error: ' + error.message);
     }
 
-    async function addCustomer(e) {
+    async function updateSettings(e) {
       e.preventDefault();
-      const newCust = {
-        name: document.getElementById('custName').value,
-        flat_no: document.getElementById('custFlat').value,
-        default_qty: parseFloat(document.getElementById('custQty').value),
-        price_per_ltr: parseFloat(document.getElementById('custPrice').value),
-        phone: document.getElementById('custPhone').value,
-        vendor_id: currentVendor.id
-      };
+      const newQty = parseFloat(document.getElementById('settingQty').value);
+      const newPrice = parseFloat(document.getElementById('settingPrice').value);
 
-      const { error } = await dbClient.from('customers').insert([newCust]);
-      if (error) {
-        alert('Error: ' + error.message);
-      } else {
-        alert('కస్టమర్ వివరాలు సేవ్ అయ్యాయి!');
-        document.getElementById('newCustomerForm').reset();
-        initApp();
-      }
+      const { error } = await db.from('customer_users').update({
+        daily_qty: newQty,
+        price_per_ltr: newPrice
+      }).eq('id', user.id);
+
+      if (!error) {
+        alert('సెట్టింగ్స్ సేవ్ అయ్యాయి!');
+        loadDashboard();
+      } else alert('Error: ' + error.message);
     }
 
-    function populateCustomerDropdown() {
-      const select = document.getElementById('custSelect');
-      const currentVal = select.value;
-      select.innerHTML = '<option value="">-- ఎంచుకోండి --</option>';
-      allCustomers.forEach(c => {
-        const selected = (c.id == currentVal) ? 'selected' : '';
-        select.innerHTML += `<option value="${c.id}" ${selected}>${c.name} (${c.flat_no})</option>`;
-      });
-      if (currentVal) renderCustomerBill();
-    }
-
-    async function renderCustomerBill() {
-      const custId = document.getElementById('custSelect').value;
-      const display = document.getElementById('billDisplay');
-      if (!custId) {
-        display.innerHTML = '';
-        return;
-      }
-
-      display.innerHTML = '<p style="text-align:center; padding: 20px;">లెక్కలు లెక్కిస్తున్నాము...</p>';
-      const customer = allCustomers.find(c => c.id == custId);
-
-      const [year, month] = today.split('-');
-      const startOfMonth = `${year}-${month}-01`;
-      const nextMonth = String(Number(month) + 1).padStart(2, '0');
-      const startOfNextMonth = `${year}-${nextMonth}-01`;
-
-      const { data: monthData } = await dbClient
-        .from('deliveries')
-        .select('*')
-        .eq('customer_id', custId)
-        .gte('delivery_date', startOfMonth)
-        .lt('delivery_date', startOfNextMonth)
-        .order('delivery_date', { ascending: false });
-
-      let totalLiters = 0;
-      let deliveredDays = 0;
+    function renderMonthlyStats(logs) {
+      let takenDays = 0;
       let skippedDays = 0;
+      let totalLiters = 0;
       let historyHtml = '';
 
-      if (monthData && monthData.length > 0) {
-        monthData.forEach(d => {
-          if (d.status === 'delivered') {
-            totalLiters += parseFloat(d.quantity);
-            deliveredDays++;
-            historyHtml += `<div class="history-item"><span>📅 ${d.delivery_date}</span><span style="color:var(--success); font-weight:600;">+${d.quantity} లీ</span></div>`;
-          } else if (d.status === 'skipped') {
-            skippedDays++;
-            historyHtml += `<div class="history-item"><span>📅 ${d.delivery_date}</span><span style="color:var(--danger); font-weight:600;">ఆపేశారు (Skip)</span></div>`;
-          }
-        });
-      } else {
-        historyHtml = '<p style="color:#64748b; padding:8px 0;">ఈ నెలకు ఇంకా డెలివరీలు రికార్డు కాలేదు.</p>';
-      }
+      logs.forEach(l => {
+        if (l.status === 'taken') {
+          takenDays++;
+          totalLiters += parseFloat(l.quantity);
+          historyHtml += `<div class="history-item"><span>📅 ${l.log_date}</span><span style="color:var(--success); font-weight:700;">+${l.quantity} L</span></div>`;
+        } else {
+          skippedDays++;
+          historyHtml += `<div class="history-item"><span>📅 ${l.log_date}</span><span style="color:var(--danger); font-weight:700;">ఆపేశాము (Skip)</span></div>`;
+        }
+      });
 
-      const totalBill = totalLiters * customer.price_per_ltr;
-      const shareText = encodeURIComponent(`🥛 *పాల బిల్లు వివరాలు*\nకస్టమర్: ${customer.name} (${customer.flat_no})\nనెల: ${month}/${year}\nమొత్తం లీటర్లు: ${totalLiters} L\nలీటర్ ధర: ₹${customer.price_per_ltr}\n*మొత్తం బిల్లు: ₹${totalBill}*`);
+      document.getElementById('takenDaysCount').innerText = takenDays;
+      document.getElementById('skippedDaysCount').innerText = skippedDays;
+      document.getElementById('totalLitersCount').innerText = `${totalLiters} L`;
 
-      const waLink = customer.phone 
-        ? `whatsapp://send?phone=91${customer.phone}&text=${shareText}` 
-        : `whatsapp://send?text=${shareText}`;
+      const bill = totalLiters * (user.price_per_ltr || 70);
+      document.getElementById('totalBillAmount').innerText = `₹${bill}`;
 
-      display.innerHTML = `
-        <div class="bill-card">
-          <h3 style="margin-bottom: 12px; color: var(--primary);">${customer.name} - నెల లెక్క</h3>
-          <div class="bill-row"><span>లీటర్ ధర</span> <b>₹${customer.price_per_ltr}</b></div>
-          <div class="bill-row"><span>పాలు పోసిన రోజులు</span> <b>${deliveredDays} రోజులు</b></div>
-          <div class="bill-row"><span>ఆపేసిన రోజులు (Skip)</span> <b>${skippedDays} రోజులు</b></div>
-          <div class="bill-row"><span>మొత్తం పాలు</span> <b>${totalLiters} లీటర్లు</b></div>
-          <div class="bill-row total"><span>మొత్తం బిల్లు</span> <span>₹${totalBill}</span></div>
-
-          <a href="${waLink}" style="text-decoration:none;">
-            <button class="btn-whatsapp">📲 WhatsApp లో బిల్లు పంపండి</button>
-          </a>
-
-          <h4 style="margin-top: 18px; margin-bottom: 6px; font-size: 0.9rem; color:#475569;">ఈ నెల డెలివరీ హిస్టరీ:</h4>
-          <div class="history-list">${historyHtml}</div>
-        </div>
-      `;
+      document.getElementById('historyList').innerHTML = historyHtml || '<p style="text-align:center; color:#64748b; padding:10px;">ఈ నెలకు ఇంకా ఎంట్రీలు లేవు.</p>';
     }
 
     window.onload = checkAuth;

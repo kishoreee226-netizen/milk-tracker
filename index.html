@@ -894,6 +894,9 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
     }
 
     window.onload = checkAuth;
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('./sw.js');
+    }
   </script>
 </body>
 </html>

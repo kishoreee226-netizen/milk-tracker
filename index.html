@@ -53,7 +53,7 @@
   <!-- Mobile App Wrapper Frame -->
   <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-2xl relative border-x border-slate-200">
     
-    <!-- 1. AUTH SCREEN (మొబైల్ & 4 డిజిట్ పిన్) -->
+    <!-- 1. AUTH SCREEN -->
     <section id="authSection" class="p-6 flex-1 flex flex-col justify-center items-center">
       <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 mb-4 shadow-sm">
         <i class="ph-bold ph-drop text-3xl"></i>
@@ -224,7 +224,7 @@
               <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                 <i class="ph-fill ph-calendar text-sky-600"></i> రోజువారీ క్యాలెండర్ (Delivery Grid)
               </h2>
-              <p class="text-[10px] text-slate-500">తేదీని తాకి లీటర్లు లేదా సెలవు మార్చండి</p>
+              <p class="text-[10px] text-slate-500">ఆటోమేటిక్‌గా పాలు రికార్డ్ అవుతాయి. వద్దు అనుకున్న రోజు తాకండి.</p>
             </div>
 
             <!-- Color Legend Indicator -->
@@ -246,9 +246,7 @@
           </div>
 
           <!-- Days Grid -->
-          <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5">
-            <!-- Dynamically populated via JavaScript -->
-          </div>
+          <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5"></div>
 
           <!-- Quota config link -->
           <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
@@ -310,7 +308,7 @@
       </main>
     </div>
 
-    <!-- TOAST NOTIFICATION CONTAINER -->
+    <!-- TOAST NOTIFICATION -->
     <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg border border-white/20 transition-all duration-300 pointer-events-none opacity-0 translate-y-4 flex items-center gap-2">
       <i class="ph-bold ph-check text-emerald-400"></i>
       <span id="toastMsg">అప్‌డేట్ అయ్యింది!</span>
@@ -321,7 +319,7 @@
       <div class="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-200">
         <div class="flex justify-between items-center pb-2 border-b border-slate-100">
           <div>
-            <h4 class="font-bold text-slate-800 text-base" id="modalDateTitle">తేదీ 10 నవంబర్</h4>
+            <h4 class="font-bold text-slate-800 text-base" id="modalDateTitle">తేదీ</h4>
             <p class="text-[11px] text-slate-500">పాల పరిమాణం నమోదు చేయండి</p>
           </div>
           <button onclick="closeDayModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
@@ -421,7 +419,7 @@
 
   </div>
 
-  <!-- APPLICATION LOGIC WITH SUPABASE INTEGRATION -->
+  <!-- APPLICATION LOGIC WITH AUTO-FILL DEFAULT QUOTA -->
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
@@ -587,10 +585,14 @@
       const monthName = TELUGU_MONTHS[currentViewingDate.getMonth()];
       document.getElementById('modalDateTitle').innerText = `తేదీ: ${day} ${monthName}`;
       
-      const dayData = monthRecords[day];
+      const item = monthRecords[day];
       const customInput = document.getElementById('customLitersInput');
-      if (dayData && dayData.status === 'delivered') {
-        customInput.value = dayData.liters;
+      
+      // If manual record exists and delivered, or default
+      if (item && item.status === 'delivered') {
+        customInput.value = item.liters;
+      } else if (!item) {
+        customInput.value = defaultDailyQuota;
       } else {
         customInput.value = '';
       }
@@ -647,9 +649,10 @@
       const logDate = `${y}-${m}-${d}`;
       const dayNum = tomorrow.getDate();
 
-      const isSkipped = monthRecords[dayNum] && monthRecords[dayNum].status === 'skipped';
-      const newStatus = isSkipped ? 'taken' : 'skipped';
-      const newQty = isSkipped ? defaultDailyQuota : 0;
+      const item = monthRecords[dayNum];
+      const isCurrentlySkipped = (item && item.status === 'skipped');
+      const newStatus = isCurrentlySkipped ? 'taken' : 'skipped';
+      const newQty = isCurrentlySkipped ? defaultDailyQuota : 0;
 
       await db.from('customer_milk_logs').upsert({
         user_id: currentUser.id,
@@ -659,7 +662,7 @@
       }, { onConflict: 'user_id,log_date' });
 
       fetchMonthData();
-      showToast(isSkipped ? `రేపు (${dayNum}న) ${defaultDailyQuota}L పాలు డెలివరీ అవుతాయి!` : `రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
+      showToast(isCurrentlySkipped ? `రేపు (${dayNum}న) ${defaultDailyQuota}L పాలు డెలివరీ అవుతాయి!` : `రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
     }
 
     async function addExtraTomorrow() {
@@ -672,8 +675,11 @@
       const logDate = `${y}-${m}-${d}`;
       const dayNum = tomorrow.getDate();
 
-      const currentVal = (monthRecords[dayNum] && monthRecords[dayNum].status === 'delivered') ? monthRecords[dayNum].liters : defaultDailyQuota;
-      const newVal = parseFloat((currentVal + 0.5).toFixed(2));
+      const item = monthRecords[dayNum];
+      let baseLiters = defaultDailyQuota;
+      if (item && item.status === 'delivered') baseLiters = item.liters;
+
+      const newVal = parseFloat((baseLiters + 0.5).toFixed(2));
 
       await db.from('customer_milk_logs').upsert({
         user_id: currentUser.id,
@@ -694,6 +700,7 @@
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const now = new Date();
 
       let deliveredDays = 0;
       let skippedDays = 0;
@@ -701,6 +708,10 @@
 
       for (let d = 1; d <= daysInMonth; d++) {
         const item = monthRecords[d];
+        const isPastOrToday = (year < now.getFullYear()) || 
+                              (year === now.getFullYear() && month < now.getMonth()) || 
+                              (year === now.getFullYear() && month === now.getMonth() && d <= now.getDate());
+
         if (item) {
           if (item.status === 'delivered' && item.liters > 0) {
             deliveredDays++;
@@ -708,6 +719,10 @@
           } else if (item.status === 'skipped') {
             skippedDays++;
           }
+        } else if (isPastOrToday) {
+          // Automatic default milk
+          deliveredDays++;
+          totalLiters += defaultDailyQuota;
         }
       }
 
@@ -732,6 +747,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.location.href = `whatsapp://send?text=${encoded}`;
     }
 
+    // MAIN RENDER (WITH AUTO DEFAULT LOGIC)
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -776,6 +792,9 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       for (let day = 1; day <= daysInMonth; day++) {
         const item = monthRecords[day];
         const isToday = (day === now.getDate() && month === now.getMonth() && year === now.getFullYear());
+        const isPastOrToday = (year < now.getFullYear()) || 
+                              (year === now.getFullYear() && month < now.getMonth()) || 
+                              (year === now.getFullYear() && month === now.getMonth() && day <= now.getDate());
 
         let statusClass = "bg-white border-slate-200 text-slate-700 hover:border-sky-300";
         let statusBadge = `<span class="text-[9px] text-slate-400 font-medium leading-none">-</span>`;
@@ -800,6 +819,16 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
             statusClass = "bg-rose-50/80 border-rose-300 text-rose-900";
             statusBadge = `<span class="text-[9px] font-bold text-rose-600 leading-none">వద్దు</span>`;
           }
+        } else if (isPastOrToday) {
+          // AUTO DEFAULT QUOTA: డేటాబేస్ లో రికార్డు లేకపోయినా, గడిచిన/నేటి రోజులకు ఆటోమేటిక్ గా డిఫాల్ట్ లీటర్లు పడతాయి
+          deliveredCount++;
+          totalLiters += defaultDailyQuota;
+          statusClass = "bg-emerald-50/70 border-emerald-300 text-emerald-900";
+          statusBadge = `
+            <span class="text-[10px] font-extrabold text-emerald-600 leading-none">
+              ${defaultDailyQuota}L
+            </span>
+          `;
         }
 
         const dayCard = document.createElement('button');

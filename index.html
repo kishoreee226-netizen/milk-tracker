@@ -3,334 +3,828 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>నా పాల డైరీ - Milk Tracker</title>
+  <title>MilkCount - పాల లెక్క (B2C Delivery Tracker)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons CDN -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+  <!-- Supabase JS Client -->
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <style>
-    :root {
-      --primary: #0284c7;
-      --bg: #f8fafc;
-      --card: #ffffff;
-      --text: #0f172a;
-      --border: #e2e8f0;
-      --success: #16a34a;
-      --danger: #ef4444;
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+          },
+          colors: {
+            brand: {
+              50: '#f0f7ff',
+              100: '#e0effe',
+              200: '#bae0fd',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+            }
+          }
+        }
+      }
     }
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 60px; max-width: 480px; margin: 0 auto; }
-    
-    header { background: var(--primary); color: white; padding: 18px; border-radius: 16px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    .header-top { display: flex; justify-content: space-between; align-items: center; }
-    .header-top h1 { font-size: 1.25rem; font-weight: 700; }
-    .user-pill { font-size: 0.8rem; background: rgba(255,255,255,0.25); padding: 4px 10px; border-radius: 20px; }
-    .btn-logout { background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 3px 8px; border-radius: 6px; font-size: 0.75rem; cursor: pointer; }
-
-    .card { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 16px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
-    
-    .today-box { text-align: center; padding: 14px 0; }
-    .today-date { font-size: 0.9rem; color: #64748b; font-weight: 500; margin-bottom: 12px; }
-    
-    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
-    button { padding: 12px; border: none; border-radius: 10px; font-size: 0.95rem; font-weight: 600; cursor: pointer; transition: 0.2s; }
-    .btn-take { background: var(--success); color: white; }
-    .btn-skip { background: #fee2e2; color: var(--danger); }
-    .btn-reset { background: #f1f5f9; color: #475569; padding: 8px; font-size: 0.85rem; border: 1px solid var(--border); margin-top: 10px; width: 100%; border-radius: 8px; }
-
-    .status-done { padding: 12px; border-radius: 10px; font-weight: 700; font-size: 1rem; }
-    .status-done.taken { background: #dcfce7; color: var(--success); }
-    .status-done.skipped { background: #fee2e2; color: var(--danger); }
-
-    .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
-    .stat-item { background: #f1f5f9; padding: 12px; border-radius: 12px; text-align: center; }
-    .stat-val { font-size: 1.25rem; font-weight: 700; color: var(--primary); margin-top: 4px; }
-    .stat-label { font-size: 0.75rem; color: #64748b; font-weight: 600; }
-
-    .total-bill-box { background: #eff6ff; border: 1.5px solid #bfdbfe; border-radius: 12px; padding: 14px; display: flex; justify-content: space-between; align-items: center; }
-    .bill-amount { font-size: 1.5rem; font-weight: 800; color: var(--primary); }
-
-    .history-item { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid #f1f5f9; font-size: 0.9rem; }
-    
-    .form-group { margin-bottom: 12px; }
-    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 0.95rem; }
-    .btn-primary { background: var(--primary); color: white; width: 100%; }
-    .btn-secondary { background: #e2e8f0; color: #334155; width: 100%; margin-top: 8px; }
-
-    .hidden { display: none !important; }
+  </script>
+  <style>
+    * { -webkit-tap-highlight-color: transparent; }
+    .custom-scroll::-webkit-scrollbar { display: none; }
+    .hidden-force { display: none !important; }
   </style>
 </head>
-<body>
+<body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex justify-center selection:bg-brand-100">
 
-  <!-- AUTH SCREEN -->
-  <section id="authSection" class="hidden">
-    <div style="text-align: center; margin: 40px 0 24px;">
-      <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 6px;">🥛 నా పాల డైరీ</h1>
-      <p style="color: #64748b; font-size: 0.9rem;">మీ రోజువారీ పాల లెక్కలు సులభంగా రాసుకోండి</p>
-    </div>
-
-    <div class="card">
-      <div class="form-group">
-        <label>మొబైల్ నంబర్ (10 అంకెలు)</label>
-        <input type="tel" id="userPhone" placeholder="ఉదా: 9876543210" maxlength="10">
+  <!-- Mobile App Wrapper Frame -->
+  <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-2xl relative border-x border-slate-200">
+    
+    <!-- 1. AUTH SCREEN (మొబైల్ & 4 డిజిట్ పిన్) -->
+    <section id="authSection" class="p-6 flex-1 flex flex-col justify-center items-center">
+      <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 mb-4 shadow-sm">
+        <i class="ph-bold ph-drop text-3xl"></i>
       </div>
-      <div class="form-group">
-        <label>4-అంకెల పిన్ (PIN)</label>
-        <input type="password" id="userPin" placeholder="ఉదా: 1234" maxlength="4" inputmode="numeric">
-      </div>
-      <button class="btn-primary" onclick="handleAuth('login')">లాగిన్ (Login)</button>
-      <button class="btn-secondary" onclick="handleAuth('register')">కొత్తగా రిజిస్టర్ అవ్వండి</button>
-    </div>
-  </section>
+      <h2 class="text-xl font-extrabold text-slate-800 text-center">MilkCount - పాల లెక్క</h2>
+      <p class="text-xs text-slate-500 mb-6 text-center">మీ రోజువారీ పాల లెక్కలు భద్రపరుచుకోండి</p>
 
-  <!-- MAIN CUSTOMER DASHBOARD -->
-  <section id="mainAppSection" class="hidden">
-    <header>
-      <div class="header-top">
-        <h1>🥛 నా పాల డైరీ</h1>
+      <div class="w-full space-y-3.5 bg-slate-50 border border-slate-200/80 p-5 rounded-2xl">
         <div>
-          <span class="user-pill" id="phoneBadge"></span>
-          <button class="btn-logout" onclick="handleLogout()">Logout</button>
+          <label class="text-xs font-bold text-slate-600 block mb-1">మొబైల్ నంబర్ (10 అంకెలు)</label>
+          <input type="tel" id="loginPhone" placeholder="ఉదా: 9876543210" maxlength="10" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600">
         </div>
-      </div>
-    </header>
-
-    <!-- ఈ రోజు డెలివరీ స్థితి -->
-    <div class="card today-box">
-      <div class="today-date" id="currentDateDisplay">తేదీ: ...</div>
-      <div id="todayActionArea">లోడ్ అవుతోంది...</div>
-    </div>
-
-    <!-- నెల లెక్కల సమ్మరీ కార్డ్ -->
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 12px;">
-        <h3 style="font-size: 1.05rem; color: #334155;">ఈ నెల లెక్కల సమ్మరీ</h3>
-        <span id="monthNameBadge" style="font-size:0.8rem; font-weight:600; color:var(--primary); background:#e0f2fe; padding:2px 8px; border-radius:6px;"></span>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">పోసుకున్న రోజులు</div>
-          <div class="stat-val" id="takenDaysCount">0</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">ఆపేసిన రోజులు (Skip)</div>
-          <div class="stat-val" id="skippedDaysCount" style="color:var(--danger);">0</div>
-        </div>
-      </div>
-
-      <div class="stats-grid">
-        <div class="stat-item">
-          <div class="stat-label">రోజూ తీసుకునే పాలు</div>
-          <div class="stat-val" id="dailyQtyDisplay">0 L</div>
-        </div>
-        <div class="stat-item">
-          <div class="stat-label">మొత్తం పాలు</div>
-          <div class="stat-val" id="totalLitersCount">0 L</div>
-        </div>
-      </div>
-
-      <div class="total-bill-box">
         <div>
-          <div style="font-size:0.8rem; color:#475569; font-weight:600;">ఈ నెల మొత్తం బిల్లు</div>
-          <div style="font-size:0.8rem; color:#64748b;">(ధర: ₹<span id="priceDisplay">0</span> / లీటర్)</div>
+          <label class="text-xs font-bold text-slate-600 block mb-1">4-అంకెల సెక్యూరిటీ పిన్ (PIN)</label>
+          <input type="password" id="loginPin" placeholder="ఉదా: 1234" maxlength="4" inputmode="numeric" class="w-full px-3.5 py-2.5 bg-white border border-slate-300 rounded-xl text-sm font-semibold focus:outline-none focus:border-brand-600 tracking-widest">
         </div>
-        <div class="bill-amount" id="totalBillAmount">₹0</div>
+        
+        <div class="pt-2 space-y-2">
+          <button onclick="handleUserAuth('login')" class="w-full bg-brand-600 hover:bg-brand-700 active:scale-95 text-white py-3 rounded-xl font-bold text-sm shadow-md transition-all">
+            లాగిన్ (Login)
+          </button>
+          <button onclick="handleUserAuth('register')" class="w-full bg-white border border-slate-200 hover:bg-slate-100 active:scale-95 text-slate-700 py-3 rounded-xl font-bold text-xs transition-all">
+            కొత్త ఖాతా రిజిస్టర్ అవ్వండి (Sign Up)
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- 2. MAIN APP CONTAINER -->
+    <div id="mainAppSection" class="hidden-force flex-1 flex flex-col">
+      <!-- TOP HEADER -->
+      <header class="bg-gradient-to-r from-sky-600 via-brand-600 to-blue-700 text-white p-4 sticky top-0 z-30 shadow-md">
+        <div class="flex items-center justify-between">
+          <div class="flex items-center gap-2.5">
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner">
+              <i class="ph-bold ph-drop text-2xl text-amber-200"></i>
+            </div>
+            <div>
+              <h1 class="text-lg font-bold tracking-tight leading-tight flex items-center gap-1.5">
+                MilkCount <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">పాల లెక్క</span>
+              </h1>
+              <div class="flex items-center gap-2 mt-0.5">
+                <span id="userPhoneBadge" class="text-[11px] text-sky-100 font-medium">9876543210</span>
+                <button onclick="logoutCustomer()" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white transition-colors">లాగౌట్</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Editable Price Badge -->
+          <button onclick="openPriceModal()" class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 transition-all text-xs px-2.5 py-1.5 rounded-lg border border-white/25 shadow-sm text-left">
+            <i class="ph ph-currency-inr text-amber-300 text-sm"></i>
+            <div>
+              <div class="text-[9px] uppercase tracking-wider text-sky-200 font-medium leading-none">ధర / రేటు</div>
+              <div class="font-bold text-white text-xs leading-tight">₹<span id="ratePerLiterText">70</span>/L</div>
+            </div>
+            <i class="ph ph-pencil-simple text-xs opacity-75 ml-0.5"></i>
+          </button>
+        </div>
+
+        <!-- Month Navigation -->
+        <div class="mt-3.5 flex items-center justify-between bg-black/15 backdrop-blur-md rounded-xl p-1.5 border border-white/10">
+          <button onclick="changeMonth(-1)" class="p-1.5 hover:bg-white/15 rounded-lg transition-colors text-white active:scale-90">
+            <i class="ph-bold ph-caret-left text-base"></i>
+          </button>
+          <div class="text-center">
+            <span id="currentMonthYearLabel" class="text-sm font-bold tracking-wide text-white">నవంబర్ 2026</span>
+            <span id="monthSubLabel" class="text-[10px] block text-sky-200 -mt-0.5 font-medium">November 2026</span>
+          </div>
+          <button onclick="changeMonth(1)" class="p-1.5 hover:bg-white/15 rounded-lg transition-colors text-white active:scale-90">
+            <i class="ph-bold ph-caret-right text-base"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- MAIN SCROLLABLE CONTENT -->
+      <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
+
+        <!-- QUICK SHORTCUTS CARD -->
+        <section class="bg-gradient-to-br from-blue-50 to-sky-50/70 border border-sky-100 rounded-2xl p-3.5 shadow-sm">
+          <div class="flex items-center justify-between mb-2.5">
+            <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+              <i class="ph-fill ph-lightning text-amber-500"></i> త్వరిత అప్‌డేట్ (Quick Actions)
+            </span>
+            <span class="text-[11px] text-slate-500" id="tomorrowIndicator">రేపటికి ప్లాన్</span>
+          </div>
+
+          <div class="grid grid-cols-2 gap-2">
+            <!-- Toggle Skip Tomorrow -->
+            <button id="skipTomorrowBtn" onclick="toggleSkipTomorrow()" class="flex flex-col items-start p-2.5 rounded-xl border border-rose-200 bg-white hover:bg-rose-50/60 active:scale-95 transition-all shadow-xs text-left group">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-xs font-bold text-rose-700 flex items-center gap-1">
+                  <i class="ph-bold ph-prohibit text-rose-500"></i> రేపు వద్దు
+                </span>
+                <span id="skipTomorrowBadge" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-0.5">Skip tomorrow's milk</span>
+            </button>
+
+            <!-- Add Extra Tomorrow -->
+            <button onclick="addExtraTomorrow()" class="flex flex-col items-start p-2.5 rounded-xl border border-emerald-200 bg-white hover:bg-emerald-50/60 active:scale-95 transition-all shadow-xs text-left group">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-xs font-bold text-emerald-700 flex items-center gap-1">
+                  <i class="ph-bold ph-plus-circle text-emerald-500"></i> ఎక్స్‌ట్రా పాలు
+                </span>
+                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 rounded">+0.5L</span>
+              </div>
+              <span class="text-[10px] text-slate-500 mt-0.5">Add extra for tomorrow</span>
+            </button>
+          </div>
+        </section>
+
+        <!-- LIVE METRIC COUNTERS -->
+        <section class="grid grid-cols-2 gap-2.5">
+          <!-- Total Amount Card -->
+          <div class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+            <div>
+              <p class="text-xs text-emerald-100 font-medium">ఈ నెల మొత్తం బిల్లు (Total Bill)</p>
+              <div class="text-2xl font-black tracking-tight mt-0.5 flex items-baseline gap-1">
+                <span>₹</span><span id="totalBillAmount">0</span>
+              </div>
+              <p class="text-[11px] text-emerald-200 mt-0.5 font-normal">
+                మొత్తం లీటర్లు: <strong id="totalLitersBadge" class="text-white">0</strong> L
+              </p>
+            </div>
+            <div class="text-right flex flex-col items-end">
+              <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md font-semibold text-emerald-100">Calculated</span>
+              <button onclick="scrollToBill()" class="mt-2 text-xs bg-white text-emerald-800 hover:bg-emerald-50 px-3 py-1.5 rounded-lg font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1">
+                బిల్ వివరాలు <i class="ph-bold ph-arrow-down text-xs"></i>
+              </button>
+            </div>
+          </div>
+
+          <!-- Days Delivered -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-500">డెలివరీ రోజులు</span>
+              <div class="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="ph-fill ph-check-circle text-sm"></i>
+              </div>
+            </div>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span id="deliveredDaysCount" class="text-xl font-bold text-slate-800">0</span>
+              <span class="text-xs text-slate-400 font-medium">రోజులు</span>
+            </div>
+            <span class="text-[10px] text-emerald-600 font-medium">Delivered</span>
+          </div>
+
+          <!-- Days Skipped -->
+          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-semibold text-slate-500">సెలవులు / ఆపినవి</span>
+              <div class="w-6 h-6 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center">
+                <i class="ph-fill ph-x-circle text-sm"></i>
+              </div>
+            </div>
+            <div class="mt-1 flex items-baseline gap-1">
+              <span id="skippedDaysCount" class="text-xl font-bold text-slate-800">0</span>
+              <span class="text-xs text-slate-400 font-medium">రోజులు</span>
+            </div>
+            <span class="text-[10px] text-rose-600 font-medium">Skipped</span>
+          </div>
+        </section>
+
+        <!-- MONTHLY CALENDAR -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+          <div class="flex items-center justify-between mb-3">
+            <div>
+              <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="ph-fill ph-calendar text-sky-600"></i> రోజువారీ క్యాలెండర్ (Delivery Grid)
+              </h2>
+              <p class="text-[10px] text-slate-500">తేదీని తాకి లీటర్లు లేదా సెలవు మార్చండి</p>
+            </div>
+
+            <!-- Color Legend Indicator -->
+            <div class="flex items-center gap-2 text-[10px] font-medium text-slate-600">
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>పాలు</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>ఆపినవి</span>
+            </div>
+          </div>
+
+          <!-- Weekday Headers -->
+          <div class="grid grid-cols-7 gap-1 text-center font-bold text-[11px] text-slate-400 mb-1.5 uppercase">
+            <span class="text-rose-500">ఆది</span>
+            <span>సోమ</span>
+            <span>మంగళ</span>
+            <span>బుధ</span>
+            <span>గురు</span>
+            <span>శుక్ర</span>
+            <span class="text-sky-600">శని</span>
+          </div>
+
+          <!-- Days Grid -->
+          <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5">
+            <!-- Dynamically populated via JavaScript -->
+          </div>
+
+          <!-- Quota config link -->
+          <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>రోజువారీ స్థిర పరిమాణం (Default Quota):</span>
+            <button onclick="openQuotaModal()" class="font-bold text-sky-600 hover:text-sky-700 flex items-center gap-1">
+              <span id="defaultQuotaLabel">1.0 లీటరు</span>
+              <i class="ph ph-gear text-sm"></i>
+            </button>
+          </div>
+        </section>
+
+        <!-- DETAILED BILL & INVOICE BREAKDOWN -->
+        <section id="billSection" class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm space-y-3">
+          <div class="flex items-center justify-between pb-2 border-b border-slate-100">
+            <h3 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
+              <i class="ph-fill ph-receipt text-sky-600"></i> బిల్లు సారాంశం (Bill Statement)
+            </h3>
+            <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium" id="billMonthBadge">నవంబర్ 2026</span>
+          </div>
+
+          <div class="space-y-2 text-xs">
+            <div class="flex justify-between text-slate-600">
+              <span>మొత్తం రోజులు (Total Month Days):</span>
+              <span id="billMonthTotalDays" class="font-medium text-slate-800">30 రోజులు</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>పాలు తీసుకున్న రోజులు (Delivered):</span>
+              <span id="billDeliveredDays" class="font-medium text-emerald-600">0 రోజులు</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>సెలవులు / వద్దన్న రోజులు (Skipped):</span>
+              <span id="billSkippedDays" class="font-medium text-rose-600">0 రోజులు</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>మొత్తం పాల పరిమాణం (Total Volume):</span>
+              <span id="billTotalLiters" class="font-bold text-slate-800">0.0 L</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>లీటరు ధర (Rate per Liter):</span>
+              <span class="font-medium text-slate-800">₹<span id="billRatePerLiter">70</span></span>
+            </div>
+
+            <div class="pt-2 border-t border-dashed border-slate-200 flex justify-between items-center text-sm">
+              <span class="font-bold text-slate-800">మొత్తం చెల్లించవలసినది:</span>
+              <span class="font-black text-emerald-600 text-base">₹<span id="billFinalAmount">0</span></span>
+            </div>
+          </div>
+
+          <!-- WhatsApp Share Button -->
+          <div class="pt-2">
+            <button onclick="shareOnWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.98] transition-all text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm">
+              <i class="ph-fill ph-whatsapp-logo text-xl"></i>
+              వాట్సాప్‌లో బిల్ పంపండి (Share on WhatsApp)
+            </button>
+            <p class="text-[10px] text-center text-slate-400 mt-1.5">పాలబ్బాయికి లేదా మీ రికార్డు కోసం సులభంగా పంపుకోవచ్చు</p>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- TOAST NOTIFICATION CONTAINER -->
+    <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 bg-slate-900/90 backdrop-blur-sm text-white text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg border border-white/20 transition-all duration-300 pointer-events-none opacity-0 translate-y-4 flex items-center gap-2">
+      <i class="ph-bold ph-check text-emerald-400"></i>
+      <span id="toastMsg">అప్‌డేట్ అయ్యింది!</span>
+    </div>
+
+    <!-- MODAL 1: EDIT SINGLE DAY -->
+    <div id="dayModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-end sm:items-center justify-center hidden-force p-0 sm:p-4">
+      <div class="bg-white w-full max-w-sm rounded-t-3xl sm:rounded-2xl p-5 shadow-2xl space-y-4 animate-in slide-in-from-bottom duration-200">
+        <div class="flex justify-between items-center pb-2 border-b border-slate-100">
+          <div>
+            <h4 class="font-bold text-slate-800 text-base" id="modalDateTitle">తేదీ 10 నవంబర్</h4>
+            <p class="text-[11px] text-slate-500">పాల పరిమాణం నమోదు చేయండి</p>
+          </div>
+          <button onclick="closeDayModal()" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 hover:bg-slate-200">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-2">పాలు తీసుకున్నట్లు మార్క్ చేయండి:</label>
+          <div class="grid grid-cols-4 gap-2">
+            <button onclick="setModalDayValue(0.5)" class="py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-xs flex flex-col items-center">
+              <span>0.5 L</span>
+              <span class="text-[9px] font-normal text-sky-600">అర లీటర్</span>
+            </button>
+            <button onclick="setModalDayValue(1.0)" class="py-2.5 rounded-xl border border-sky-300 bg-sky-100 hover:bg-sky-200 text-sky-900 font-extrabold text-xs flex flex-col items-center">
+              <span>1.0 L</span>
+              <span class="text-[9px] font-normal text-sky-700">1 లీటర్</span>
+            </button>
+            <button onclick="setModalDayValue(1.5)" class="py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-xs flex flex-col items-center">
+              <span>1.5 L</span>
+              <span class="text-[9px] font-normal text-sky-600">ఒకటిన్నర</span>
+            </button>
+            <button onclick="setModalDayValue(2.0)" class="py-2.5 rounded-xl border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-800 font-bold text-xs flex flex-col items-center">
+              <span>2.0 L</span>
+              <span class="text-[9px] font-normal text-sky-600">2 లీటర్లు</span>
+            </button>
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">కస్టమ్ లీటర్లు (Custom Ltr):</label>
+          <div class="flex items-center gap-2">
+            <input type="number" id="customLitersInput" step="0.25" min="0" max="10" placeholder="e.g. 2.5" class="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 font-semibold">
+            <button onclick="applyCustomLiters()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-xs font-bold">
+              సేవ్
+            </button>
+          </div>
+        </div>
+
+        <div class="pt-2 border-t border-slate-100">
+          <button onclick="setModalDayValue(0)" class="w-full py-2.5 rounded-xl border border-rose-300 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors">
+            <i class="ph-bold ph-prohibit"></i> ఈ రోజు పాలు రాలేదు / వద్దు (Skip / No Milk)
+          </button>
+        </div>
       </div>
     </div>
 
-    <!-- రేట్ & రోజూ తీసుకునే పాల సెట్టింగ్స్ -->
-    <details class="card" style="padding: 12px 16px;">
-      <summary style="font-weight:600; cursor:pointer; color:var(--primary);">⚙️ నా పాల రేటు / క్వాంటిటీ మార్చుకోండి</summary>
-      <form onsubmit="updateSettings(event)" style="margin-top: 14px;">
-        <div class="form-group">
-          <label>రోజూ తీసుకునే పాలు (లీటర్లలో)</label>
-          <input type="number" step="0.25" id="settingQty" required>
+    <!-- MODAL 2: EDIT MILK RATE -->
+    <div id="priceModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
+        <div class="flex justify-between items-center pb-1 border-b border-slate-100">
+          <h4 class="font-bold text-slate-800 text-sm">లీటరు ధర మార్చండి (Rate)</h4>
+          <button onclick="closePriceModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
-        <div class="form-group">
-          <label>లీటర్ ధర (₹)</label>
-          <input type="number" id="settingPrice" required>
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">1 లీటరు పాల రేటు (రూపాయల్లో):</label>
+          <div class="relative">
+            <span class="absolute left-3 top-2.5 text-slate-400 font-bold">₹</span>
+            <input type="number" id="rateInput" min="10" max="300" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-xl text-base font-bold focus:outline-none focus:border-sky-500">
+          </div>
         </div>
-        <button type="submit" class="btn-primary" style="padding:10px; font-size:0.9rem;">సేవ్ చేయండి</button>
-      </form>
-    </details>
-
-    <!-- ఈ నెల హిస్టరీ -->
-    <div class="card">
-      <h3 style="font-size: 1rem; color: #334155; margin-bottom: 10px;">డెలివరీ హిస్టరీ (ఈ నెల)</h3>
-      <div id="historyList">లోడ్ అవుతోంది...</div>
+        <div class="flex gap-2">
+          <button onclick="closePriceModal()" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button onclick="saveMilkRate()" class="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
+        </div>
+      </div>
     </div>
-  </section>
 
+    <!-- MODAL 3: EDIT DEFAULT QUOTA -->
+    <div id="quotaModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
+        <div class="flex justify-between items-center pb-1 border-b border-slate-100">
+          <h4 class="font-bold text-slate-800 text-sm">రోజువారీ స్థిర పరిమాణం</h4>
+          <button onclick="closeQuotaModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+        <div>
+          <label class="text-xs text-slate-500 mb-1 block">రోజూ వచ్చే పాలు (లీటర్లలో):</label>
+          <select id="defaultQuotaSelect" class="w-full p-2.5 border border-slate-300 rounded-xl text-sm font-bold focus:outline-none focus:border-sky-500">
+            <option value="0.5">0.5 లీటరు (అర లీటర్)</option>
+            <option value="1.0">1.0 లీటరు (సాధారణం)</option>
+            <option value="1.5">1.5 లీటర్లు</option>
+            <option value="2.0">2.0 లీటర్లు</option>
+            <option value="2.5">2.5 లీటర్లు</option>
+            <option value="3.0">3.0 లీటర్లు</option>
+          </select>
+        </div>
+        <div class="flex gap-2">
+          <button onclick="closeQuotaModal()" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button onclick="saveDefaultQuota()" class="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- APPLICATION LOGIC WITH SUPABASE INTEGRATION -->
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
     const db = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    const today = new Date().toISOString().split('T')[0];
-    const [currYear, currMonth] = today.split('-');
+    const TELUGU_MONTHS = ["జనవరి", "ఫిబ్రవరి", "మార్చి", "ఏప్రిల్", "మే", "జూన్", "జూలై", "ఆగస్టు", "సెప్టెంబర్", "అక్టోబర్", "నవంబర్", "డిసెంబర్"];
+    const ENGLISH_MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
-    let user = JSON.parse(localStorage.getItem('milk_self_customer') || 'null');
+    let currentViewingDate = new Date();
+    let selectedDayForModal = null;
+
+    let currentUser = JSON.parse(localStorage.getItem('milk_self_customer') || 'null');
+    let ratePerLiter = 70;
+    let defaultDailyQuota = 1.0;
+    let monthRecords = {};
 
     function checkAuth() {
-      if (user && user.id) {
-        document.getElementById('authSection').classList.add('hidden');
-        document.getElementById('mainAppSection').classList.remove('hidden');
-        document.getElementById('phoneBadge').innerText = user.phone;
-        document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
-        document.getElementById('monthNameBadge').innerText = `${currMonth}/${currYear}`;
-        loadDashboard();
+      if (currentUser && currentUser.id) {
+        document.getElementById('authSection').classList.add('hidden-force');
+        document.getElementById('mainAppSection').classList.remove('hidden-force');
+        document.getElementById('userPhoneBadge').innerText = currentUser.phone;
+        ratePerLiter = parseFloat(currentUser.price_per_ltr || 70);
+        defaultDailyQuota = parseFloat(currentUser.daily_qty || 1.0);
+        fetchMonthData();
       } else {
-        document.getElementById('authSection').classList.remove('hidden');
-        document.getElementById('mainAppSection').classList.add('hidden');
+        document.getElementById('authSection').classList.remove('hidden-force');
+        document.getElementById('mainAppSection').classList.add('hidden-force');
       }
     }
 
-    async function handleAuth(type) {
-      const phone = document.getElementById('userPhone').value.trim();
-      const pin = document.getElementById('userPin').value.trim();
+    async function handleUserAuth(type) {
+      const phone = document.getElementById('loginPhone').value.trim();
+      const pin = document.getElementById('loginPin').value.trim();
 
-      if (phone.length !== 10 || isNaN(phone)) return alert('10 అంకెల మొబైల్ నంబర్ ఇవ్వండి.');
-      if (pin.length !== 4 || isNaN(pin)) return alert('4 అంకెల పిన్ ఇవ్వండి.');
+      if (phone.length !== 10 || isNaN(phone)) return alert('దయచేసి 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.');
+      if (pin.length !== 4 || isNaN(pin)) return alert('దయచేసి 4 అంకెల పిన్ నమోదు చేయండి.');
 
       if (type === 'register') {
         const { data: exist } = await db.from('customer_users').select('*').eq('phone', phone).single();
-        if (exist) return alert('ఈ నంబర్ ఇప్పటికే ఉంది. లాగిన్ అవ్వండి.');
+        if (exist) return alert('ఈ మొబైల్ నంబర్ ఇప్పటికే రిజిస్టర్ అయి ఉంది. లాగిన్ అవ్వండి.');
 
-        const { data, error } = await db.from('customer_users').insert([{ phone, pin, daily_qty: 1.0, price_per_ltr: 70 }]).select().single();
+        const { data, error } = await db.from('customer_users').insert([{
+          phone: phone,
+          pin: pin,
+          daily_qty: 1.0,
+          price_per_ltr: 70
+        }]).select().single();
+
         if (error) alert('Error: ' + error.message);
         else {
-          user = data;
+          alert('ఖాతా విజయవంతంగా సృష్టించబడింది!');
+          currentUser = data;
           localStorage.setItem('milk_self_customer', JSON.stringify(data));
           checkAuth();
         }
       } else {
         const { data, error } = await db.from('customer_users').select('*').eq('phone', phone).eq('pin', pin).single();
-        if (error || !data) alert('మొబైల్ నంబర్ లేదా పిన్ తప్పుగా ఉంది!');
+        if (error || !data) alert('మొబైల్ నంబర్ లేదా 4-డిజిట్ పిన్ తప్పుగా నమోదు చేశారు!');
         else {
-          user = data;
+          currentUser = data;
           localStorage.setItem('milk_self_customer', JSON.stringify(data));
           checkAuth();
         }
       }
     }
 
-    function handleLogout() {
+    function logoutCustomer() {
       localStorage.removeItem('milk_self_customer');
-      user = null;
+      currentUser = null;
       checkAuth();
     }
 
-    async function loadDashboard() {
-      // లేటెస్ట్ యూజర్ డేటా
-      const { data: uData } = await db.from('customer_users').select('*').eq('id', user.id).single();
-      if (uData) user = uData;
-
-      document.getElementById('dailyQtyDisplay').innerText = `${user.daily_qty} L`;
-      document.getElementById('priceDisplay').innerText = user.price_per_ltr;
-      document.getElementById('settingQty').value = user.daily_qty;
-      document.getElementById('settingPrice').value = user.price_per_ltr;
-
-      // ఈ రోజు రికార్డు
-      const { data: todayLog } = await db.from('customer_milk_logs').select('*').eq('user_id', user.id).eq('log_date', today).single();
-      renderTodayAction(todayLog);
-
-      // ఈ నెల రికార్డులు
-      const startOfMonth = `${currYear}-${currMonth}-01`;
-      const nextMonthStr = String(Number(currMonth) + 1).padStart(2, '0');
-      const startOfNextMonth = `${currYear}-${nextMonthStr}-01`;
-
-      const { data: logs } = await db.from('customer_milk_logs')
-        .select('*')
-        .eq('user_id', user.id)
-        .gte('log_date', startOfMonth)
-        .lt('log_date', startOfNextMonth)
-        .order('log_date', { ascending: false });
-
-      renderMonthlyStats(logs || []);
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toastMsg');
+      toastMsg.innerText = msg;
+      toast.classList.remove('opacity-0', 'translate-y-4');
+      toast.classList.add('opacity-100', 'translate-y-0');
+      setTimeout(() => {
+        toast.classList.remove('opacity-100', 'translate-y-0');
+        toast.classList.add('opacity-0', 'translate-y-4');
+      }, 2200);
     }
 
-    function renderTodayAction(log) {
-      const area = document.getElementById('todayActionArea');
-      if (log) {
-        if (log.status === 'taken') {
-          area.innerHTML = `
-            <div class="status-done taken">🥛 ఈ రోజు తీసుకున్నాము (${log.quantity} L)</div>
-            <button class="btn-reset" onclick="resetLog('${log.id}')">మార్చు (Edit / Undo)</button>
-          `;
-        } else {
-          area.innerHTML = `
-            <div class="status-done skipped">❌ ఈ రోజు ఆపేశాము (Skipped)</div>
-            <button class="btn-reset" onclick="resetLog('${log.id}')">మార్చు (Edit / Undo)</button>
-          `;
-        }
-      } else {
-        area.innerHTML = `
-          <div class="action-grid">
-            <button class="btn-take" onclick="saveLog(${user.daily_qty}, 'taken')">తీసుకున్నాము (${user.daily_qty} L)</button>
-            <button class="btn-skip" onclick="saveLog(0, 'skipped')">ఆపేశాము (Skip)</button>
-          </div>
-        `;
+    function changeMonth(delta) {
+      currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
+      fetchMonthData();
+    }
+
+    async function fetchMonthData() {
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const monthStr = String(month + 1).padStart(2, '0');
+      const startDate = `${year}-${monthStr}-01`;
+      
+      const nextMonthDate = new Date(year, month + 1, 1);
+      const nextYear = nextMonthDate.getFullYear();
+      const nextMonthStr = String(nextMonthDate.getMonth() + 1).padStart(2, '0');
+      const endDate = `${nextYear}-${nextMonthStr}-01`;
+
+      const { data, error } = await db.from('customer_milk_logs')
+        .select('*')
+        .eq('user_id', currentUser.id)
+        .gte('log_date', startDate)
+        .lt('log_date', endDate);
+
+      monthRecords = {};
+      if (data) {
+        data.forEach(item => {
+          const dayNum = parseInt(item.log_date.split('-')[2]);
+          monthRecords[dayNum] = {
+            id: item.id,
+            status: item.status === 'taken' ? 'delivered' : 'skipped',
+            liters: parseFloat(item.quantity)
+          };
+        });
+      }
+      renderApp();
+    }
+
+    function openPriceModal() {
+      document.getElementById('rateInput').value = ratePerLiter;
+      document.getElementById('priceModal').classList.remove('hidden-force');
+    }
+    function closePriceModal() {
+      document.getElementById('priceModal').classList.add('hidden-force');
+    }
+    async function saveMilkRate() {
+      const val = parseFloat(document.getElementById('rateInput').value);
+      if (val && val > 0) {
+        ratePerLiter = val;
+        currentUser.price_per_ltr = val;
+        localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+        await db.from('customer_users').update({ price_per_ltr: val }).eq('id', currentUser.id);
+        closePriceModal();
+        showToast(`పాల రేటు ₹${ratePerLiter}/L గా మారింది!`);
+        renderApp();
       }
     }
 
-    async function saveLog(qty, status) {
+    function openQuotaModal() {
+      document.getElementById('defaultQuotaSelect').value = defaultDailyQuota.toString();
+      document.getElementById('quotaModal').classList.remove('hidden-force');
+    }
+    function closeQuotaModal() {
+      document.getElementById('quotaModal').classList.add('hidden-force');
+    }
+    async function saveDefaultQuota() {
+      const val = parseFloat(document.getElementById('defaultQuotaSelect').value);
+      if (val && val > 0) {
+        defaultDailyQuota = val;
+        currentUser.daily_qty = val;
+        localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+        await db.from('customer_users').update({ daily_qty: val }).eq('id', currentUser.id);
+        closeQuotaModal();
+        showToast(`డిఫాల్ట్ కోటా ${defaultDailyQuota}L గా మారింది!`);
+        renderApp();
+      }
+    }
+
+    function openDayModal(day) {
+      selectedDayForModal = day;
+      const monthName = TELUGU_MONTHS[currentViewingDate.getMonth()];
+      document.getElementById('modalDateTitle').innerText = `తేదీ: ${day} ${monthName}`;
+      
+      const dayData = monthRecords[day];
+      const customInput = document.getElementById('customLitersInput');
+      if (dayData && dayData.status === 'delivered') {
+        customInput.value = dayData.liters;
+      } else {
+        customInput.value = '';
+      }
+      document.getElementById('dayModal').classList.remove('hidden-force');
+    }
+
+    function closeDayModal() {
+      document.getElementById('dayModal').classList.add('hidden-force');
+      selectedDayForModal = null;
+    }
+
+    async function setModalDayValue(liters) {
+      if (!selectedDayForModal) return;
+      const y = currentViewingDate.getFullYear();
+      const m = String(currentViewingDate.getMonth() + 1).padStart(2, '0');
+      const d = String(selectedDayForModal).padStart(2, '0');
+      const logDate = `${y}-${m}-${d}`;
+
+      const status = liters === 0 ? 'skipped' : 'taken';
+      const quantity = liters;
+
       const { error } = await db.from('customer_milk_logs').upsert({
-        user_id: user.id,
-        log_date: today,
-        quantity: qty,
+        user_id: currentUser.id,
+        log_date: logDate,
+        quantity: quantity,
         status: status
       }, { onConflict: 'user_id,log_date' });
 
-      if (!error) loadDashboard();
-      else alert('Error: ' + error.message);
-    }
-
-    async function resetLog(logId) {
-      const { error } = await db.from('customer_milk_logs').delete().eq('id', logId);
-      if (!error) loadDashboard();
-      else alert('Error: ' + error.message);
-    }
-
-    async function updateSettings(e) {
-      e.preventDefault();
-      const newQty = parseFloat(document.getElementById('settingQty').value);
-      const newPrice = parseFloat(document.getElementById('settingPrice').value);
-
-      const { error } = await db.from('customer_users').update({
-        daily_qty: newQty,
-        price_per_ltr: newPrice
-      }).eq('id', user.id);
-
       if (!error) {
-        alert('సెట్టింగ్స్ సేవ్ అయ్యాయి!');
-        loadDashboard();
-      } else alert('Error: ' + error.message);
+        monthRecords[selectedDayForModal] = {
+          status: status === 'taken' ? 'delivered' : 'skipped',
+          liters: quantity
+        };
+        showToast(liters === 0 ? `${selectedDayForModal}వ తేదీ పాలు వద్దు అని మార్క్ చేశాం!` : `${selectedDayForModal}వ తేదీ: ${liters}L మార్క్ అయ్యాయి!`);
+        renderApp();
+      }
+      closeDayModal();
     }
 
-    function renderMonthlyStats(logs) {
-      let takenDays = 0;
+    function applyCustomLiters() {
+      const val = parseFloat(document.getElementById('customLitersInput').value);
+      if (!isNaN(val) && val >= 0) {
+        setModalDayValue(val);
+      }
+    }
+
+    async function toggleSkipTomorrow() {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      
+      const y = tomorrow.getFullYear();
+      const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const d = String(tomorrow.getDate()).padStart(2, '0');
+      const logDate = `${y}-${m}-${d}`;
+      const dayNum = tomorrow.getDate();
+
+      const isSkipped = monthRecords[dayNum] && monthRecords[dayNum].status === 'skipped';
+      const newStatus = isSkipped ? 'taken' : 'skipped';
+      const newQty = isSkipped ? defaultDailyQuota : 0;
+
+      await db.from('customer_milk_logs').upsert({
+        user_id: currentUser.id,
+        log_date: logDate,
+        quantity: newQty,
+        status: newStatus
+      }, { onConflict: 'user_id,log_date' });
+
+      fetchMonthData();
+      showToast(isSkipped ? `రేపు (${dayNum}న) ${defaultDailyQuota}L పాలు డెలివరీ అవుతాయి!` : `రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
+    }
+
+    async function addExtraTomorrow() {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      
+      const y = tomorrow.getFullYear();
+      const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const d = String(tomorrow.getDate()).padStart(2, '0');
+      const logDate = `${y}-${m}-${d}`;
+      const dayNum = tomorrow.getDate();
+
+      const currentVal = (monthRecords[dayNum] && monthRecords[dayNum].status === 'delivered') ? monthRecords[dayNum].liters : defaultDailyQuota;
+      const newVal = parseFloat((currentVal + 0.5).toFixed(2));
+
+      await db.from('customer_milk_logs').upsert({
+        user_id: currentUser.id,
+        log_date: logDate,
+        quantity: newVal,
+        status: 'taken'
+      }, { onConflict: 'user_id,log_date' });
+
+      fetchMonthData();
+      showToast(`రేపు (${dayNum}న) +0.5L జోడించాం! మొత్తం: ${newVal}L`);
+    }
+
+    function scrollToBill() {
+      document.getElementById('billSection').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function shareOnWhatsApp() {
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+
+      let deliveredDays = 0;
       let skippedDays = 0;
       let totalLiters = 0;
-      let historyHtml = '';
 
-      logs.forEach(l => {
-        if (l.status === 'taken') {
-          takenDays++;
-          totalLiters += parseFloat(l.quantity);
-          historyHtml += `<div class="history-item"><span>📅 ${l.log_date}</span><span style="color:var(--success); font-weight:700;">+${l.quantity} L</span></div>`;
-        } else {
-          skippedDays++;
-          historyHtml += `<div class="history-item"><span>📅 ${l.log_date}</span><span style="color:var(--danger); font-weight:700;">ఆపేశాము (Skip)</span></div>`;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const item = monthRecords[d];
+        if (item) {
+          if (item.status === 'delivered' && item.liters > 0) {
+            deliveredDays++;
+            totalLiters += item.liters;
+          } else if (item.status === 'skipped') {
+            skippedDays++;
+          }
         }
-      });
+      }
 
-      document.getElementById('takenDaysCount').innerText = takenDays;
-      document.getElementById('skippedDaysCount').innerText = skippedDays;
-      document.getElementById('totalLitersCount').innerText = `${totalLiters} L`;
+      const totalAmount = Math.round(totalLiters * ratePerLiter);
+      const monthNameTel = TELUGU_MONTHS[month];
+      const monthNameEng = ENGLISH_MONTHS[month];
 
-      const bill = totalLiters * (user.price_per_ltr || 70);
-      document.getElementById('totalBillAmount').innerText = `₹${bill}`;
+      const textMessage = 
+`🥛 *పాల లెక్క వివరాలు (Milk Delivery Bill)* 🥛
+-------------------------------------
+📅 *నెల:* ${monthNameTel} (${monthNameEng}) ${year}
+✅ *పాలు తీసుకున్న రోజులు:* ${deliveredDays} రోజులు
+❌ *సెలవులు (ఆపిన రోజులు):* ${skippedDays} రోజులు
+🍶 *మొత్తం పాల పరిమాణం:* ${totalLiters.toFixed(1)} లీటర్లు
+💰 *లీటరు ధర:* ₹${ratePerLiter}
+-------------------------------------
+💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*
+-------------------------------------
+_MilkCount యాప్ ద్వారా రూపొందించబడింది._`;
 
-      document.getElementById('historyList').innerHTML = historyHtml || '<p style="text-align:center; color:#64748b; padding:10px;">ఈ నెలకు ఇంకా ఎంట్రీలు లేవు.</p>';
+      const encoded = encodeURIComponent(textMessage);
+      window.location.href = `whatsapp://send?text=${encoded}`;
+    }
+
+    function renderApp() {
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+
+      document.getElementById('currentMonthYearLabel').innerText = `${TELUGU_MONTHS[month]} ${year}`;
+      document.getElementById('monthSubLabel').innerText = `${ENGLISH_MONTHS[month]} ${year}`;
+      document.getElementById('ratePerLiterText').innerText = ratePerLiter;
+      document.getElementById('billRatePerLiter').innerText = ratePerLiter;
+      document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
+      document.getElementById('billMonthBadge').innerText = `${TELUGU_MONTHS[month]} ${year}`;
+
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const firstDayIndex = new Date(year, month, 1).getDay();
+
+      let deliveredCount = 0;
+      let skippedCount = 0;
+      let totalLiters = 0;
+
+      const grid = document.getElementById('calendarDaysGrid');
+      grid.innerHTML = '';
+
+      for (let i = 0; i < firstDayIndex; i++) {
+        const emptyCell = document.createElement('div');
+        emptyCell.className = 'h-14 sm:h-16 rounded-xl bg-slate-50/50 border border-transparent';
+        grid.appendChild(emptyCell);
+      }
+
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const tomorrowDay = tomorrow.getDate();
+      const isTomorrowSkipped = monthRecords[tomorrowDay] && monthRecords[tomorrowDay].status === 'skipped';
+      
+      const skipBadge = document.getElementById('skipTomorrowBadge');
+      if (isTomorrowSkipped) {
+        skipBadge.className = 'w-2.5 h-2.5 rounded-full bg-rose-500 animate-pulse';
+        document.getElementById('skipTomorrowBtn').classList.add('bg-rose-50', 'border-rose-400');
+      } else {
+        skipBadge.className = 'w-2.5 h-2.5 rounded-full bg-slate-300';
+        document.getElementById('skipTomorrowBtn').classList.remove('bg-rose-50', 'border-rose-400');
+      }
+
+      for (let day = 1; day <= daysInMonth; day++) {
+        const item = monthRecords[day];
+        const isToday = (day === now.getDate() && month === now.getMonth() && year === now.getFullYear());
+
+        let statusClass = "bg-white border-slate-200 text-slate-700 hover:border-sky-300";
+        let statusBadge = `<span class="text-[9px] text-slate-400 font-medium leading-none">-</span>`;
+
+        if (item) {
+          if (item.status === 'delivered') {
+            deliveredCount++;
+            totalLiters += item.liters;
+
+            const isExtra = item.liters > defaultDailyQuota;
+            statusClass = isExtra 
+              ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
+              : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
+
+            statusBadge = `
+              <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
+                ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
+              </span>
+            `;
+          } else if (item.status === 'skipped') {
+            skippedCount++;
+            statusClass = "bg-rose-50/80 border-rose-300 text-rose-900";
+            statusBadge = `<span class="text-[9px] font-bold text-rose-600 leading-none">వద్దు</span>`;
+          }
+        }
+
+        const dayCard = document.createElement('button');
+        dayCard.onclick = () => openDayModal(day);
+        dayCard.className = `relative h-14 sm:h-16 rounded-xl border p-1.5 flex flex-col justify-between items-center transition-all active:scale-95 cursor-pointer shadow-xs ${statusClass} ${isToday ? 'ring-2 ring-sky-500 ring-offset-1 font-bold' : ''}`;
+        
+        dayCard.innerHTML = `
+          <div class="w-full flex items-center justify-between text-[11px] leading-none">
+            <span class="${isToday ? 'bg-sky-600 text-white w-4 h-4 rounded-full flex items-center justify-center font-bold' : 'font-semibold text-slate-700'}">${day}</span>
+            ${isToday ? '<span class="text-[8px] bg-sky-100 text-sky-800 px-1 rounded font-bold">నేడు</span>' : ''}
+          </div>
+          <div class="my-auto py-0.5 text-center">
+            ${statusBadge}
+          </div>
+        `;
+
+        grid.appendChild(dayCard);
+      }
+
+      const totalBill = Math.round(totalLiters * ratePerLiter);
+
+      document.getElementById('totalBillAmount').innerText = totalBill.toLocaleString('en-IN');
+      document.getElementById('totalLitersBadge').innerText = totalLiters.toFixed(1);
+      document.getElementById('deliveredDaysCount').innerText = deliveredCount;
+      document.getElementById('skippedDaysCount').innerText = skippedCount;
+
+      document.getElementById('billMonthTotalDays').innerText = `${daysInMonth} రోజులు`;
+      document.getElementById('billDeliveredDays').innerText = `${deliveredCount} రోజులు`;
+      document.getElementById('billSkippedDays').innerText = `${skippedCount} రోజులు`;
+      document.getElementById('billTotalLiters').innerText = `${totalLiters.toFixed(1)} L`;
+      document.getElementById('billFinalAmount').innerText = totalBill.toLocaleString('en-IN');
     }
 
     window.onload = checkAuth;

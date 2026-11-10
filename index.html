@@ -24,10 +24,10 @@
     .date-badge { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
     
     .mode-switcher { display: flex; background: #e2e8f0; border-radius: 10px; padding: 4px; margin-bottom: 16px; gap: 4px; }
-    .mode-btn { flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: transparent; color: #475569; }
+    .mode-btn { flex: 1; padding: 10px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: transparent; color: #475569; }
     .mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
 
-    .customer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .customer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
     .customer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
     .customer-name { font-size: 1.05rem; font-weight: 600; }
     .flat-badge { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
@@ -39,7 +39,7 @@
     .btn-skip { background-color: #fee2e2; color: var(--danger); }
     .btn-reset { background-color: #f1f5f9; color: #475569; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border); }
 
-    .status-area { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
+    .status-area { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
     .status-delivered { background-color: #dcfce7; color: var(--success); }
     .status-skipped { background-color: #fee2e2; color: var(--danger); }
 
@@ -53,7 +53,7 @@
     .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
     .btn-add { background: var(--primary); color: white; width: 100%; padding: 10px; border-radius: 8px; }
 
-    .hidden { display: none; }
+    .hidden { display: none !important; }
   </style>
 </head>
 <body>
@@ -121,7 +121,13 @@
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
-    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    
+    let dbClient;
+    try {
+      dbClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+    } catch(e) {
+      console.error(e);
+    }
 
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
@@ -150,16 +156,24 @@
     }
 
     async function init() {
-      const { data: customers } = await supabase.from('customers').select('*').order('flat_no', { ascending: true });
-      allCustomers = customers || [];
+      try {
+        const { data: customers, error: errC } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
+        if (errC) {
+          document.getElementById('vendorApp').innerHTML = `<p style="color:red; text-align:center;">Error: ${errC.message}</p>`;
+          return;
+        }
+        allCustomers = customers || [];
 
-      const { data: deliveries } = await supabase.from('deliveries').select('*').eq('delivery_date', today);
-      todayDeliveries = {};
-      if (deliveries) {
-        deliveries.forEach(d => { todayDeliveries[d.customer_id] = d; });
+        const { data: deliveries } = await dbClient.from('deliveries').select('*').eq('delivery_date', today);
+        todayDeliveries = {};
+        if (deliveries) {
+          deliveries.forEach(d => { todayDeliveries[d.customer_id] = d; });
+        }
+
+        renderVendorList();
+      } catch (err) {
+        document.getElementById('vendorApp').innerHTML = `<p style="color:red; text-align:center;">Error: ${err.message}</p>`;
       }
-
-      renderVendorList();
     }
 
     function renderVendorList() {
@@ -167,7 +181,7 @@
       app.innerHTML = '';
 
       if (allCustomers.length === 0) {
-        app.innerHTML = '<p style="text-align:center;">కస్టమర్లు ఎవరూ లేరు.</p>';
+        app.innerHTML = '<p style="text-align:center; padding: 20px;">కస్టమర్లు ఎవరూ లేరు.</p>';
         return;
       }
 
@@ -213,7 +227,7 @@
     }
 
     async function saveDelivery(customerId, qty, status) {
-      const { error } = await supabase.from('deliveries').upsert({
+      const { error } = await dbClient.from('deliveries').upsert({
         customer_id: customerId,
         delivery_date: today,
         quantity: qty,
@@ -221,11 +235,13 @@
       }, { onConflict: 'customer_id,delivery_date' });
 
       if (!error) init();
+      else alert('Error: ' + error.message);
     }
 
     async function resetDelivery(recordId) {
-      const { error } = await supabase.from('deliveries').delete().eq('id', recordId);
+      const { error } = await dbClient.from('deliveries').delete().eq('id', recordId);
       if (!error) init();
+      else alert('Error: ' + error.message);
     }
 
     async function addCustomer(e) {
@@ -238,9 +254,9 @@
         phone: document.getElementById('custPhone').value
       };
 
-      const { error } = await supabase.from('customers').insert([newCust]);
+      const { error } = await dbClient.from('customers').insert([newCust]);
       if (error) {
-        alert('ఎర్రర్: ' + error.message);
+        alert('Error: ' + error.message);
       } else {
         alert('కస్టమర్ వివరాలు సేవ్ అయ్యాయి!');
         document.getElementById('newCustomerForm').reset();
@@ -264,12 +280,11 @@
         return;
       }
 
-      display.innerHTML = '<p style="text-align:center;">లెక్కలు లెక్కిస్తున్నాము...</p>';
+      display.innerHTML = '<p style="text-align:center; padding: 20px;">లెక్కలు లెక్కిస్తున్నాము...</p>';
       const customer = allCustomers.find(c => c.id == custId);
 
-      // ప్రస్తుత నెల డెలివరీల వివరాలు
-      const currentMonth = today.substring(0, 7); // YYYY-MM
-      const { data: monthData } = await supabase
+      const currentMonth = today.substring(0, 7);
+      const { data: monthData } = await dbClient
         .from('deliveries')
         .select('*')
         .eq('customer_id', custId)
@@ -295,7 +310,7 @@
 
       display.innerHTML = `
         <div class="bill-card">
-          <h3 style="margin-bottom: 12px; color: var(--primary);">${customer.name} - నెలవారీ లెక్క</h3>
+          <h3 style="margin-bottom: 12px; color: var(--primary);">${customer.name} - నెల లెక్క</h3>
           <div class="bill-row"><span>లీటర్ ధర</span> <b>₹${customer.price_per_ltr}</b></div>
           <div class="bill-row"><span>పాలు పోసిన రోజులు</span> <b>${deliveredDays} రోజులు</b></div>
           <div class="bill-row"><span>ఆపేసిన రోజులు (Skip)</span> <b>${skippedDays} రోజులు</b></div>
@@ -305,7 +320,7 @@
       `;
     }
 
-    init();
+    window.onload = init;
   </script>
 </body>
 </html>

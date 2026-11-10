@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>పాల లెక్కల ట్రాకర్ - Milk Count</title>
+  <title>పాల ట్రాకర్ - Milk Tracker</title>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <style>
     :root {
@@ -17,114 +17,181 @@
     }
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
     body { background-color: var(--bg); color: var(--text); padding: 16px; padding-bottom: 80px; }
-    header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 20px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
-    header h1 { font-size: 1.25rem; font-weight: 700; }
+    
+    header { background: var(--primary); color: white; padding: 16px; border-radius: 12px; margin-bottom: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); }
+    .header-top { display: flex; justify-content: space-between; align-items: center; }
+    .header-top h1 { font-size: 1.2rem; font-weight: 700; }
     .date-badge { font-size: 0.85rem; opacity: 0.9; margin-top: 4px; }
-    .customer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-    .customer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
-    .customer-name { font-size: 1.1rem; font-weight: 600; }
+    
+    .mode-switcher { display: flex; background: #e2e8f0; border-radius: 10px; padding: 4px; margin-bottom: 16px; gap: 4px; }
+    .mode-btn { flex: 1; padding: 8px; border: none; border-radius: 8px; font-weight: 600; cursor: pointer; background: transparent; color: #475569; }
+    .mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+
+    .customer-card { background: var(--card); border: 1px solid var(--border); border-radius: 12px; padding: 14px; margin-bottom: 12px; }
+    .customer-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+    .customer-name { font-size: 1.05rem; font-weight: 600; }
     .flat-badge { background: #e0e7ff; color: #3730a3; padding: 2px 8px; border-radius: 6px; font-size: 0.8rem; font-weight: 500; }
-    .details { font-size: 0.85rem; color: #64748b; margin-bottom: 14px; }
-    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    button { padding: 10px 14px; border: none; border-radius: 8px; font-size: 0.9rem; font-weight: 600; cursor: pointer; }
+    .details { font-size: 0.82rem; color: #64748b; margin-top: 2px; }
+    
+    .action-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+    button { padding: 10px; border: none; border-radius: 8px; font-size: 0.88rem; font-weight: 600; cursor: pointer; }
     .btn-deliver { background-color: var(--success); color: white; }
     .btn-skip { background-color: #fee2e2; color: var(--danger); }
-    .status-badge { text-align: center; padding: 8px; border-radius: 8px; font-weight: bold; font-size: 0.85rem; }
+    .btn-reset { background-color: #f1f5f9; color: #475569; padding: 6px 12px; font-size: 0.8rem; border-radius: 6px; border: 1px solid var(--border); }
+
+    .status-area { display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-radius: 8px; font-weight: 600; font-size: 0.85rem; }
     .status-delivered { background-color: #dcfce7; color: var(--success); }
     .status-skipped { background-color: #fee2e2; color: var(--danger); }
-    .loading { text-align: center; color: #64748b; padding: 40px 0; }
-    .error-box { background: #fee2e2; color: #dc2626; padding: 12px; border-radius: 8px; font-size: 0.9rem; margin-top: 10px; }
+
+    .bill-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 14px; }
+    .bill-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 0.9rem; }
+    .bill-row.total { font-weight: 700; font-size: 1.1rem; border-bottom: none; color: var(--primary); }
+
+    .add-form { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+    .form-group { margin-bottom: 10px; }
+    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+    .form-group input { width: 100%; padding: 8px 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
+    .btn-add { background: var(--primary); color: white; width: 100%; padding: 10px; border-radius: 8px; }
+
+    .hidden { display: none; }
   </style>
 </head>
 <body>
 
   <header>
-    <h1>🥛 పాల డెలివరీ ట్రాకర్</h1>
-    <div class="date-badge" id="currentDateDisplay">తేదీ: లోడ్ అవుతోంది...</div>
+    <div class="header-top">
+      <h1>🥛 పాల ట్రాకర్</h1>
+      <span style="font-size: 0.8rem; background: rgba(255,255,255,0.2); padding: 4px 8px; border-radius: 6px;">Live</span>
+    </div>
+    <div class="date-badge" id="currentDateDisplay">తేదీ: ...</div>
   </header>
 
-  <main id="app">
-    <div class="loading">కస్టమర్ల వివరాలు లోడ్ అవుతున్నాయి...</div>
-  </main>
+  <div class="mode-switcher">
+    <button class="mode-btn active" id="btnVendor" onclick="switchMode('vendor')">పాలబ్బాయి మోడ్ (Vendor)</button>
+    <button class="mode-btn" id="btnCustomer" onclick="switchMode('customer')">కస్టమర్ వ్యూ (Bill)</button>
+  </div>
+
+  <!-- VENDOR VIEW -->
+  <section id="vendorSection">
+    <div id="vendorApp">
+      <div style="text-align:center; padding: 20px; color:#64748b;">లోడ్ అవుతోంది...</div>
+    </div>
+
+    <!-- కొత్త కస్టమర్ చేర్చే ఫారం -->
+    <details style="margin-top: 16px; background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px;">
+      <summary style="font-weight: 600; cursor: pointer; color: var(--primary);">+ కొత్త కస్టమర్‌ని చేర్చండి</summary>
+      <form id="newCustomerForm" onsubmit="addCustomer(event)" style="margin-top: 12px;">
+        <div class="form-group">
+          <label>పేరు *</label>
+          <input type="text" id="custName" required placeholder="ఉదా: రాము గారు">
+        </div>
+        <div class="form-group">
+          <label>ఫ్లాట్ / ఇంటి నంబర్ *</label>
+          <input type="text" id="custFlat" required placeholder="ఉదా: 204">
+        </div>
+        <div class="form-group">
+          <label>రోజూ తీసుకునే పాలు (లీటర్లలో) *</label>
+          <input type="number" step="0.5" id="custQty" required placeholder="1.0" value="1.0">
+        </div>
+        <div class="form-group">
+          <label>లీటర్ ధర (₹) *</label>
+          <input type="number" id="custPrice" required placeholder="70" value="70">
+        </div>
+        <div class="form-group">
+          <label>ఫోన్ నంబర్</label>
+          <input type="tel" id="custPhone" placeholder="9876543210">
+        </div>
+        <button type="submit" class="btn-add">కస్టమర్‌ని సేవ్ చేయి</button>
+      </form>
+    </details>
+  </section>
+
+  <!-- CUSTOMER VIEW -->
+  <section id="customerSection" class="hidden">
+    <div class="add-form">
+      <label style="font-size: 0.85rem; font-weight: 600; display:block; margin-bottom: 6px;">కస్టమర్‌ని ఎంచుకోండి:</label>
+      <select id="custSelect" onchange="renderCustomerBill()" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border); font-size: 0.95rem;">
+        <option value="">-- ఎంచుకోండి --</option>
+      </select>
+    </div>
+
+    <div id="billDisplay"></div>
+  </section>
 
   <script>
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
     const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNiZW1jaHVmcmdjdnprYnl2ZnJ4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTQzMDQzMTEsImV4cCI6MjEwOTg4MDMxMX0.UZOiRzdcIbjS0lWHosZNb9YkKVJ9FNDehNL1Q-JTEqI';
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
 
-    let supabaseClient = null;
+    let allCustomers = [];
+    let todayDeliveries = {};
 
-    try {
-      supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-    } catch (e) {
-      document.getElementById('app').innerHTML = `<div class="error-box">Supabase కనెక్షన్ ఎర్రర్: ${e.message}</div>`;
-    }
+    function switchMode(mode) {
+      const vendorSec = document.getElementById('vendorSection');
+      const custSec = document.getElementById('customerSection');
+      const btnV = document.getElementById('btnVendor');
+      const btnC = document.getElementById('btnCustomer');
 
-    async function loadData() {
-      if (!supabaseClient) return;
-      const app = document.getElementById('app');
-
-      try {
-        const { data: customers, error: custError } = await supabaseClient
-          .from('customers')
-          .select('*')
-          .order('flat_no', { ascending: true });
-
-        if (custError) {
-          app.innerHTML = `<div class="error-box">డేటా ఎర్రర్: ${custError.message}</div>`;
-          return;
-        }
-
-        const { data: deliveries, error: delError } = await supabaseClient
-          .from('deliveries')
-          .select('*')
-          .eq('delivery_date', today);
-
-        if (delError) {
-          console.warn("Deliveries fetch error:", delError);
-        }
-
-        const deliveryMap = {};
-        if (deliveries) {
-          deliveries.forEach(d => { deliveryMap[d.customer_id] = d; });
-        }
-
-        renderList(customers, deliveryMap);
-      } catch (err) {
-        app.innerHTML = `<div class="error-box">నెట్‌వర్క్ ఎర్రర్: ${err.message}</div>`;
+      if (mode === 'vendor') {
+        vendorSec.classList.remove('hidden');
+        custSec.classList.add('hidden');
+        btnV.classList.add('active');
+        btnC.classList.remove('active');
+      } else {
+        vendorSec.classList.add('hidden');
+        custSec.classList.remove('hidden');
+        btnV.classList.remove('active');
+        btnC.classList.add('active');
+        populateCustomerDropdown();
       }
     }
 
-    function renderList(customers, deliveryMap) {
-      const app = document.getElementById('app');
+    async function init() {
+      const { data: customers } = await supabase.from('customers').select('*').order('flat_no', { ascending: true });
+      allCustomers = customers || [];
+
+      const { data: deliveries } = await supabase.from('deliveries').select('*').eq('delivery_date', today);
+      todayDeliveries = {};
+      if (deliveries) {
+        deliveries.forEach(d => { todayDeliveries[d.customer_id] = d; });
+      }
+
+      renderVendorList();
+    }
+
+    function renderVendorList() {
+      const app = document.getElementById('vendorApp');
       app.innerHTML = '';
 
-      if (!customers || customers.length === 0) {
+      if (allCustomers.length === 0) {
         app.innerHTML = '<p style="text-align:center;">కస్టమర్లు ఎవరూ లేరు.</p>';
         return;
       }
 
-      customers.forEach(customer => {
-        const record = deliveryMap[customer.id];
+      allCustomers.forEach(customer => {
+        const record = todayDeliveries[customer.id];
         const card = document.createElement('div');
         card.className = 'customer-card';
 
         let actionArea = '';
         if (record) {
-          if (record.status === 'delivered') {
-            actionArea = `<div class="status-badge status-delivered">✅ డెలివరీ పూర్తయింది (${record.quantity} Ltr)</div>`;
-          } else {
-            actionArea = `<div class="status-badge status-skipped">❌ ఈ రోజు ఆపేశారు (Skipped)</div>`;
-          }
+          const isDelivered = record.status === 'delivered';
+          actionArea = `
+            <div class="status-area ${isDelivered ? 'status-delivered' : 'status-skipped'}">
+              <span>${isDelivered ? `✅ ఇచ్చాము (${record.quantity} L)` : '❌ ఆపేశారు (Skip)'}</span>
+              <button class="btn-reset" onclick="resetDelivery('${record.id}')">మార్చు (Undo)</button>
+            </div>
+          `;
         } else {
           actionArea = `
             <div class="action-grid">
-              <button class="btn-deliver" onclick="recordDelivery('${customer.id}', ${customer.default_qty}, 'delivered')">
+              <button class="btn-deliver" onclick="saveDelivery('${customer.id}', ${customer.default_qty}, 'delivered')">
                 ఇచ్చాము (${customer.default_qty} L)
               </button>
-              <button class="btn-skip" onclick="recordDelivery('${customer.id}', 0, 'skipped')">
+              <button class="btn-skip" onclick="saveDelivery('${customer.id}', 0, 'skipped')">
                 ఆపేశారు (Skip)
               </button>
             </div>
@@ -135,35 +202,110 @@
           <div class="customer-header">
             <div>
               <div class="customer-name">${customer.name}</div>
-              <div class="details">ధర: ₹${customer.price_per_ltr}/లీ | ఫోన్: ${customer.phone || 'లేదు'}</div>
+              <div class="details">ఫ్లాట్: <b>${customer.flat_no}</b> | ₹${customer.price_per_ltr}/లీ</div>
             </div>
-            <span class="flat-badge">${customer.flat_no}</span>
+            <span class="flat-badge">${customer.default_qty} L/day</span>
           </div>
           ${actionArea}
         `;
-
         app.appendChild(card);
       });
     }
 
-    async function recordDelivery(customerId, qty, status) {
-      const { error } = await supabaseClient
-        .from('deliveries')
-        .upsert({
-          customer_id: customerId,
-          delivery_date: today,
-          quantity: qty,
-          status: status
-        }, { onConflict: 'customer_id,delivery_date' });
+    async function saveDelivery(customerId, qty, status) {
+      const { error } = await supabase.from('deliveries').upsert({
+        customer_id: customerId,
+        delivery_date: today,
+        quantity: qty,
+        status: status
+      }, { onConflict: 'customer_id,delivery_date' });
 
+      if (!error) init();
+    }
+
+    async function resetDelivery(recordId) {
+      const { error } = await supabase.from('deliveries').delete().eq('id', recordId);
+      if (!error) init();
+    }
+
+    async function addCustomer(e) {
+      e.preventDefault();
+      const newCust = {
+        name: document.getElementById('custName').value,
+        flat_no: document.getElementById('custFlat').value,
+        default_qty: parseFloat(document.getElementById('custQty').value),
+        price_per_ltr: parseFloat(document.getElementById('custPrice').value),
+        phone: document.getElementById('custPhone').value
+      };
+
+      const { error } = await supabase.from('customers').insert([newCust]);
       if (error) {
         alert('ఎర్రర్: ' + error.message);
       } else {
-        loadData();
+        alert('కస్టమర్ వివరాలు సేవ్ అయ్యాయి!');
+        document.getElementById('newCustomerForm').reset();
+        init();
       }
     }
 
-    loadData();
+    function populateCustomerDropdown() {
+      const select = document.getElementById('custSelect');
+      select.innerHTML = '<option value="">-- ఎంచుకోండి --</option>';
+      allCustomers.forEach(c => {
+        select.innerHTML += `<option value="${c.id}">${c.name} (${c.flat_no})</option>`;
+      });
+    }
+
+    async function renderCustomerBill() {
+      const custId = document.getElementById('custSelect').value;
+      const display = document.getElementById('billDisplay');
+      if (!custId) {
+        display.innerHTML = '';
+        return;
+      }
+
+      display.innerHTML = '<p style="text-align:center;">లెక్కలు లెక్కిస్తున్నాము...</p>';
+      const customer = allCustomers.find(c => c.id == custId);
+
+      // ప్రస్తుత నెల డెలివరీల వివరాలు
+      const currentMonth = today.substring(0, 7); // YYYY-MM
+      const { data: monthData } = await supabase
+        .from('deliveries')
+        .select('*')
+        .eq('customer_id', custId)
+        .gte('delivery_date', `${currentMonth}-01`)
+        .lte('delivery_date', `${currentMonth}-31`);
+
+      let totalLiters = 0;
+      let deliveredDays = 0;
+      let skippedDays = 0;
+
+      if (monthData) {
+        monthData.forEach(d => {
+          if (d.status === 'delivered') {
+            totalLiters += parseFloat(d.quantity);
+            deliveredDays++;
+          } else if (d.status === 'skipped') {
+            skippedDays++;
+          }
+        });
+      }
+
+      const totalBill = totalLiters * customer.price_per_ltr;
+
+      display.innerHTML = `
+        <div class="bill-card">
+          <h3 style="margin-bottom: 12px; color: var(--primary);">${customer.name} - నెలవారీ లెక్క</h3>
+          <div class="bill-row"><span>లీటర్ ధర</span> <b>₹${customer.price_per_ltr}</b></div>
+          <div class="bill-row"><span>పాలు పోసిన రోజులు</span> <b>${deliveredDays} రోజులు</b></div>
+          <div class="bill-row"><span>ఆపేసిన రోజులు (Skip)</span> <b>${skippedDays} రోజులు</b></div>
+          <div class="bill-row"><span>మొత్తం పాలు</span> <b>${totalLiters} లీటర్లు</b></div>
+          <div class="bill-row total"><span>మొత్తం బిల్లు</span> <span>₹${totalBill}</span></div>
+        </div>
+      `;
+    }
+
+    init();
   </script>
 </body>
 </html>

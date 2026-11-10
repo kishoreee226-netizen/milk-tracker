@@ -43,9 +43,14 @@
     .status-delivered { background-color: #dcfce7; color: var(--success); }
     .status-skipped { background-color: #fee2e2; color: var(--danger); }
 
-    .bill-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 14px; }
+    .bill-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-top: 14px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
     .bill-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px dashed var(--border); font-size: 0.9rem; }
-    .bill-row.total { font-weight: 700; font-size: 1.1rem; border-bottom: none; color: var(--primary); }
+    .bill-row.total { font-weight: 700; font-size: 1.15rem; border-bottom: none; color: var(--primary); padding-top: 12px; }
+
+    .history-list { margin-top: 16px; font-size: 0.85rem; }
+    .history-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid #f1f5f9; }
+
+    .btn-whatsapp { background-color: #25d366; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-top: 14px; font-size: 0.95rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
 
     .add-form { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
     .form-group { margin-bottom: 10px; }
@@ -157,11 +162,7 @@
 
     async function init() {
       try {
-        const { data: customers, error: errC } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
-        if (errC) {
-          document.getElementById('vendorApp').innerHTML = `<p style="color:red; text-align:center;">Error: ${errC.message}</p>`;
-          return;
-        }
+        const { data: customers } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
         allCustomers = customers || [];
 
         const { data: deliveries } = await dbClient.from('deliveries').select('*').eq('delivery_date', today);
@@ -266,10 +267,13 @@
 
     function populateCustomerDropdown() {
       const select = document.getElementById('custSelect');
+      const currentVal = select.value;
       select.innerHTML = '<option value="">-- ఎంచుకోండి --</option>';
       allCustomers.forEach(c => {
-        select.innerHTML += `<option value="${c.id}">${c.name} (${c.flat_no})</option>`;
+        const selected = (c.id == currentVal) ? 'selected' : '';
+        select.innerHTML += `<option value="${c.id}" ${selected}>${c.name} (${c.flat_no})</option>`;
       });
+      if (currentVal) renderCustomerBill();
     }
 
     async function renderCustomerBill() {
@@ -283,30 +287,41 @@
       display.innerHTML = '<p style="text-align:center; padding: 20px;">లెక్కలు లెక్కిస్తున్నాము...</p>';
       const customer = allCustomers.find(c => c.id == custId);
 
-      const currentMonth = today.substring(0, 7);
+      const [year, month] = today.split('-');
+      const startOfMonth = `${year}-${month}-01`;
+      const nextMonth = String(Number(month) + 1).padStart(2, '0');
+      const startOfNextMonth = `${year}-${nextMonth}-01`;
+
       const { data: monthData } = await dbClient
         .from('deliveries')
         .select('*')
         .eq('customer_id', custId)
-        .gte('delivery_date', `${currentMonth}-01`)
-        .lte('delivery_date', `${currentMonth}-31`);
+        .gte('delivery_date', startOfMonth)
+        .lt('delivery_date', startOfNextMonth)
+        .order('delivery_date', { ascending: false });
 
       let totalLiters = 0;
       let deliveredDays = 0;
       let skippedDays = 0;
+      let historyHtml = '';
 
-      if (monthData) {
+      if (monthData && monthData.length > 0) {
         monthData.forEach(d => {
           if (d.status === 'delivered') {
             totalLiters += parseFloat(d.quantity);
             deliveredDays++;
+            historyHtml += `<div class="history-item"><span>📅 ${d.delivery_date}</span><span style="color:var(--success); font-weight:600;">+${d.quantity} లీ</span></div>`;
           } else if (d.status === 'skipped') {
             skippedDays++;
+            historyHtml += `<div class="history-item"><span>📅 ${d.delivery_date}</span><span style="color:var(--danger); font-weight:600;">ఆపేశారు (Skip)</span></div>`;
           }
         });
+      } else {
+        historyHtml = '<p style="color:#64748b; padding:8px 0;">ఈ నెలకు ఇంకా డెలివరీలు రికార్డు కాలేదు.</p>';
       }
 
       const totalBill = totalLiters * customer.price_per_ltr;
+      const shareText = encodeURIComponent(`🥛 *పాల బిల్లు వివరాలు*\nకస్టమర్: ${customer.name} (${customer.flat_no})\nనెల: ${month}/${year}\nమొత్తం లీటర్లు: ${totalLiters} L\nలీటర్ ధర: ₹${customer.price_per_ltr}\n*మొత్తం బిల్లు: ₹${totalBill}*`);
 
       display.innerHTML = `
         <div class="bill-card">
@@ -316,6 +331,13 @@
           <div class="bill-row"><span>ఆపేసిన రోజులు (Skip)</span> <b>${skippedDays} రోజులు</b></div>
           <div class="bill-row"><span>మొత్తం పాలు</span> <b>${totalLiters} లీటర్లు</b></div>
           <div class="bill-row total"><span>మొత్తం బిల్లు</span> <span>₹${totalBill}</span></div>
+
+          <a href="https://wa.me/${customer.phone ? '91' + customer.phone : ''}?text=${shareText}" target="_blank" style="text-decoration:none;">
+            <button class="btn-whatsapp">📲 WhatsApp లో బిల్లు పంపండి</button>
+          </a>
+
+          <h4 style="margin-top: 18px; margin-bottom: 6px; font-size: 0.9rem; color:#475569;">ఈ నెల డెలివరీ హిస్టరీ:</h4>
+          <div class="history-list">${historyHtml}</div>
         </div>
       `;
     }

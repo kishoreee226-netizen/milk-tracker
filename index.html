@@ -53,46 +53,46 @@
 
     .btn-whatsapp { background-color: #25d366; color: white; width: 100%; padding: 12px; border-radius: 8px; margin-top: 14px; font-size: 0.95rem; font-weight: 600; }
 
-    .add-form { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
-    .form-group { margin-bottom: 10px; }
-    .form-group label { display: block; font-size: 0.8rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
-    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.9rem; }
-    .btn-add { background: var(--primary); color: white; width: 100%; padding: 10px; border-radius: 8px; }
-    .btn-secondary { background: #e2e8f0; color: #334155; width: 100%; padding: 10px; border-radius: 8px; margin-top: 8px; }
+    .add-form { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .form-group { margin-bottom: 12px; }
+    .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 4px; color: #475569; }
+    .form-group input { width: 100%; padding: 10px; border: 1px solid var(--border); border-radius: 6px; font-size: 0.95rem; }
+    .btn-add { background: var(--primary); color: white; width: 100%; padding: 12px; border-radius: 8px; font-weight: 600; }
+    .btn-secondary { background: #e2e8f0; color: #334155; width: 100%; padding: 12px; border-radius: 8px; margin-top: 8px; font-weight: 600; }
 
     .hidden { display: none !important; }
   </style>
 </head>
 <body>
 
-  <!-- AUTH SECTION (లాగిన్ & సైన్ అప్) -->
-  <section id="authSection" class="hidden" style="max-width: 400px; margin: 30px auto;">
+  <!-- LOGIN / REGISTER SCREEN -->
+  <section id="authSection" class="hidden" style="max-width: 400px; margin: 40px auto 0;">
     <div style="text-align: center; margin-bottom: 24px;">
       <h1 style="color: var(--primary); font-size: 1.8rem; margin-bottom: 6px;">🥛 పాల ట్రాకర్</h1>
-      <p style="color: #64748b; font-size: 0.9rem;">మీ స్వంత వ్యాపార ఖాతాలోకి లాగిన్ అవ్వండి</p>
+      <p style="color: #64748b; font-size: 0.9rem;">మొబైల్ నంబర్ మరియు 4 అంకెల పిన్ ఎంటర్ చేయండి</p>
     </div>
 
     <div class="add-form">
       <div class="form-group">
-        <label>ఈమెయిల్ (Email)</label>
-        <input type="email" id="authEmail" placeholder="name@example.com" required>
+        <label>మొబైల్ నంబర్ (10 అంకెలు)</label>
+        <input type="tel" id="userPhone" placeholder="ఉదా: 9876543210" maxlength="10">
       </div>
       <div class="form-group">
-        <label>పాస్‌వర్డ్ (Password)</label>
-        <input type="password" id="authPassword" placeholder="కనీసం 6 అక్షరాలు" required>
+        <label>4-అంకెల సెక్యూరిటీ పిన్ (PIN)</label>
+        <input type="password" id="userPin" placeholder="ఉదా: 1234" maxlength="4" inputmode="numeric">
       </div>
-      <button class="btn-add" onclick="handleLogin()">లాగిన్ (Login)</button>
-      <button class="btn-secondary" onclick="handleSignUp()">కొత్త అకౌంట్ క్రియేట్ చేయి (Sign Up)</button>
+      <button class="btn-add" onclick="handleAuth('login')">లాగిన్ (Login)</button>
+      <button class="btn-secondary" onclick="handleAuth('register')">కొత్తగా రిజిస్టర్ అవ్వండి (Register)</button>
     </div>
   </section>
 
-  <!-- MAIN APP SECTION -->
+  <!-- MAIN APP SCREEN -->
   <section id="mainAppSection" class="hidden">
     <header>
       <div class="header-top">
         <h1>🥛 పాల ట్రాకర్</h1>
         <div>
-          <span class="user-badge" id="userEmailBadge"></span>
+          <span class="user-badge" id="phoneBadge"></span>
           <button onclick="handleLogout()" style="background: none; border: 1px solid rgba(255,255,255,0.4); color: white; padding: 2px 8px; border-radius: 4px; font-size: 0.75rem; margin-left: 6px;">Logout</button>
         </div>
       </div>
@@ -159,18 +159,15 @@
     const today = new Date().toISOString().split('T')[0];
     document.getElementById('currentDateDisplay').innerText = `తేదీ: ${today}`;
 
-    let currentUser = null;
+    let currentVendor = JSON.parse(localStorage.getItem('milk_current_vendor') || 'null');
     let allCustomers = [];
     let todayDeliveries = {};
 
-    // AUTH FUNCTIONS
-    async function checkUserSession() {
-      const { data: { session } } = await dbClient.auth.getSession();
-      if (session && session.user) {
-        currentUser = session.user;
+    function checkAuth() {
+      if (currentVendor && currentVendor.id) {
         document.getElementById('authSection').classList.add('hidden');
         document.getElementById('mainAppSection').classList.remove('hidden');
-        document.getElementById('userEmailBadge').innerText = currentUser.email.split('@')[0];
+        document.getElementById('phoneBadge').innerText = currentVendor.phone;
         initApp();
       } else {
         document.getElementById('authSection').classList.remove('hidden');
@@ -178,36 +175,50 @@
       }
     }
 
-    async function handleLogin() {
-      const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value;
-      if (!email || !password) return alert('ఈమెయిల్ మరియు పాస్‌వర్డ్ ఇవ్వండి.');
+    async function handleAuth(action) {
+      const phone = document.getElementById('userPhone').value.trim();
+      const pin = document.getElementById('userPin').value.trim();
 
-      const { data, error } = await dbClient.auth.signInWithPassword({ email, password });
-      if (error) alert('లాగిన్ విఫలమైంది: ' + error.message);
-      else checkUserSession();
-    }
+      if (phone.length !== 10 || isNaN(phone)) {
+        return alert('దయచేసి సరైన 10 అంకెల మొబైల్ నంబర్ ఇవ్వండి.');
+      }
+      if (pin.length !== 4 || isNaN(pin)) {
+        return alert('దయచేసి 4 అంకెల పిన్ (PIN) ఇవ్వండి.');
+      }
 
-    async function handleSignUp() {
-      const email = document.getElementById('authEmail').value.trim();
-      const password = document.getElementById('authPassword').value;
-      if (!email || !password) return alert('ఈమెయిల్ మరియు పాస్‌వర్డ్ ఇవ్వండి.');
+      if (action === 'register') {
+        const { data: existing } = await dbClient.from('vendors').select('*').eq('phone', phone).single();
+        if (existing) {
+          return alert('ఈ మొబైల్ నంబర్ ఇప్పటికే రిజిస్టర్ అయింది. దయచేసి లాగిన్ అవ్వండి.');
+        }
 
-      const { data, error } = await dbClient.auth.signUp({ email, password });
-      if (error) alert('సైన్ అప్ విఫలమైంది: ' + error.message);
-      else {
-        alert('ఖాతా విజయవంతంగా సృష్టించబడింది! లాగిన్ అవుతున్నారు...');
-        checkUserSession();
+        const { data, error } = await dbClient.from('vendors').insert([{ phone, pin }]).select().single();
+        if (error) {
+          alert('రిజిస్ట్రేషన్ ఎర్రర్: ' + error.message);
+        } else {
+          alert('ఖాతా విజయవంతంగా సృష్టించబడింది!');
+          currentVendor = data;
+          localStorage.setItem('milk_current_vendor', JSON.stringify(data));
+          checkAuth();
+        }
+      } else {
+        const { data, error } = await dbClient.from('vendors').select('*').eq('phone', phone).eq('pin', pin).single();
+        if (error || !data) {
+          alert('మొబైల్ నంబర్ లేదా 4 అంకెల పిన్ తప్పుగా ఇచ్చారు!');
+        } else {
+          currentVendor = data;
+          localStorage.setItem('milk_current_vendor', JSON.stringify(data));
+          checkAuth();
+        }
       }
     }
 
-    async function handleLogout() {
-      await dbClient.auth.signOut();
-      currentUser = null;
-      checkUserSession();
+    function handleLogout() {
+      localStorage.removeItem('milk_current_vendor');
+      currentVendor = null;
+      checkAuth();
     }
 
-    // APP CORE FUNCTIONS
     function switchMode(mode) {
       const vendorSec = document.getElementById('vendorSection');
       const custSec = document.getElementById('customerSection');
@@ -230,7 +241,12 @@
 
     async function initApp() {
       try {
-        const { data: customers } = await dbClient.from('customers').select('*').order('flat_no', { ascending: true });
+        const { data: customers } = await dbClient
+          .from('customers')
+          .select('*')
+          .eq('vendor_id', currentVendor.id)
+          .order('flat_no', { ascending: true });
+        
         allCustomers = customers || [];
 
         const { data: deliveries } = await dbClient.from('deliveries').select('*').eq('delivery_date', today);
@@ -321,7 +337,7 @@
         default_qty: parseFloat(document.getElementById('custQty').value),
         price_per_ltr: parseFloat(document.getElementById('custPrice').value),
         phone: document.getElementById('custPhone').value,
-        user_id: currentUser.id
+        vendor_id: currentVendor.id
       };
 
       const { error } = await dbClient.from('customers').insert([newCust]);
@@ -415,8 +431,7 @@
       `;
     }
 
-    // START CHECKING SESSION ON LOAD
-    window.onload = checkUserSession;
+    window.onload = checkAuth;
   </script>
 </body>
 </html>

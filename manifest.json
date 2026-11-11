@@ -1,6 +1,6 @@
 {
   "id": "/milk-tracker-v2",
-  "name": "MilkCount - పాల లెక్క",
+  "name": "MilkCount - పాల లెక్కలు",
   "short_name": "MilkCount",
   "description": "Daily Milk Delivery & Consumption Tracker",
   "start_url": "./index.html",

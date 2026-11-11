@@ -3,7 +3,7 @@
   "name": "MilkCount - పాల లెక్కలు",
   "short_name": "MilkCount",
   "description": "Daily Milk Delivery & Consumption Tracker",
-  "start_url": "./index.html",
+  "start_url": "./index.html?v=2",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

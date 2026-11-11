@@ -257,7 +257,7 @@
               <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
                 <i class="ph-fill ph-calendar text-sky-600"></i> రోజువారీ క్యాలెండర్ (Delivery Grid)
               </h2>
-              <p class="text-[10px] text-slate-500">గడిచిన రోజులు ఆటో-రికార్డ్ అవుతాయి. వద్దు అనుకున్న రోజు తాకండి.</p>
+              <p class="text-[10px] text-slate-500">మార్పులు చేయడానికి తేదీపై నొక్కండి</p>
             </div>
 
             <!-- Color Legend Indicator -->
@@ -265,6 +265,19 @@
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>పాలు</span>
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>ఆపినవి</span>
             </div>
+          </div>
+
+          <!-- AUTO FILL TOGGLE SWITCH (AUTO MODE) -->
+          <div class="flex items-center justify-between bg-slate-50 border border-slate-200/80 px-3 py-2.5 rounded-xl mb-3">
+            <div>
+              <span class="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <i class="ph-bold ph-magic-wand text-sky-600"></i> ఆటో మోడ్ (Auto Mode)
+              </span>
+              <p class="text-[10px] text-slate-500" id="autoModeDesc">రోజూ ఆటోమేటిక్‌గా పాలు నమోదవుతాయి</p>
+            </div>
+            <button id="autoModeToggleBtn" onclick="toggleAutoMode()" class="relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none bg-sky-600">
+              <span id="autoModeThumb" class="inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6"></span>
+            </button>
           </div>
 
           <!-- Weekday Headers -->
@@ -473,6 +486,7 @@
     let isSignUpMode = false;
     let ratePerLiter = 70;
     let defaultDailyQuota = 1.0;
+    let isAutoMode = true; // Auto Fill Mode Toggle
     let monthRecords = {};
 
     // 2. LIFECYCLE & AUTHENTICATION
@@ -489,18 +503,16 @@
       const session = localStorage.getItem('milk_self_customer');
       const lastAccount = localStorage.getItem('milkcount_last_account');
 
-      // ఎగ్జిట్ అయ్యి మళ్లీ ఓపెన్ చేస్తే డైరెక్ట్ హోమ్‌పేజ్
       if (session) {
         try {
           currentUser = JSON.parse(session);
-          setupUserSession(currentUser);
+          setupUserSession(currentUser, false);
           return;
         } catch (e) {
           localStorage.removeItem('milk_self_customer');
         }
       }
 
-      // లాగౌట్ అయి ఉంటే, కేవలం PIN అడిగే స్క్రీన్ చూపించడం
       if (lastAccount) {
         try {
           savedUserCache = JSON.parse(lastAccount);
@@ -562,21 +574,22 @@
           phone: phone,
           pin: pin,
           daily_qty: 1.0,
-          price_per_ltr: 70
+          price_per_ltr: 70,
+          auto_mode: true
         }]).select().single();
 
         if (error) {
           alert('Error: ' + error.message);
         } else {
           alert('ఖాతా విజయవంతంగా సృష్టించబడింది!');
-          setupUserSession(data);
+          setupUserSession(data, true);
         }
       } else {
         const { data, error } = await db.from('customer_users').select('*').eq('phone', phone).eq('pin', pin).maybeSingle();
         if (error || !data) {
           alert('మొబైల్ నంబర్ లేదా 4-డిజిట్ పిన్ తప్పుగా నమోదు చేశారు!');
         } else {
-          setupUserSession(data);
+          setupUserSession(data, false);
         }
       }
     }
@@ -589,11 +602,11 @@
       if (error || !data) {
         alert('పిన్ తప్పుగా నమోదు చేశారు!');
       } else {
-        setupUserSession(data);
+        setupUserSession(data, false);
       }
     }
 
-    function setupUserSession(user) {
+    function setupUserSession(user, isNewUser = false) {
       currentUser = user;
       localStorage.setItem('milk_self_customer', JSON.stringify(user));
       localStorage.setItem('milkcount_last_account', JSON.stringify({ phone: user.phone, name: user.name }));
@@ -604,11 +617,20 @@
       
       ratePerLiter = parseFloat(user.price_per_ltr || 70);
       defaultDailyQuota = parseFloat(user.daily_qty || 1.0);
+      isAutoMode = user.auto_mode !== false;
 
       document.getElementById('ratePerLiterText').innerText = ratePerLiter;
       document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
 
+      updateAutoModeUI();
       fetchMonthData();
+
+      if (isNewUser) {
+        setTimeout(() => {
+          openQuotaModal();
+          showToast("స్వాగతం! దయచేసి మీ రోజువారీ పాల కోటాను సరిచూసుకోండి.");
+        }, 500);
+      }
     }
 
     function logoutCustomer() {
@@ -634,7 +656,38 @@
       }, 2200);
     }
 
-    // 3. MONTH NAVIGATION & DATA FETCHING
+    // 3. AUTO FILL MODE TOGGLE LOGIC
+    async function toggleAutoMode() {
+      isAutoMode = !isAutoMode;
+      currentUser.auto_mode = isAutoMode;
+      localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+      
+      updateAutoModeUI();
+      renderApp();
+
+      await db.from('customer_users').update({ auto_mode: isAutoMode }).eq('id', currentUser.id);
+      showToast(isAutoMode ? "ఆటో మోడ్ ఆన్ చేయబడింది (Auto-fill ON)" : "మాన్యువల్ మోడ్ ఆన్ చేయబడింది (Auto-fill OFF)");
+    }
+
+    function updateAutoModeUI() {
+      const btn = document.getElementById('autoModeToggleBtn');
+      const thumb = document.getElementById('autoModeThumb');
+      const desc = document.getElementById('autoModeDesc');
+
+      if (!btn || !thumb || !desc) return;
+
+      if (isAutoMode) {
+        btn.className = "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none bg-sky-600";
+        thumb.className = "inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-6";
+        desc.innerText = "రోజూ ఆటోమేటిక్‌గా పాలు నమోదవుతాయి";
+      } else {
+        btn.className = "relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none bg-slate-300";
+        thumb.className = "inline-block h-4 w-4 transform rounded-full bg-white transition-transform translate-x-1";
+        desc.innerText = "మాన్యువల్: మీరు నమోదు చేస్తేనే లెక్కించబడుతుంది";
+      }
+    }
+
+    // 4. MONTH NAVIGATION & DATA FETCHING
     function changeMonth(delta) {
       currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
       fetchMonthData();
@@ -671,7 +724,7 @@
       renderApp();
     }
 
-    // 4. SETTINGS MODALS (PRICE & QUOTA)
+    // 5. SETTINGS MODALS (PRICE & QUOTA)
     function openPriceModal() {
       document.getElementById('rateInput').value = ratePerLiter;
       document.getElementById('priceModal').classList.remove('hidden-force');
@@ -712,7 +765,7 @@
       }
     }
 
-    // 5. DAY MODAL & ACTIONS
+    // 6. DAY MODAL & ACTIONS
     function openDayModal(day) {
       selectedDayForModal = day;
       const monthName = TELUGU_MONTHS[currentViewingDate.getMonth()];
@@ -783,7 +836,7 @@
       }
     }
 
-    // 6. QUICK ACTIONS (TOMORROW'S PLAN)
+    // 7. QUICK ACTIONS (TOMORROW'S PLAN)
     async function toggleSkipTomorrow() {
       const now = new Date();
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -847,32 +900,34 @@
       document.getElementById('billSection').scrollIntoView({ behavior: 'smooth' });
     }
 
+    // 8. WHATSAPP SHARE
     function shareOnWhatsApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const now = new Date();
+      
+      const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
+      userRegDate.setHours(0, 0, 0, 0);
 
       let deliveredDays = 0;
       let skippedDays = 0;
       let totalLiters = 0;
 
       for (let d = 1; d <= daysInMonth; d++) {
+        const currentDate = new Date(year, month, d);
+        const isPastOrToday = currentDate <= now;
+        const isAfterOrOnJoin = currentDate >= userRegDate;
         const item = monthRecords[d];
-        const isPastOrToday = (year < now.getFullYear()) || 
-                              (year === now.getFullYear() && month < now.getMonth()) || 
-                              (year === now.getFullYear() && month === now.getMonth() && d <= now.getDate());
 
         if (item) {
           if (item.status === 'delivered' && item.liters > 0) {
-            if (isPastOrToday) {
-              deliveredDays++;
-              totalLiters += item.liters;
-            }
+            deliveredDays++;
+            totalLiters += item.liters;
           } else if (item.status === 'skipped') {
             skippedDays++;
           }
-        } else if (isPastOrToday) {
+        } else if (isPastOrToday && isAfterOrOnJoin && isAutoMode) {
           deliveredDays++;
           totalLiters += defaultDailyQuota;
         }
@@ -900,7 +955,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.location.href = `whatsapp://send?text=${encoded}`;
     }
 
-    // 7. CALENDAR & BILL STATEMENT RENDER
+    // 9. CALENDAR & APP RENDER (Auto-Mode + Registration-Date Aware)
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -942,42 +997,40 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         document.getElementById('skipTomorrowBtn').classList.remove('bg-rose-50', 'border-rose-400');
       }
 
+      const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
+      userRegDate.setHours(0, 0, 0, 0);
+
       for (let day = 1; day <= daysInMonth; day++) {
         const item = monthRecords[day];
+        const currentDate = new Date(year, month, day);
         const isToday = (day === now.getDate() && month === now.getMonth() && year === now.getFullYear());
-        const isPastOrToday = (year < now.getFullYear()) || 
-                              (year === now.getFullYear() && month < now.getMonth()) || 
-                              (year === now.getFullYear() && month === now.getMonth() && day <= now.getDate());
+        const isPastOrToday = currentDate <= now;
+        const isAfterOrOnJoin = currentDate >= userRegDate;
 
         let statusClass = "bg-white border-slate-200 text-slate-700 hover:border-sky-300";
-        let statusBadge = `<span class="text-[9px] text-slate-400 font-medium leading-none">-</span>`;
+        let statusBadge = `<span class="text-[9px] text-slate-300 font-medium leading-none">-</span>`;
 
         if (item) {
           if (item.status === 'delivered') {
-            if (isPastOrToday) {
-              deliveredCount++;
-              totalLiters += item.liters;
+            deliveredCount++;
+            totalLiters += item.liters;
 
-              const isExtra = item.liters > defaultDailyQuota;
-              statusClass = isExtra 
-                ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
-                : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
+            const isExtra = item.liters > defaultDailyQuota;
+            statusClass = isExtra 
+              ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
+              : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
 
-              statusBadge = `
-                <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
-                  ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
-                </span>
-              `;
-            } else {
-              statusClass = "bg-sky-50 border-sky-300 text-sky-900";
-              statusBadge = `<span class="text-[10px] font-bold text-sky-600 leading-none">${item.liters}L</span>`;
-            }
+            statusBadge = `
+              <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
+                ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
+              </span>
+            `;
           } else if (item.status === 'skipped') {
             skippedCount++;
             statusClass = "bg-rose-50/80 border-rose-300 text-rose-900";
             statusBadge = `<span class="text-[9px] font-bold text-rose-600 leading-none">వద్దు</span>`;
           }
-        } else if (isPastOrToday) {
+        } else if (isPastOrToday && isAfterOrOnJoin && isAutoMode) {
           deliveredCount++;
           totalLiters += defaultDailyQuota;
           statusClass = "bg-emerald-50/70 border-emerald-300 text-emerald-900";

@@ -1,9 +1,9 @@
 {
-  "id": "/milk-tracker-v3",
+  "id": "/milk-tracker-v4",
   "name": "MilkCount - పాల లెక్కలు",
   "short_name": "MilkCount",
   "description": "Daily Milk Delivery & Consumption Tracker",
-  "start_url": "./index.html?v=3",
+  "start_url": "./index.html?v=4",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
@@ -14,13 +14,13 @@
       "src": "./logo-192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
       "src": "./logo-512.png",
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ]
 }

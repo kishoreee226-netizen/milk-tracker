@@ -67,7 +67,7 @@
       <p class="text-xs text-slate-500 mb-6 text-center">మీ రోజువారీ పాల లెక్కలు భద్రపరుచుకోండి</p>
 
       <div class="w-full bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-xs">
-        
+
         <!-- Quick PIN Lock Container (గతంలో లాగిన్ అయిన నంబర్ కోసం) -->
         <div id="quickPinContainer" class="hidden-force text-center space-y-3">
           <div class="w-12 h-12 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center mx-auto text-lg font-bold">
@@ -267,6 +267,7 @@
             <!-- Color Legend Indicator -->
             <div class="flex items-center gap-2 text-[10px] font-medium text-slate-600">
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>పాలు</span>
+              <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>షెడ్యూల్</span>
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span>ఆపినవి</span>
             </div>
           </div>
@@ -493,6 +494,14 @@
     let isAutoMode = true; // Auto Fill Mode Toggle
     let monthRecords = {};
 
+    // Helper: Check if a given (year, month, day) is in the future (strictly after today)
+    function isFutureDate(year, month, day) {
+      const now = new Date();
+      const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const targetDate = new Date(year, month, day);
+      return targetDate > todayStart;
+    }
+
     // 2. LIFECYCLE & AUTHENTICATION
     window.onload = function() {
       checkAuth();
@@ -618,7 +627,7 @@
       document.getElementById('authSection').classList.add('hidden-force');
       document.getElementById('mainAppSection').classList.remove('hidden-force');
       document.getElementById('userPhoneBadge').innerText = `${user.name || 'User'} (${user.phone})`;
-      
+
       ratePerLiter = parseFloat(user.price_per_ltr || 70);
       defaultDailyQuota = parseFloat(user.daily_qty || 1.0);
       isAutoMode = user.auto_mode !== false;
@@ -665,7 +674,7 @@
       isAutoMode = !isAutoMode;
       currentUser.auto_mode = isAutoMode;
       localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
-      
+
       updateAutoModeUI();
       renderApp();
 
@@ -773,7 +782,10 @@
     function openDayModal(day) {
       selectedDayForModal = day;
       const monthName = TELUGU_MONTHS[currentViewingDate.getMonth()];
-      document.getElementById('modalDateTitle').innerText = `తేదీ: ${day} ${monthName}`;
+      const future = isFutureDate(currentViewingDate.getFullYear(), currentViewingDate.getMonth(), day);
+      document.getElementById('modalDateTitle').innerText = future
+        ? `తేదీ: ${day} ${monthName} (షెడ్యూల్)`
+        : `తేదీ: ${day} ${monthName}`;
 
       const item = monthRecords[day];
       const customInput = document.getElementById('customLitersInput');
@@ -797,6 +809,7 @@
       const m = String(currentViewingDate.getMonth() + 1).padStart(2, '0');
       const d = String(selectedDayForModal).padStart(2, '0');
       const logDate = `${y}-${m}-${d}`;
+      const future = isFutureDate(y, currentViewingDate.getMonth(), selectedDayForModal);
 
       const status = liters === 0 ? 'skipped' : 'taken';
       const quantity = liters;
@@ -813,7 +826,13 @@
           status: status === 'taken' ? 'delivered' : 'skipped',
           liters: quantity
         };
-        showToast(liters === 0 ? `${selectedDayForModal}వ తేదీ పాలు వద్దు అని మార్క్ చేశాం!` : `${selectedDayForModal}వ తేదీ: ${liters}L మార్క్ అయ్యాయి!`);
+        if (liters === 0) {
+          showToast(`${selectedDayForModal}వ తేదీ పాలు వద్దు అని మార్క్ చేశాం!`);
+        } else if (future) {
+          showToast(`${selectedDayForModal}వ తేదీకి ${liters}L షెడ్యూల్ చేయబడింది (ఆ రోజు బిల్లులో కలుస్తుంది)!`);
+        } else {
+          showToast(`${selectedDayForModal}వ తేదీ: ${liters}L మార్క్ అయ్యాయి!`);
+        }
         renderApp();
       }
       closeDayModal();
@@ -896,7 +915,7 @@
       }, { onConflict: 'user_id,log_date' });
 
       monthRecords[dayNum] = { status: 'delivered', liters: newVal };
-      showToast(`రేపు (${dayNum}న) +0.5L జోడించాం! మొత్తం: ${newVal}L`);
+      showToast(`రేపు (${dayNum}న) +0.5L షెడ్యూల్ చేశాం! మొత్తం: ${newVal}L`);
       renderApp();
     }
 
@@ -910,7 +929,7 @@
       const month = currentViewingDate.getMonth();
       const daysInMonth = new Date(year, month + 1, 0).getDate();
       const now = new Date();
-      
+
       const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
       userRegDate.setHours(0, 0, 0, 0);
 
@@ -925,7 +944,7 @@
         const item = monthRecords[d];
 
         if (item) {
-          if (item.status === 'delivered' && item.liters > 0) {
+          if (item.status === 'delivered' && item.liters > 0 && isPastOrToday) {
             deliveredDays++;
             totalLiters += item.liters;
           } else if (item.status === 'skipped') {
@@ -959,7 +978,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.location.href = `whatsapp://send?text=${encoded}`;
     }
 
-    // 9. CALENDAR & APP RENDER (Auto-Mode + Registration-Date Aware)
+    // 9. CALENDAR & APP RENDER (Auto-Mode + Registration-Date Aware + Future Scheduled Blue Badge)
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -1016,19 +1035,30 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
         if (item) {
           if (item.status === 'delivered') {
-            deliveredCount++;
-            totalLiters += item.liters;
+            if (isPastOrToday) {
+              // Past or Today: Green & Counted in Bill
+              deliveredCount++;
+              totalLiters += item.liters;
 
-            const isExtra = item.liters > defaultDailyQuota;
-            statusClass = isExtra 
-              ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
-              : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
+              const isExtra = item.liters > defaultDailyQuota;
+              statusClass = isExtra 
+                ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
+                : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
 
-            statusBadge = `
-              <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
-                ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
-              </span>
-            `;
+              statusBadge = `
+                <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
+                  ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
+                </span>
+              `;
+            } else {
+              // Future Scheduled Date: Blue Badge & NOT Counted in Bill yet
+              statusClass = "bg-sky-50 border-sky-400 text-sky-950 shadow-xs";
+              statusBadge = `
+                <span class="text-[10px] font-extrabold text-sky-700 leading-none flex items-center gap-0.5">
+                  ${item.liters}L <i class="ph-bold ph-clock text-[9px] text-sky-600"></i>
+                </span>
+              `;
+            }
           } else if (item.status === 'skipped') {
             skippedCount++;
             statusClass = "bg-rose-50/80 border-rose-300 text-rose-900";

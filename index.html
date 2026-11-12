@@ -346,13 +346,18 @@
             </div>
           </div>
 
-          <!-- WhatsApp Share Button -->
-          <div class="pt-2">
+          <!-- WhatsApp Share & App Share Buttons -->
+          <div class="pt-2 space-y-2.5">
             <button onclick="shareOnWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.98] transition-all text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm">
               <i class="ph-fill ph-whatsapp-logo text-xl"></i>
               వాట్సాప్‌లో బిల్ పంపండి (Share on WhatsApp)
             </button>
-            <p class="text-[10px] text-center text-slate-400 mt-1.5">పాలబ్బాయికి లేదా మీ రికార్డు కోసం సులభంగా పంపుకోవచ్చు</p>
+
+            <button onclick="shareAppLink()" class="w-full bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs">
+              <i class="ph-bold ph-share-network text-base text-sky-600"></i>
+              యాప్ లింక్ షేర్ చేయండి (Share App Link)
+            </button>
+            <p class="text-[10px] text-center text-slate-400">పాలబ్బాయికి బిల్ పంపడానికి లేదా తెలిసినవారికి యాప్ షేర్ చేయడానికి</p>
           </div>
         </section>
 
@@ -976,6 +981,21 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
       const encoded = encodeURIComponent(textMessage);
       window.location.href = `whatsapp://send?text=${encoded}`;
+    }
+
+    function shareAppLink() {
+      const appUrl = 'https://kishoreee226-netizen.github.io/milk-tracker/';
+      const shareText = `🥛 *MilkCount - పాల లెక్క యాప్*\nరోజువారీ పాల లెక్కలు, ఆటో బిల్లింగ్ మరియు వాట్సాప్ బిల్ రిపోర్ట్ కోసం ఈ యాప్ ఇన్‌స్టాల్ చేసుకోండి:\n${appUrl}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'MilkCount - పాల లెక్క',
+          text: shareText,
+          url: appUrl
+        }).catch(() => {});
+      } else {
+        window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+      }
     }
 
     // 9. CALENDAR & APP RENDER (Auto-Mode + Registration-Date Aware + Future Scheduled Blue Badge)

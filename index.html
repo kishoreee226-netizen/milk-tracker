@@ -51,6 +51,12 @@
     * { -webkit-tap-highlight-color: transparent; }
     .custom-scroll::-webkit-scrollbar { display: none; }
     .hidden-force { display: none !important; }
+    @media print {
+      body { background: #fff !important; }
+      header, #quickActionsSection, #metricsSection, #calendarSection, #billActionsContainer, #toast, .fixed { display: none !important; }
+      #mainAppSection, main, #billSection { display: block !important; box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; width: 100% !important; max-width: 100% !important; }
+      #printStatementTable { display: block !important; }
+    }
   </style>
 </head>
 <body class="bg-slate-100 text-slate-800 font-sans min-h-screen flex justify-center selection:bg-brand-100">
@@ -169,7 +175,7 @@
       <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
 
         <!-- QUICK SHORTCUTS CARD -->
-        <section class="bg-gradient-to-br from-blue-50 to-sky-50/70 border border-sky-100 rounded-2xl p-3.5 shadow-sm">
+        <section id="quickActionsSection" class="bg-gradient-to-br from-blue-50 to-sky-50/70 border border-sky-100 rounded-2xl p-3.5 shadow-sm">
           <div class="flex items-center justify-between mb-2.5">
             <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
               <i class="ph-fill ph-lightning text-amber-500"></i> త్వరిత అప్‌డేట్ (Quick Actions)
@@ -177,45 +183,75 @@
             <span class="text-[11px] text-slate-500" id="tomorrowIndicator">రేపటికి ప్లాన్</span>
           </div>
 
-          <div class="grid grid-cols-2 gap-2">
+          <div class="grid grid-cols-3 gap-2">
             <!-- Toggle Skip Tomorrow -->
             <button id="skipTomorrowBtn" onclick="toggleSkipTomorrow()" class="flex flex-col items-start p-2.5 rounded-xl border border-rose-200 bg-white hover:bg-rose-50/60 active:scale-95 transition-all shadow-xs text-left group">
               <div class="flex items-center justify-between w-full">
-                <span class="text-xs font-bold text-rose-700 flex items-center gap-1">
+                <span class="text-[11px] font-bold text-rose-700 flex items-center gap-1">
                   <i class="ph-bold ph-prohibit text-rose-500"></i> రేపు వద్దు
                 </span>
-                <span id="skipTomorrowBadge" class="w-2.5 h-2.5 rounded-full bg-slate-300"></span>
+                <span id="skipTomorrowBadge" class="w-2 h-2 rounded-full bg-slate-300"></span>
               </div>
-              <span class="text-[10px] text-slate-500 mt-0.5">Skip tomorrow's milk</span>
+              <span class="text-[9px] text-slate-500 mt-0.5 leading-tight">Skip tomorrow</span>
             </button>
 
             <!-- Add Extra Tomorrow -->
             <button onclick="addExtraTomorrow()" class="flex flex-col items-start p-2.5 rounded-xl border border-emerald-200 bg-white hover:bg-emerald-50/60 active:scale-95 transition-all shadow-xs text-left group">
               <div class="flex items-center justify-between w-full">
-                <span class="text-xs font-bold text-emerald-700 flex items-center gap-1">
-                  <i class="ph-bold ph-plus-circle text-emerald-500"></i> ఎక్స్‌ట్రా పాలు
+                <span class="text-[11px] font-bold text-emerald-700 flex items-center gap-1">
+                  <i class="ph-bold ph-plus-circle text-emerald-500"></i> ఎక్స్‌ట్రా
                 </span>
-                <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 rounded">+0.5L</span>
+                <span class="text-[9px] bg-emerald-100 text-emerald-800 font-bold px-1 rounded">+0.5L</span>
               </div>
-              <span class="text-[10px] text-slate-500 mt-0.5">Add extra for tomorrow</span>
+              <span class="text-[9px] text-slate-500 mt-0.5 leading-tight">Extra tomorrow</span>
             </button>
+
+            <!-- Vacation / Date-Range Skip -->
+            <button onclick="openVacationModal()" class="flex flex-col items-start p-2.5 rounded-xl border border-amber-200 bg-white hover:bg-amber-50/60 active:scale-95 transition-all shadow-xs text-left group">
+              <div class="flex items-center justify-between w-full">
+                <span class="text-[11px] font-bold text-amber-800 flex items-center gap-1">
+                  <i class="ph-bold ph-airplane-tilt text-amber-600"></i> సెలవులు
+                </span>
+                <span class="text-[9px] bg-amber-100 text-amber-800 font-bold px-1 rounded">Days</span>
+              </div>
+              <span class="text-[9px] text-slate-500 mt-0.5 leading-tight">Vacation skip</span>
+            </button>
+          </div>
+
+          <!-- Instant Milkman WhatsApp Alert Banner -->
+          <div id="milkmanNotifyBar" class="hidden-force mt-2.5 pt-2.5 border-t border-sky-200/70 flex items-center justify-between gap-2">
+            <span id="milkmanNotifyText" class="text-[11px] font-semibold text-slate-700 leading-tight">పాలబ్బాయికి వాట్సాప్‌లో చెప్పాలా?</span>
+            <div class="flex items-center gap-1.5 shrink-0">
+              <button onclick="sendMilkmanQuickAlert()" class="bg-[#25D366] hover:bg-[#20ba59] text-white text-[11px] font-bold px-2.5 py-1 rounded-lg flex items-center gap-1 shadow-xs active:scale-95">
+                <i class="ph-fill ph-whatsapp-logo"></i> పంపండి
+              </button>
+              <button onclick="dismissMilkmanAlert()" class="text-slate-400 hover:text-slate-600 p-1">
+                <i class="ph-bold ph-x text-xs"></i>
+              </button>
+            </div>
           </div>
         </section>
 
         <!-- LIVE METRIC COUNTERS -->
-        <section class="grid grid-cols-2 gap-2.5">
+        <section id="metricsSection" class="grid grid-cols-3 gap-2">
           <!-- Total Amount Card -->
-          <div class="col-span-2 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
+          <div class="col-span-3 bg-gradient-to-r from-emerald-600 to-teal-700 text-white rounded-2xl p-4 shadow-sm flex items-center justify-between">
             <div>
-              <p class="text-xs text-emerald-100 font-medium">ఈ నెల మొత్తం బిల్లు (Total Bill)</p>
+              <div class="flex items-center gap-2">
+                <p class="text-xs text-emerald-100 font-medium">ఈ నెల మొత్తం బిల్లు (Total Bill)</p>
+                <span id="billPaidStampTop" class="hidden-force text-[10px] bg-white text-emerald-800 font-black px-2 py-0.5 rounded-full uppercase tracking-wider shadow-xs">PAID ✓</span>
+              </div>
               <div class="text-2xl font-black tracking-tight mt-0.5 flex items-baseline gap-1">
                 <span>₹</span><span id="totalBillAmount">0</span>
               </div>
               <p class="text-[11px] text-emerald-200 mt-0.5 font-normal">
                 మొత్తం లీటర్లు: <strong id="totalLitersBadge" class="text-white">0</strong> L
               </p>
+              <p id="monthlyComparisonBadge" class="text-[10px] text-emerald-100/90 mt-1 bg-black/15 inline-block px-2 py-0.5 rounded-md font-medium">
+                గత నెల పోలిక లెక్కిస్తోంది...
+              </p>
             </div>
-            <div class="text-right flex flex-col items-end">
+            <div class="text-right flex flex-col items-end shrink-0">
               <span class="text-[10px] uppercase tracking-wider bg-white/20 px-2 py-0.5 rounded-md font-semibold text-emerald-100">Calculated</span>
               <button onclick="scrollToBill()" class="mt-2 text-xs bg-white text-emerald-800 hover:bg-emerald-50 px-3 py-1.5 rounded-lg font-bold shadow-xs active:scale-95 transition-all flex items-center gap-1">
                 బిల్ వివరాలు <i class="ph-bold ph-arrow-down text-xs"></i>
@@ -224,38 +260,52 @@
           </div>
 
           <!-- Days Delivered -->
-          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+          <div class="bg-white border border-slate-200 rounded-xl p-2.5 shadow-xs">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-semibold text-slate-500">డెలివరీ రోజులు</span>
-              <div class="w-6 h-6 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
-                <i class="ph-fill ph-check-circle text-sm"></i>
+              <span class="text-[10px] font-semibold text-slate-500">డెలివరీ</span>
+              <div class="w-5 h-5 rounded-md bg-emerald-50 text-emerald-600 flex items-center justify-center">
+                <i class="ph-fill ph-check-circle text-xs"></i>
               </div>
             </div>
             <div class="mt-1 flex items-baseline gap-1">
-              <span id="deliveredDaysCount" class="text-xl font-bold text-slate-800">0</span>
-              <span class="text-xs text-slate-400 font-medium">రోజులు</span>
+              <span id="deliveredDaysCount" class="text-lg font-bold text-slate-800">0</span>
+              <span class="text-[10px] text-slate-400 font-medium">రోజులు</span>
             </div>
-            <span class="text-[10px] text-emerald-600 font-medium">Delivered</span>
+            <span class="text-[9px] text-emerald-600 font-medium block">Delivered</span>
           </div>
 
           <!-- Days Skipped -->
-          <div class="bg-white border border-slate-200 rounded-xl p-3 shadow-xs">
+          <div class="bg-white border border-slate-200 rounded-xl p-2.5 shadow-xs">
             <div class="flex items-center justify-between">
-              <span class="text-[11px] font-semibold text-slate-500">సెలవులు / ఆపినవి</span>
-              <div class="w-6 h-6 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center">
-                <i class="ph-fill ph-x-circle text-sm"></i>
+              <span class="text-[10px] font-semibold text-slate-500">ఆపినవి</span>
+              <div class="w-5 h-5 rounded-md bg-rose-50 text-rose-600 flex items-center justify-center">
+                <i class="ph-fill ph-x-circle text-xs"></i>
               </div>
             </div>
             <div class="mt-1 flex items-baseline gap-1">
-              <span id="skippedDaysCount" class="text-xl font-bold text-slate-800">0</span>
-              <span class="text-xs text-slate-400 font-medium">రోజులు</span>
+              <span id="skippedDaysCount" class="text-lg font-bold text-slate-800">0</span>
+              <span class="text-[10px] text-slate-400 font-medium">రోజులు</span>
             </div>
-            <span class="text-[10px] text-rose-600 font-medium">Skipped</span>
+            <span class="text-[9px] text-rose-600 font-medium block">Skipped</span>
           </div>
+
+          <!-- 3rd Box: Milkman Contact & Settings -->
+          <button onclick="openMilkmanModal()" class="bg-white border border-sky-200 hover:bg-sky-50/70 active:scale-95 transition-all rounded-xl p-2.5 shadow-xs text-left flex flex-col justify-between">
+            <div class="flex items-center justify-between w-full">
+              <span class="text-[10px] font-bold text-sky-700">పాలబ్బాయి</span>
+              <div class="w-5 h-5 rounded-md bg-sky-100 text-sky-700 flex items-center justify-center">
+                <i class="ph-fill ph-user-circle text-xs"></i>
+              </div>
+            </div>
+            <div class="mt-1 w-full truncate">
+              <span id="milkmanCardName" class="text-xs font-extrabold text-slate-800 block truncate">నంబర్ సేవ్</span>
+            </div>
+            <span id="milkmanCardSub" class="text-[9px] text-sky-600 font-medium block truncate">Milkman Info</span>
+          </button>
         </section>
 
         <!-- MONTHLY CALENDAR -->
-        <section class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
+        <section id="calendarSection" class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
           <div class="flex items-center justify-between mb-3">
             <div>
               <h2 class="text-sm font-bold text-slate-800 flex items-center gap-1.5">
@@ -341,23 +391,81 @@
             </div>
 
             <div class="pt-2 border-t border-dashed border-slate-200 flex justify-between items-center text-sm">
-              <span class="font-bold text-slate-800">మొత్తం చెల్లించవలసినది:</span>
+              <span class="font-bold text-slate-800">ఈ నెల బిల్లు (Current Bill):</span>
               <span class="font-black text-emerald-600 text-base">₹<span id="billFinalAmount">0</span></span>
             </div>
           </div>
 
-          <!-- WhatsApp Share & App Share Buttons -->
-          <div class="pt-2 space-y-2.5">
-            <button onclick="shareOnWhatsApp()" class="w-full bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.98] transition-all text-white font-bold py-3 px-4 rounded-xl flex items-center justify-center gap-2 shadow-sm text-sm">
-              <i class="ph-fill ph-whatsapp-logo text-xl"></i>
-              వాట్సాప్‌లో బిల్ పంపండి (Share on WhatsApp)
-            </button>
+          <!-- PAYMENT & BALANCE LEDGER -->
+          <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 space-y-2.5">
+            <div class="flex items-center justify-between">
+              <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
+                <i class="ph-bold ph-wallet text-sky-600"></i> పేమెంట్ & బాకీ వివరాలు
+              </span>
+              <span id="paymentStatusPill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">చెల్లించాలి (Pending)</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 text-xs">
+              <div>
+                <label class="text-[10px] font-semibold text-slate-500 block mb-0.5">పాత బాకీ (Previous Due ₹)</label>
+                <input type="number" id="prevDueInput" min="0" placeholder="0" onchange="saveMonthLedger()" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-slate-800 focus:outline-none focus:border-sky-500">
+              </div>
+              <div>
+                <label class="text-[10px] font-semibold text-slate-500 block mb-0.5">చెల్లించినది (Paid ₹)</label>
+                <input type="number" id="paidAmountInput" min="0" placeholder="0" onchange="saveMonthLedger()" class="w-full bg-white border border-slate-300 rounded-lg px-2.5 py-1.5 text-xs font-bold text-emerald-700 focus:outline-none focus:border-emerald-500">
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/80 text-xs">
+              <span class="font-bold text-slate-700">మొత్తం నికర బాకీ (Net Balance):</span>
+              <span id="netBalanceText" class="font-black text-rose-600 text-sm">₹0</span>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2 pt-1">
+              <button onclick="markFullBillPaid()" class="bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold py-2 px-2.5 rounded-lg text-[11px] flex items-center justify-center gap-1 transition-all">
+                <i class="ph-bold ph-check-circle"></i> పూర్తిగా చెల్లించాను (Paid)
+              </button>
+              <button onclick="payViaUPI()" class="bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-bold py-2 px-2.5 rounded-lg text-[11px] flex items-center justify-center gap-1 transition-all">
+                <i class="ph-bold ph-qr-code"></i> UPI Pay (GPay/PhonePe)
+              </button>
+            </div>
+          </div>
+
+          <!-- Hidden Daily Log Table (Shown only when printing / saving as PDF) -->
+          <div id="printStatementTable" class="hidden pt-3 border-t border-slate-300">
+            <h4 class="font-bold text-xs text-slate-800 mb-2">తేదీల వారీగా పాల వివరాలు (Daily Breakdown):</h4>
+            <table class="w-full text-left border-collapse text-[11px]">
+              <thead>
+                <tr class="border-b border-slate-300 bg-slate-100">
+                  <th class="p-1.5">తేదీ</th>
+                  <th class="p-1.5">స్థితి</th>
+                  <th class="p-1.5 text-right">లీటర్లు</th>
+                  <th class="p-1.5 text-right">మొత్తం</th>
+                </tr>
+              </thead>
+              <tbody id="printStatementBody"></tbody>
+            </table>
+          </div>
+
+          <!-- WhatsApp Share, PDF Receipt & App Share Buttons -->
+          <div id="billActionsContainer" class="pt-2 space-y-2">
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="shareOnWhatsApp()" class="col-span-2 bg-[#25D366] hover:bg-[#20ba59] active:scale-[0.98] transition-all text-white font-bold py-3 px-3 rounded-xl flex items-center justify-center gap-1.5 shadow-sm text-xs">
+                <i class="ph-fill ph-whatsapp-logo text-lg"></i>
+                వాట్సాప్‌లో బిల్ పంపండి
+              </button>
+
+              <button onclick="printBillReceipt()" class="bg-slate-800 hover:bg-slate-900 active:scale-[0.98] transition-all text-white font-bold py-3 px-2.5 rounded-xl flex items-center justify-center gap-1 shadow-sm text-xs">
+                <i class="ph-bold ph-printer text-base"></i>
+                PDF / ప్రింట్
+              </button>
+            </div>
 
             <button onclick="shareAppLink()" class="w-full bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs">
               <i class="ph-bold ph-share-network text-base text-sky-600"></i>
               యాప్ లింక్ షేర్ చేయండి (Share App Link)
             </button>
-            <p class="text-[10px] text-center text-slate-400">పాలబ్బాయికి బిల్ పంపడానికి లేదా తెలిసినవారికి యాప్ షేర్ చేయడానికి</p>
+            <p class="text-[10px] text-center text-slate-400">పాలబ్బాయికి బిల్ పంపడానికి, PDF డౌన్‌లోడ్ చేసుకోవడానికి లేదా యాప్ షేర్ చేయడానికి</p>
           </div>
         </section>
 
@@ -476,6 +584,86 @@
       </div>
     </div>
 
+    <!-- MODAL 4: VACATION / DATE-RANGE SKIP -->
+    <div id="vacationModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
+        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <i class="ph-bold ph-airplane-tilt text-amber-600"></i> సెలవులు సెట్ చేయండి (Vacation)
+            </h4>
+            <p class="text-[10px] text-slate-500">ఈ తేదీల మధ్య పాలు ఆటోమేటిక్‌గా 'వద్దు' అని పడతాయి</p>
+          </div>
+          <button onclick="closeVacationModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <div class="space-y-3">
+          <div>
+            <label class="text-xs font-bold text-slate-600 mb-1 block">ఏ తేదీ నుండి (From Date):</label>
+            <input type="date" id="vacStartDate" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-amber-500">
+          </div>
+          <div>
+            <label class="text-xs font-bold text-slate-600 mb-1 block">ఏ తేదీ వరకు (To Date):</label>
+            <input type="date" id="vacEndDate" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-amber-500">
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeVacationModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button id="applyVacationBtn" onclick="applyVacationSkip()" class="flex-1 py-2.5 rounded-xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold">సెలవులు మార్క్ చేయి</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 5: MILKMAN CONTACT & UPI SETTINGS -->
+    <div id="milkmanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
+        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <i class="ph-fill ph-user-circle text-sky-600"></i> పాలబ్బాయి వివరాలు (Milkman)
+            </h4>
+            <p class="text-[10px] text-slate-500">నేరుగా కాల్, వాట్సాప్ & UPI పేమెంట్ కోసం</p>
+          </div>
+          <button onclick="closeMilkmanModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">పాలబ్బాయి పేరు (Name):</label>
+            <input type="text" id="milkmanNameInput" placeholder="ఉదా: రాజు గారు" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">వాట్సాప్ / ఫోన్ నంబర్ (10 అంకెలు):</label>
+            <input type="tel" id="milkmanPhoneInput" maxlength="10" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">UPI ID (GPay / PhonePe కోసం - ఐచ్ఛికం):</label>
+            <input type="text" id="milkmanUpiInput" placeholder="ఉదా: 9876543210@ybl" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-sky-500">
+          </div>
+        </div>
+
+        <!-- Quick Call & WhatsApp buttons if phone saved -->
+        <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-2 pt-1">
+          <a id="callMilkmanLink" href="#" class="py-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 font-bold text-xs flex items-center justify-center gap-1">
+            <i class="ph-bold ph-phone"></i> కాల్ చేయండి
+          </a>
+          <button onclick="chatMilkmanWhatsApp()" class="py-2 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 font-bold text-xs flex items-center justify-center gap-1">
+            <i class="ph-fill ph-whatsapp-logo text-emerald-600"></i> వాట్సాప్
+          </button>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeMilkmanModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- JAVASCRIPT LOGIC -->
@@ -498,6 +686,9 @@
     let defaultDailyQuota = 1.0;
     let isAutoMode = true; // Auto Fill Mode Toggle
     let monthRecords = {};
+    let prevMonthRecords = {};
+    let pendingMilkmanAlertMsg = '';
+    let currentCalculatedBill = 0;
 
     // Helper: Check if a given (year, month, day) is in the future (strictly after today)
     function isFutureDate(year, month, day) {
@@ -641,6 +832,7 @@
       document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
 
       updateAutoModeUI();
+      updateMilkmanCardUI();
       fetchMonthData();
 
       if (isNewUser) {
@@ -722,17 +914,41 @@
       const nextMonthStr = String(nextMonthDate.getMonth() + 1).padStart(2, '0');
       const endDate = `${nextYear}-${nextMonthStr}-01`;
 
-      const { data } = await db.from('customer_milk_logs')
-        .select('*')
-        .eq('user_id', currentUser.id)
-        .gte('log_date', startDate)
-        .lt('log_date', endDate);
+      const prevMonthDate = new Date(year, month - 1, 1);
+      const prevYear = prevMonthDate.getFullYear();
+      const prevMonthStr = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
+      const prevStartDate = `${prevYear}-${prevMonthStr}-01`;
+
+      const [{ data }, { data: prevData }] = await Promise.all([
+        db.from('customer_milk_logs')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .gte('log_date', startDate)
+          .lt('log_date', endDate),
+        db.from('customer_milk_logs')
+          .select('*')
+          .eq('user_id', currentUser.id)
+          .gte('log_date', prevStartDate)
+          .lt('log_date', startDate)
+      ]);
 
       monthRecords = {};
       if (data) {
         data.forEach(item => {
           const dayNum = parseInt(item.log_date.split('-')[2]);
           monthRecords[dayNum] = {
+            id: item.id,
+            status: item.status === 'taken' ? 'delivered' : 'skipped',
+            liters: parseFloat(item.quantity)
+          };
+        });
+      }
+
+      prevMonthRecords = {};
+      if (prevData) {
+        prevData.forEach(item => {
+          const dayNum = parseInt(item.log_date.split('-')[2]);
+          prevMonthRecords[dayNum] = {
             id: item.id,
             status: item.status === 'taken' ? 'delivered' : 'skipped',
             liters: parseFloat(item.quantity)
@@ -891,6 +1107,7 @@
         }, { onConflict: 'user_id,log_date' });
         monthRecords[dayNum] = { status: 'skipped', liters: 0 };
         showToast(`రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
+        promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip) అని తెలియజేస్తున్నాము. - ${currentUser.name || 'Customer'}`);
       }
 
       renderApp();
@@ -921,6 +1138,7 @@
 
       monthRecords[dayNum] = { status: 'delivered', liters: newVal };
       showToast(`రేపు (${dayNum}న) +0.5L షెడ్యూల్ చేశాం! మొత్తం: ${newVal}L`);
+      promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి మొత్తం ${newVal}L పాలు కావాలి (+0.5L ఎక్స్‌ట్రా). - ${currentUser.name || 'Customer'}`);
       renderApp();
     }
 
@@ -979,8 +1197,28 @@
 -------------------------------------
 _MilkCount యాప్ ద్వారా రూపొందించబడింది._`;
 
-      const encoded = encodeURIComponent(textMessage);
-      window.location.href = `whatsapp://send?text=${encoded}`;
+      const ledger = getMonthLedger(year, month);
+      let extraBillLines = '';
+      if (ledger.prevDue > 0 || ledger.paid > 0) {
+        const netDue = Math.max(0, (totalAmount + ledger.prevDue) - ledger.paid);
+        extraBillLines = `
+📌 *పాత బాకీ:* ₹${ledger.prevDue}
+✅ *చెల్లించినది:* ₹${ledger.paid}
+💳 *నికర బాకీ (Balance):* ₹${netDue}`;
+      }
+
+      const finalWaMessage = textMessage.replace(
+        `💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*`,
+        `💵 *ఈ నెల బిల్లు: ₹${totalAmount}*${extraBillLines}`
+      );
+
+      const encoded = encodeURIComponent(finalWaMessage);
+      const milkman = getMilkmanProfile();
+      if (milkman.phone && milkman.phone.length === 10) {
+        window.location.href = `whatsapp://send?phone=91${milkman.phone}&text=${encoded}`;
+      } else {
+        window.location.href = `whatsapp://send?text=${encoded}`;
+      }
     }
 
     function shareAppLink() {
@@ -1113,6 +1351,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
 
       const totalBill = Math.round(totalLiters * ratePerLiter);
+      currentCalculatedBill = totalBill;
 
       document.getElementById('totalBillAmount').innerText = totalBill.toLocaleString('en-IN');
       document.getElementById('totalLitersBadge').innerText = totalLiters.toFixed(1);
@@ -1124,6 +1363,324 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('billSkippedDays').innerText = `${skippedCount} రోజులు`;
       document.getElementById('billTotalLiters').innerText = `${totalLiters.toFixed(1)} L`;
       document.getElementById('billFinalAmount').innerText = totalBill.toLocaleString('en-IN');
+
+      // Update Monthly Comparison Insight (Feature #5)
+      updateMonthlyInsight(year, month, totalLiters);
+
+      // Update Payment & Due Ledger UI (Feature #2)
+      refreshLedgerUI(year, month, totalBill);
+
+      // Build Print Statement Table (Feature #5)
+      buildPrintStatementTable(year, month, daysInMonth, now, userRegDate);
+    }
+
+    // 10. NEW CUSTOMER FEATURES LOGIC (Vacation, Milkman Profile, Payment Ledger, Insights & PDF)
+
+    // A. Vacation Date-Range Skip (Feature #1)
+    function openVacationModal() {
+      const y = currentViewingDate.getFullYear();
+      const m = String(currentViewingDate.getMonth() + 1).padStart(2, '0');
+      const now = new Date();
+      const defaultStart = (y === now.getFullYear() && currentViewingDate.getMonth() === now.getMonth())
+        ? `${y}-${m}-${String(Math.min(now.getDate() + 1, 28)).padStart(2, '0')}`
+        : `${y}-${m}-01`;
+      document.getElementById('vacStartDate').value = defaultStart;
+      document.getElementById('vacEndDate').value = defaultStart;
+      document.getElementById('vacationModal').classList.remove('hidden-force');
+    }
+
+    function closeVacationModal() {
+      document.getElementById('vacationModal').classList.add('hidden-force');
+    }
+
+    async function applyVacationSkip() {
+      const startStr = document.getElementById('vacStartDate').value;
+      const endStr = document.getElementById('vacEndDate').value;
+      if (!startStr || !endStr) return alert('దయచేసి రెండు తేదీలను ఎంచుకోండి.');
+
+      const start = new Date(startStr + 'T00:00:00');
+      const end = new Date(endStr + 'T00:00:00');
+      if (end < start) return alert('ముగింపు తేదీ (To Date) ప్రారంభ తేదీ కంటే తర్వాత ఉండాలి.');
+
+      const diffDays = Math.round((end - start) / (1000 * 60 * 60 * 24)) + 1;
+      if (diffDays > 60) return alert('ఒకేసారి గరిష్టంగా 60 రోజుల వరకు మాత్రమే సెలవులు సెట్ చేయగలరు.');
+
+      const btn = document.getElementById('applyVacationBtn');
+      btn.disabled = true;
+      btn.innerText = 'సేవ్ అవుతోంది...';
+
+      const rows = [];
+      const cur = new Date(start);
+      while (cur <= end) {
+        const y = cur.getFullYear();
+        const m = String(cur.getMonth() + 1).padStart(2, '0');
+        const d = String(cur.getDate()).padStart(2, '0');
+        rows.push({
+          user_id: currentUser.id,
+          log_date: `${y}-${m}-${d}`,
+          quantity: 0,
+          status: 'skipped'
+        });
+        cur.setDate(cur.getDate() + 1);
+      }
+
+      const { error } = await db.from('customer_milk_logs').upsert(rows, { onConflict: 'user_id,log_date' });
+      btn.disabled = false;
+      btn.innerText = 'సెలవులు మార్క్ చేయి';
+
+      if (error) {
+        alert('Error: ' + error.message);
+        return;
+      }
+
+      closeVacationModal();
+      showToast(`${diffDays} రోజుల సెలవులు నమోదు చేయబడ్డాయి!`);
+      promptMilkmanAlert(`నమస్కారం, ${startStr} నుండి ${endStr} వరకు (${diffDays} రోజులు) మేము ఊరికి వెళ్తున్నాము, పాలు పోయవద్దు. - ${currentUser.name || 'Customer'}`);
+      fetchMonthData();
+    }
+
+    // B. Milkman Contact & Quick WhatsApp Alert (Feature #4)
+    function getMilkmanProfile() {
+      if (!currentUser) return { name: '', phone: '', upi: '' };
+      try {
+        return JSON.parse(localStorage.getItem(`milkman_profile_${currentUser.id}`)) || { name: '', phone: '', upi: '' };
+      } catch (e) {
+        return { name: '', phone: '', upi: '' };
+      }
+    }
+
+    function updateMilkmanCardUI() {
+      const m = getMilkmanProfile();
+      const nameEl = document.getElementById('milkmanCardName');
+      const subEl = document.getElementById('milkmanCardSub');
+      if (!nameEl || !subEl) return;
+
+      if (m.name || m.phone) {
+        nameEl.innerText = m.name || m.phone;
+        subEl.innerText = m.phone ? `📞 ${m.phone}` : 'UPI Saved';
+      } else {
+        nameEl.innerText = 'నంబర్ సేవ్';
+        subEl.innerText = 'Add Milkman';
+      }
+    }
+
+    function openMilkmanModal() {
+      const m = getMilkmanProfile();
+      document.getElementById('milkmanNameInput').value = m.name || '';
+      document.getElementById('milkmanPhoneInput').value = m.phone || '';
+      document.getElementById('milkmanUpiInput').value = m.upi || '';
+
+      const actionsDiv = document.getElementById('milkmanDirectActions');
+      if (m.phone && m.phone.length === 10) {
+        actionsDiv.classList.remove('hidden-force');
+        document.getElementById('callMilkmanLink').href = `tel:${m.phone}`;
+      } else {
+        actionsDiv.classList.add('hidden-force');
+      }
+      document.getElementById('milkmanModal').classList.remove('hidden-force');
+    }
+
+    function closeMilkmanModal() {
+      document.getElementById('milkmanModal').classList.add('hidden-force');
+    }
+
+    function saveMilkmanProfile() {
+      const name = document.getElementById('milkmanNameInput').value.trim();
+      const phone = document.getElementById('milkmanPhoneInput').value.trim();
+      const upi = document.getElementById('milkmanUpiInput').value.trim();
+
+      if (phone && (phone.length !== 10 || isNaN(phone))) {
+        return alert('దయచేసి 10 అంకెల సరైన మొబైల్ నంబర్ నమోదు చేయండి.');
+      }
+
+      localStorage.setItem(`milkman_profile_${currentUser.id}`, JSON.stringify({ name, phone, upi }));
+      updateMilkmanCardUI();
+      closeMilkmanModal();
+      showToast('పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
+    }
+
+    function chatMilkmanWhatsApp() {
+      const m = getMilkmanProfile();
+      if (!m.phone) return;
+      const msg = encodeURIComponent(`నమస్కారం ${m.name || 'గారు'}, నేను ${currentUser.name || 'Customer'} మాట్లాడుతున్నాను.`);
+      window.location.href = `whatsapp://send?phone=91${m.phone}&text=${msg}`;
+    }
+
+    function promptMilkmanAlert(msg) {
+      pendingMilkmanAlertMsg = msg;
+      const bar = document.getElementById('milkmanNotifyBar');
+      const txt = document.getElementById('milkmanNotifyText');
+      const m = getMilkmanProfile();
+      txt.innerText = m.name ? `${m.name} గారికి వాట్సాప్‌లో చెప్పాలా?` : 'పాలబ్బాయికి వాట్సాప్‌లో చెప్పాలా?';
+      bar.classList.remove('hidden-force');
+    }
+
+    function dismissMilkmanAlert() {
+      document.getElementById('milkmanNotifyBar').classList.add('hidden-force');
+    }
+
+    function sendMilkmanQuickAlert() {
+      const m = getMilkmanProfile();
+      const encoded = encodeURIComponent(pendingMilkmanAlertMsg);
+      dismissMilkmanAlert();
+      if (m.phone && m.phone.length === 10) {
+        window.location.href = `whatsapp://send?phone=91${m.phone}&text=${encoded}`;
+      } else {
+        window.location.href = `whatsapp://send?text=${encoded}`;
+      }
+    }
+
+    // C. Payment & Due Ledger + UPI Pay (Feature #2)
+    function getLedgerKey(year, month) {
+      return `milk_ledger_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
+    }
+
+    function getMonthLedger(year, month) {
+      try {
+        return JSON.parse(localStorage.getItem(getLedgerKey(year, month))) || { prevDue: 0, paid: 0 };
+      } catch (e) {
+        return { prevDue: 0, paid: 0 };
+      }
+    }
+
+    function saveMonthLedger() {
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const prevDue = Math.max(0, parseFloat(document.getElementById('prevDueInput').value) || 0);
+      const paid = Math.max(0, parseFloat(document.getElementById('paidAmountInput').value) || 0);
+
+      localStorage.setItem(getLedgerKey(year, month), JSON.stringify({ prevDue, paid }));
+      refreshLedgerUI(year, month, currentCalculatedBill);
+      showToast('పేమెంట్ వివరాలు అప్‌డేట్ అయ్యాయి!');
+    }
+
+    function markFullBillPaid() {
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const prevDue = Math.max(0, parseFloat(document.getElementById('prevDueInput').value) || 0);
+      const totalPayable = currentCalculatedBill + prevDue;
+
+      document.getElementById('paidAmountInput').value = totalPayable;
+      localStorage.setItem(getLedgerKey(year, month), JSON.stringify({ prevDue, paid: totalPayable }));
+      refreshLedgerUI(year, month, currentCalculatedBill);
+      showToast(`₹${totalPayable} చెల్లించినట్లు (PAID) మార్క్ చేయబడింది!`);
+    }
+
+    function refreshLedgerUI(year, month, billAmount) {
+      const ledger = getMonthLedger(year, month);
+      document.getElementById('prevDueInput').value = ledger.prevDue || '';
+      document.getElementById('paidAmountInput').value = ledger.paid || '';
+
+      const totalPayable = billAmount + ledger.prevDue;
+      const netBalance = totalPayable - ledger.paid;
+      const netEl = document.getElementById('netBalanceText');
+      const pillEl = document.getElementById('paymentStatusPill');
+      const stampEl = document.getElementById('billPaidStampTop');
+
+      if (totalPayable > 0 && netBalance <= 0) {
+        netEl.innerText = netBalance < 0 ? `₹0 (అడ్వాన్స్: ₹${Math.abs(netBalance)})` : '₹0 (Clear)';
+        netEl.className = 'font-black text-emerald-600 text-sm';
+        pillEl.innerText = 'చెల్లించబడింది (PAID ✓)';
+        pillEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+        stampEl.classList.remove('hidden-force');
+      } else {
+        netEl.innerText = `₹${Math.max(0, netBalance).toLocaleString('en-IN')}`;
+        netEl.className = 'font-black text-rose-600 text-sm';
+        pillEl.innerText = ledger.paid > 0 ? 'పాక్షిక చెల్లింపు (Partial)' : 'చెల్లించాలి (Pending)';
+        pillEl.className = 'text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800';
+        stampEl.classList.add('hidden-force');
+      }
+    }
+
+    function payViaUPI() {
+      const m = getMilkmanProfile();
+      if (!m.upi) {
+        showToast('ముందుగా పాలబ్బాయి UPI ID సేవ్ చేయండి');
+        openMilkmanModal();
+        return;
+      }
+      const prevDue = Math.max(0, parseFloat(document.getElementById('prevDueInput').value) || 0);
+      const paid = Math.max(0, parseFloat(document.getElementById('paidAmountInput').value) || 0);
+      const amountToPay = Math.max(1, (currentCalculatedBill + prevDue) - paid);
+      const payeeName = encodeURIComponent(m.name || 'Milk Vendor');
+      const note = encodeURIComponent(`Milk Bill ${TELUGU_MONTHS[currentViewingDate.getMonth()]}`);
+
+      window.location.href = `upi://pay?pa=${encodeURIComponent(m.upi)}&pn=${payeeName}&am=${amountToPay}&cu=INR&tn=${note}`;
+    }
+
+    // D. Monthly Insights Comparison & PDF/Print Receipt (Feature #5)
+    function updateMonthlyInsight(year, month, currentLiters) {
+      const insightEl = document.getElementById('monthlyComparisonBadge');
+      if (!insightEl) return;
+
+      const prevDate = new Date(year, month - 1, 1);
+      const prevYear = prevDate.getFullYear();
+      const prevMonth = prevDate.getMonth();
+      const prevDays = new Date(prevYear, prevMonth + 1, 0).getDate();
+      const now = new Date();
+      const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
+      userRegDate.setHours(0, 0, 0, 0);
+
+      let prevLiters = 0;
+      for (let d = 1; d <= prevDays; d++) {
+        const cDate = new Date(prevYear, prevMonth, d);
+        const isPast = cDate <= now;
+        const isJoined = cDate >= userRegDate;
+        const rec = prevMonthRecords[d];
+        if (rec) {
+          if (rec.status === 'delivered' && isPast) prevLiters += rec.liters;
+        } else if (isPast && isJoined && isAutoMode) {
+          prevLiters += defaultDailyQuota;
+        }
+      }
+
+      if (prevLiters === 0) {
+        insightEl.innerText = `గత నెల (${TELUGU_MONTHS[prevMonth]}) రికార్డు లేదు`;
+        return;
+      }
+
+      const diff = parseFloat((currentLiters - prevLiters).toFixed(1));
+      if (diff > 0) {
+        insightEl.innerText = `📈 గత నెల (${prevLiters.toFixed(1)}L) కంటే +${diff}L ఎక్కువ`;
+      } else if (diff < 0) {
+        insightEl.innerText = `📉 గత నెల (${prevLiters.toFixed(1)}L) కంటే ${Math.abs(diff)}L తక్కువ`;
+      } else {
+        insightEl.innerText = `⚖️ గత నెల (${prevLiters.toFixed(1)}L) తో సమానం`;
+      }
+    }
+
+    function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
+      const tbody = document.getElementById('printStatementBody');
+      if (!tbody) return;
+      let rowsHtml = '';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cDate = new Date(year, month, d);
+        const isPast = cDate <= now;
+        const isJoined = cDate >= userRegDate;
+        const rec = monthRecords[d];
+        let statusText = '-';
+        let litersVal = 0;
+
+        if (rec) {
+          if (rec.status === 'delivered') {
+            statusText = isPast ? 'డెలివరీ (Delivered)' : 'షెడ్యూల్ (Scheduled)';
+            litersVal = isPast ? rec.liters : 0;
+          } else {
+            statusText = 'వద్దు (Skipped)';
+          }
+        } else if (isPast && isJoined && isAutoMode) {
+          statusText = 'ఆటో డెలివరీ';
+          litersVal = defaultDailyQuota;
+        }
+
+        const amt = Math.round(litersVal * ratePerLiter);
+        rowsHtml += `<tr class="border-b border-slate-200"><td class="p-1">${d} ${TELUGU_MONTHS[month]}</td><td class="p-1">${statusText}</td><td class="p-1 text-right">${litersVal > 0 ? litersVal + ' L' : '-'}</td><td class="p-1 text-right">${amt > 0 ? '₹' + amt : '-'}</td></tr>`;
+      }
+      tbody.innerHTML = rowsHtml;
+    }
+
+    function printBillReceipt() {
+      window.print();
     }
   </script>
 </body>

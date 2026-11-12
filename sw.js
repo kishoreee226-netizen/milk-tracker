@@ -4,7 +4,7 @@ const ASSETS_TO_CACHE = [
   './index.html',
   './vendor.html',
   './manifest.json?v=4',
-  './vendor-manifest.json',
+  './vendor-manifest.json?v=2',
   './favicon.png',
   './logo-512.png',
   './vendor-logo.png'

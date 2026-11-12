@@ -5,8 +5,8 @@ const ASSETS_TO_CACHE = [
   './index.html',
   './manifest.json',
   './favicon.png',
-  './milklogo-192×192.png',
-  './milklogo-512×512.png'
+  './logo-192.png',
+  './logo-512.png'
 ];
 
 // Install Event

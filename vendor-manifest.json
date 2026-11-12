@@ -1,7 +1,9 @@
 {
+  "id": "./vendor.html",
   "name": "MilkCount Vendor - పాల వ్యాపారి",
   "short_name": "MilkVendor",
   "start_url": "./vendor.html",
+  "scope": "./vendor.html",
   "display": "standalone",
   "background_color": "#0f766e",
   "theme_color": "#0f766e",

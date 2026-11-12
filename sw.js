@@ -1,42 +1,37 @@
-const CACHE_NAME = 'milkcount-v10';
-const ASSETS_TO_CACHE = [
+const CACHE_NAME = 'milkcount-v9';
+const ASSETS = [
   './',
   './index.html',
-  './vendor.html',
-  './manifest.json?v=4',
-  './vendor-manifest.json?v=2',
-  './favicon.png',
-  './logo-512.png',
-  './vendor-logo.png'
+  './manifest.json',
+  './logo-192.png',
+  './logo-512.png'
 ];
 
-self.addEventListener('install', (event) => {
+self.addEventListener('install', (e) => {
   self.skipWaiting();
-  event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS_TO_CACHE))
+  e.waitUntil(
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(ASSETS))
   );
 });
 
-self.addEventListener('activate', (event) => {
-  event.waitUntil(
+self.addEventListener('activate', (e) => {
+  e.waitUntil(
     caches.keys().then((keys) =>
-      Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
-      )
+      Promise.all(keys.filter((k) => k !== CACHE_NAME).map((k) => caches.delete(k)))
     )
   );
   self.clients.claim();
 });
 
-self.addEventListener('fetch', (event) => {
-  if (event.request.url.includes('supabase.co')) return;
-  event.respondWith(
-    fetch(event.request)
+self.addEventListener('fetch', (e) => {
+  if (e.request.url.includes('supabase.co')) return;
+  e.respondWith(
+    fetch(e.request)
       .then((res) => {
         const resClone = res.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, resClone));
+        caches.open(CACHE_NAME).then((cache) => cache.put(e.request, resClone));
         return res;
       })
-      .catch(() => caches.match(event.request))
+      .catch(() => caches.match(e.request))
   );
 });

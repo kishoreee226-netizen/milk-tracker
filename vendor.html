@@ -6,8 +6,8 @@
   <title>MilkCount Vendor - పాల వ్యాపారి డాష్‌బోర్డ్</title>
 
   <!-- Favicon & Touch Icons -->
-  <link rel="icon" type="image/png" href="./favicon.png">
-  <link rel="apple-touch-icon" href="./logo-512.png">
+  <link rel="icon" type="image/png" href="./vendor-logo.png">
+  <link rel="apple-touch-icon" href="./vendor-logo.png">
 
   <!-- PWA Web App Settings -->
   <link rel="manifest" href="./vendor-manifest.json">
@@ -50,8 +50,9 @@
 
     <!-- 1. VENDOR AUTH SCREEN -->
     <section id="vendorAuthSection" class="p-6 flex-1 flex flex-col justify-center items-center bg-white">
-      <div class="w-16 h-16 rounded-2xl bg-gradient-to-br from-teal-600 to-emerald-700 flex items-center justify-center text-white mb-4 shadow-lg shadow-teal-600/20">
-        <i class="ph-fill ph-truck text-3xl text-amber-200"></i>
+      <div class="w-20 h-20 rounded-2xl overflow-hidden bg-teal-700 flex items-center justify-center mb-4 shadow-lg shadow-teal-600/20 border-2 border-teal-100">
+        <img src="./vendor-logo.png" alt="MilkCount Vendor Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden-force');">
+        <i class="ph-fill ph-truck text-3xl text-amber-200 hidden-force"></i>
       </div>
       <h2 class="text-xl font-extrabold text-slate-900 text-center">MilkCount Vendor</h2>
       <p class="text-xs text-slate-500 mb-6 text-center">పాల వ్యాపారి డెలివరీ, కలెక్షన్ & బిజినెస్ డాష్‌బోర్డ్</p>
@@ -86,8 +87,9 @@
       <header class="bg-gradient-to-r from-teal-700 via-teal-800 to-emerald-900 text-white p-4 sticky top-0 z-30 shadow-md">
         <div class="flex items-center justify-between">
           <div class="flex items-center gap-2.5">
-            <div class="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center text-white border border-white/25 shadow-inner">
-              <i class="ph-fill ph-truck text-2xl text-amber-200"></i>
+            <div class="w-10 h-10 rounded-xl overflow-hidden bg-white/15 backdrop-blur-md flex items-center justify-center text-white border border-white/25 shadow-inner shrink-0">
+              <img src="./vendor-logo.png" alt="Vendor Logo" class="w-full h-full object-cover" onerror="this.style.display='none'; this.nextElementSibling.classList.remove('hidden-force');">
+              <i class="ph-fill ph-truck text-2xl text-amber-200 hidden-force"></i>
             </div>
             <div>
               <h1 class="text-base font-extrabold tracking-tight leading-tight flex items-center gap-1.5">
@@ -438,6 +440,11 @@
     let selectedCustForDayEdit = null;
 
     window.onload = function() {
+      if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
+        navigator.serviceWorker.register('./sw.js').catch(function(err) {
+          console.log('SW registration skipped:', err);
+        });
+      }
       const savedVendor = localStorage.getItem('milkcount_vendor_session');
       if (savedVendor) {
         try {

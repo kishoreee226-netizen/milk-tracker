@@ -138,8 +138,11 @@
               <h1 class="text-lg font-bold tracking-tight leading-tight flex items-center gap-1.5">
                 MilkCount <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">పాల లెక్క</span>
               </h1>
-              <div class="flex items-center gap-2 mt-0.5">
-                <span id="userPhoneBadge" class="text-[11px] text-sky-100 font-medium">User</span>
+              <div class="flex items-center gap-1.5 mt-0.5 flex-wrap">
+                <button onclick="openProfileModal()" class="text-[11px] text-sky-100 hover:text-white font-medium flex items-center gap-1 underline decoration-sky-300/60 underline-offset-2">
+                  <span id="userPhoneBadge">User</span>
+                  <i class="ph-bold ph-pencil-simple text-[10px]"></i>
+                </button>
                 <button onclick="logoutCustomer()" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white transition-colors">లాగౌట్</button>
               </div>
             </div>
@@ -390,6 +393,11 @@
               <span class="font-medium text-slate-800">₹<span id="billRatePerLiter">70</span></span>
             </div>
 
+            <div id="billQualitySummaryRow" class="hidden-force bg-amber-50 border border-amber-200/80 rounded-lg p-2 text-[11px] text-amber-900">
+              <span class="font-bold flex items-center gap-1"><i class="ph-fill ph-warning-circle text-amber-600"></i> నాణ్యత / సమస్యల నోట్స్:</span>
+              <p id="billQualitySummaryText" class="text-[10px] text-amber-800 mt-0.5 leading-relaxed"></p>
+            </div>
+
             <div class="pt-2 border-t border-dashed border-slate-200 flex justify-between items-center text-sm">
               <span class="font-bold text-slate-800">ఈ నెల బిల్లు (Current Bill):</span>
               <span class="font-black text-emerald-600 text-base">₹<span id="billFinalAmount">0</span></span>
@@ -519,6 +527,33 @@
             <input type="number" id="customLitersInput" step="0.25" min="0" max="10" placeholder="e.g. 2.5" class="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 font-semibold">
             <button onclick="applyCustomLiters()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-xs font-bold">
               సేవ్
+            </button>
+          </div>
+        </div>
+
+        <!-- Quality & SNF / Issue Note Section -->
+        <div class="pt-2 border-t border-slate-100 space-y-2">
+          <div class="flex items-center justify-between">
+            <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
+              <i class="ph-bold ph-seal-warning text-amber-500"></i> పాల నాణ్యత / సమస్య నోట్:
+            </label>
+            <button onclick="clearDayQualityNote()" class="text-[10px] text-slate-400 hover:text-rose-600 font-semibold">క్లియర్</button>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5">
+            <button onclick="setDayQualityNote('నీళ్లు ఎక్కువ (Watery)')" class="py-1.5 px-2 rounded-lg border border-amber-200 bg-amber-50 hover:bg-amber-100 text-amber-900 font-bold text-[10px] text-center">
+              💧 నీళ్లు ఎక్కువ
+            </button>
+            <button onclick="setDayQualityNote('పాలు విరిగాయి (Spoiled)')" class="py-1.5 px-2 rounded-lg border border-rose-200 bg-rose-50 hover:bg-rose-100 text-rose-900 font-bold text-[10px] text-center">
+              ⚠️ పాలు విరిగాయి
+            </button>
+            <button onclick="setDayQualityNote('ఆలస్యంగా వచ్చాయి (Late)')" class="py-1.5 px-2 rounded-lg border border-sky-200 bg-sky-50 hover:bg-sky-100 text-sky-900 font-bold text-[10px] text-center">
+              ⏰ ఆలస్యం
+            </button>
+          </div>
+          <div class="flex items-center gap-1.5">
+            <input type="text" id="customQualityInput" placeholder="ఇతర నోట్ (ఉదా: తక్కువ ఫ్యాట్ / SNF)" class="flex-1 border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs focus:outline-none focus:border-amber-500">
+            <button onclick="saveCustomQualityNote()" class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-1.5 rounded-lg text-[11px] font-bold">
+              నోట్
             </button>
           </div>
         </div>
@@ -660,6 +695,43 @@
         <div class="flex gap-2 pt-1">
           <button onclick="closeMilkmanModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
           <button onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL 6: EDIT CUSTOMER PROFILE & CHANGE PIN -->
+    <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
+        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <i class="ph-fill ph-shield-check text-brand-600"></i> ప్రొఫైల్ & పిన్ మార్పు
+            </h4>
+            <p class="text-[10px] text-slate-500">మీ పేరు మరియు 4-అంకెల సెక్యూరిటీ PIN మార్చుకోండి</p>
+          </div>
+          <button onclick="closeProfileModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">మొబైల్ నంబర్ (మార్చలేరు):</label>
+            <input type="text" id="profilePhoneReadonly" disabled class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl text-xs font-bold text-slate-500">
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">మీ పేరు (Name):</label>
+            <input type="text" id="profileNameInput" placeholder="మీ పేరు" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-brand-600">
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">కొత్త 4-అంకెల పిన్ (New PIN):</label>
+            <input type="password" id="profilePinInput" maxlength="4" inputmode="numeric" placeholder="••••" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-sm font-black tracking-widest focus:outline-none focus:border-brand-600">
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeProfileModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button id="saveProfileBtn" onclick="saveCustomerProfile()" class="flex-1 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold">అప్‌డేట్ చేయండి</button>
         </div>
       </div>
     </div>
@@ -1016,6 +1088,8 @@
       } else {
         customInput.value = '';
       }
+      const qNotes = getMonthQualityNotes(currentViewingDate.getFullYear(), currentViewingDate.getMonth());
+      document.getElementById('customQualityInput').value = qNotes[day] || '';
       document.getElementById('dayModal').classList.remove('hidden-force');
     }
 
@@ -1068,6 +1142,7 @@
 
       await db.from('customer_milk_logs').delete().eq('user_id', currentUser.id).eq('log_date', logDate);
       delete monthRecords[selectedDayForModal];
+      removeQualityNoteForDay(currentViewingDate.getFullYear(), currentViewingDate.getMonth(), selectedDayForModal);
       showToast(`${selectedDayForModal}వ తేదీ రీసెట్ చేయబడింది!`);
       closeDayModal();
       renderApp();
@@ -1207,10 +1282,23 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 💳 *నికర బాకీ (Balance):* ₹${netDue}`;
       }
 
-      const finalWaMessage = textMessage.replace(
-        `💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*`,
-        `💵 *ఈ నెల బిల్లు: ₹${totalAmount}*${extraBillLines}`
-      );
+      const qNotes = getMonthQualityNotes(year, month);
+      const qEntries = Object.keys(qNotes).sort((a, b) => Number(a) - Number(b));
+      let qualityWaLines = '';
+      if (qEntries.length > 0) {
+        const listStr = qEntries.map(d => `• ${d}న: ${qNotes[d]}`).join('\n');
+        qualityWaLines = `\n⚠️ *నాణ్యత / సమస్యల వివరాలు:*\n${listStr}\n-------------------------------------`;
+      }
+
+      const finalWaMessage = textMessage
+        .replace(
+          `💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*`,
+          `💵 *ఈ నెల బిల్లు: ₹${totalAmount}*${extraBillLines}`
+        )
+        .replace(
+          `_MilkCount యాప్ ద్వారా రూపొందించబడింది._`,
+          `${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`
+        );
 
       const encoded = encodeURIComponent(finalWaMessage);
       const milkman = getMilkmanProfile();
@@ -1280,6 +1368,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
       const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
       userRegDate.setHours(0, 0, 0, 0);
+      const monthQualityNotes = getMonthQualityNotes(year, month);
 
       for (let day = 1; day <= daysInMonth; day++) {
         const item = monthRecords[day];
@@ -1337,10 +1426,11 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         dayCard.onclick = () => openDayModal(day);
         dayCard.className = `relative h-14 sm:h-16 rounded-xl border p-1.5 flex flex-col justify-between items-center transition-all active:scale-95 cursor-pointer shadow-xs ${statusClass} ${isToday ? 'ring-2 ring-sky-500 ring-offset-1 font-bold' : ''}`;
 
+        const hasQualityNote = Boolean(monthQualityNotes[day]);
         dayCard.innerHTML = `
           <div class="w-full flex items-center justify-between text-[11px] leading-none">
             <span class="${isToday ? 'bg-sky-600 text-white w-4 h-4 rounded-full flex items-center justify-center font-bold' : 'font-semibold text-slate-700'}">${day}</span>
-            ${isToday ? '<span class="text-[8px] bg-sky-100 text-sky-800 px-1 rounded font-bold">నేడు</span>' : ''}
+            ${hasQualityNote ? '<span title="' + monthQualityNotes[day] + '" class="w-2 h-2 rounded-full bg-amber-500 ring-1 ring-white"></span>' : (isToday ? '<span class="text-[8px] bg-sky-100 text-sky-800 px-1 rounded font-bold">నేడు</span>' : '')}
           </div>
           <div class="my-auto py-0.5 text-center">
             ${statusBadge}
@@ -1366,6 +1456,9 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
       // Update Monthly Comparison Insight (Feature #5)
       updateMonthlyInsight(year, month, totalLiters);
+
+      // Update Quality Summary in Bill Statement
+      refreshBillQualitySummary(year, month);
 
       // Update Payment & Due Ledger UI (Feature #2)
       refreshLedgerUI(year, month, totalBill);
@@ -1681,6 +1774,118 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
     function printBillReceipt() {
       window.print();
+    }
+
+    // E. Quality & SNF / Issue Log (Per-Day Notes)
+    function getQualityStorageKey(year, month) {
+      return `milk_quality_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
+    }
+
+    function getMonthQualityNotes(year, month) {
+      if (!currentUser) return {};
+      try {
+        return JSON.parse(localStorage.getItem(getQualityStorageKey(year, month))) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function setDayQualityNote(noteText) {
+      if (!selectedDayForModal) return;
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const notes = getMonthQualityNotes(year, month);
+      notes[selectedDayForModal] = noteText;
+      localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(notes));
+      document.getElementById('customQualityInput').value = noteText;
+      showToast(`${selectedDayForModal}వ తేదీ: "${noteText}" నమోదైంది!`);
+      renderApp();
+    }
+
+    function saveCustomQualityNote() {
+      const val = document.getElementById('customQualityInput').value.trim();
+      if (!val) {
+        clearDayQualityNote();
+        return;
+      }
+      setDayQualityNote(val);
+    }
+
+    function clearDayQualityNote() {
+      if (!selectedDayForModal) return;
+      removeQualityNoteForDay(currentViewingDate.getFullYear(), currentViewingDate.getMonth(), selectedDayForModal);
+      document.getElementById('customQualityInput').value = '';
+      showToast(`${selectedDayForModal}వ తేదీ నాణ్యత నోట్ తొలగించబడింది!`);
+      renderApp();
+    }
+
+    function removeQualityNoteForDay(year, month, day) {
+      const notes = getMonthQualityNotes(year, month);
+      if (notes[day]) {
+        delete notes[day];
+        localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(notes));
+      }
+    }
+
+    function refreshBillQualitySummary(year, month) {
+      const notes = getMonthQualityNotes(year, month);
+      const keys = Object.keys(notes).sort((a, b) => Number(a) - Number(b));
+      const row = document.getElementById('billQualitySummaryRow');
+      const txt = document.getElementById('billQualitySummaryText');
+      if (!row || !txt) return;
+
+      if (keys.length === 0) {
+        row.classList.add('hidden-force');
+      } else {
+        row.classList.remove('hidden-force');
+        txt.innerText = keys.map(d => `${d}న: ${notes[d]}`).join(' | ');
+      }
+    }
+
+    // F. Customer Profile & Change PIN
+    function openProfileModal() {
+      if (!currentUser) return;
+      document.getElementById('profilePhoneReadonly').value = currentUser.phone;
+      document.getElementById('profileNameInput').value = currentUser.name || '';
+      document.getElementById('profilePinInput').value = currentUser.pin || '';
+      document.getElementById('profileModal').classList.remove('hidden-force');
+    }
+
+    function closeProfileModal() {
+      document.getElementById('profileModal').classList.add('hidden-force');
+    }
+
+    async function saveCustomerProfile() {
+      const newName = document.getElementById('profileNameInput').value.trim();
+      const newPin = document.getElementById('profilePinInput').value.trim();
+
+      if (!newName) return alert('దయచేసి మీ పేరు నమోదు చేయండి.');
+      if (newPin.length !== 4 || isNaN(newPin)) return alert('దయచేసి 4 అంకెల పిన్ (PIN) నమోదు చేయండి.');
+
+      const btn = document.getElementById('saveProfileBtn');
+      btn.disabled = true;
+      btn.innerText = 'సేవ్ అవుతోంది...';
+
+      const { error } = await db.from('customer_users')
+        .update({ name: newName, pin: newPin })
+        .eq('id', currentUser.id);
+
+      btn.disabled = false;
+      btn.innerText = 'అప్‌డేట్ చేయండి';
+
+      if (error) {
+        alert('Error: ' + error.message);
+        return;
+      }
+
+      currentUser.name = newName;
+      currentUser.pin = newPin;
+      localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+      localStorage.setItem('milkcount_last_account', JSON.stringify({ phone: currentUser.phone, name: newName }));
+
+      document.getElementById('userPhoneBadge').innerText = `${newName} (${currentUser.phone})`;
+      closeProfileModal();
+      showToast('మీ పేరు మరియు కొత్త PIN అప్‌డేట్ అయ్యాయి!');
     }
   </script>
 </body>

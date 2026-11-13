@@ -151,12 +151,12 @@
             </div>
           </div>
 
-          <!-- Editable Price & Milk Type Badge -->
-          <button onclick="openPriceModal()" class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 transition-all text-xs px-2.5 py-1.5 rounded-lg border border-white/25 shadow-sm text-left shrink-0">
-            <i class="ph ph-currency-inr text-amber-300 text-sm"></i>
+          <!-- Editable Shift Rates & Milk Types Badge -->
+          <button onclick="openQuotaModal()" class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 transition-all text-xs px-2.5 py-1.5 rounded-lg border border-white/25 shadow-sm text-left shrink-0">
+            <i class="ph ph-sliders text-amber-300 text-sm"></i>
             <div>
-              <div id="milkTypeHeaderTag" class="text-[9px] uppercase tracking-wider text-sky-200 font-bold leading-none">🐃 Buffalo</div>
-              <div class="font-bold text-white text-xs leading-tight">₹<span id="ratePerLiterText">75</span>/L</div>
+              <div id="milkTypeHeaderTag" class="text-[9px] uppercase tracking-wider text-sky-200 font-bold leading-none">🌅 🐃 ₹75</div>
+              <div id="ratePerLiterHeaderSub" class="font-bold text-white text-[11px] leading-tight">🌇 🐄 ₹55</div>
             </div>
             <i class="ph ph-pencil-simple text-xs opacity-75 ml-0.5"></i>
           </button>
@@ -179,6 +179,22 @@
 
       <!-- MAIN SCROLLABLE CONTENT -->
       <main class="flex-1 overflow-y-auto p-4 space-y-4 pb-28">
+
+        <!-- LIVE VENDOR DELIVERY STATUS & FAMILY SYNC BAR -->
+        <div id="liveDeliveryStatusBanner" class="bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span id="liveDeliveryIcon" class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
+              <i class="ph-bold ph-clock text-base"></i>
+            </span>
+            <div class="min-w-0">
+              <p id="liveDeliveryTitle" class="text-xs font-extrabold text-slate-800 truncate">ఈరోజు డెలివరీ: పెండింగ్ (Pending)</p>
+              <p id="familySyncSubLabel" class="text-[10px] text-slate-500 truncate">వెండర్ డెలివరీ టిక్ చేయగానే ఇక్కడ అప్‌డేట్ అవుతుంది</p>
+            </div>
+          </div>
+          <button onclick="openFamilyModal()" class="bg-indigo-50 hover:bg-indigo-100 border border-indigo-200 text-indigo-800 text-[10px] font-extrabold px-2.5 py-1.5 rounded-xl flex items-center gap-1 shrink-0 active:scale-95">
+            <i class="ph-bold ph-users-three text-xs"></i> ఫ్యామిలీ
+          </button>
+        </div>
 
         <!-- QUICK SHORTCUTS CARD -->
         <section id="quickActionsSection" class="bg-gradient-to-br from-blue-50 to-sky-50/70 border border-sky-100 rounded-2xl p-3.5 shadow-sm">
@@ -310,18 +326,29 @@
           </button>
         </section>
 
-        <!-- DELIVERY PREFERENCES BAR (Milk Type, Shift & Default Quota synced with Vendor) -->
-        <section class="bg-white border border-slate-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2">
-          <div class="flex items-center gap-2 min-w-0">
-            <span id="prefMilkBadge" class="text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-xl shrink-0">🐃 గేదె పాలు</span>
+        <!-- DELIVERY PREFERENCES BAR (Morning & Evening Independent Milk Types, Quotas & Rates) -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-3 shadow-2xs space-y-2">
+          <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
-              <span id="prefShiftAreaText" class="text-xs font-bold text-slate-700 block truncate">🌅 Morning • 📍 General</span>
-              <span class="text-[10px] text-slate-400 block">వెండర్ యాప్‌తో సింక్ అయింది</span>
+              <span class="text-[11px] font-extrabold text-slate-800 flex items-center gap-1">
+                <i class="ph-fill ph-drop-half-bottom text-sky-600"></i> షిఫ్ట్ వారీగా పాల రకం & రేటు
+              </span>
+              <span id="prefAreaSubText" class="text-[10px] text-slate-400 block truncate">📍 General • వెండర్‌తో సింక్</span>
+            </div>
+            <button onclick="openQuotaModal()" class="text-[11px] font-bold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 px-2.5 py-1.5 rounded-xl shrink-0 active:scale-95">
+              మార్చండి
+            </button>
+          </div>
+          <div class="grid grid-cols-2 gap-2 text-[11px]">
+            <div id="morningPrefPill" class="bg-amber-50/80 border border-amber-200 rounded-xl px-2.5 py-1.5">
+              <span class="text-[9px] font-bold text-amber-800 uppercase block">🌅 ఉదయం (Morning)</span>
+              <span id="morningPrefDetail" class="font-extrabold text-slate-800">🐃 1.0L @ ₹75</span>
+            </div>
+            <div id="eveningPrefPill" class="bg-sky-50/80 border border-sky-200 rounded-xl px-2.5 py-1.5">
+              <span class="text-[9px] font-bold text-sky-800 uppercase block">🌇 సాయంత్రం (Evening)</span>
+              <span id="eveningPrefDetail" class="font-extrabold text-slate-800">🐄 0.0L @ ₹55</span>
             </div>
           </div>
-          <button onclick="openQuotaModal()" class="text-[11px] font-bold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 px-2.5 py-1.5 rounded-xl shrink-0 active:scale-95">
-            మార్చండి
-          </button>
         </section>
 
         <!-- MONTHLY CALENDAR -->
@@ -402,12 +429,16 @@
               <span id="billSkippedDays" class="font-medium text-rose-600">0 రోజులు</span>
             </div>
             <div class="flex justify-between text-slate-600">
-              <span>మొత్తం పాల పరిమాణం (Total Volume):</span>
-              <span id="billTotalLiters" class="font-bold text-slate-800">0.0 L</span>
+              <span>🌅 ఉదయం పాలు (<span id="billMorningTypeLabel">Buffalo</span>):</span>
+              <span id="billMorningSummary" class="font-bold text-slate-800">0.0 L (₹0)</span>
             </div>
             <div class="flex justify-between text-slate-600">
-              <span>లీటరు ధర (Rate per Liter):</span>
-              <span class="font-medium text-slate-800">₹<span id="billRatePerLiter">75</span></span>
+              <span>🌇 సాయంత్రం పాలు (<span id="billEveningTypeLabel">Cow</span>):</span>
+              <span id="billEveningSummary" class="font-bold text-slate-800">0.0 L (₹0)</span>
+            </div>
+            <div class="flex justify-between text-slate-600">
+              <span>మొత్తం పాల పరిమాణం (Total Volume):</span>
+              <span id="billTotalLiters" class="font-extrabold text-slate-900">0.0 L</span>
             </div>
 
             <div id="billQualitySummaryRow" class="hidden-force bg-amber-50 border border-amber-200/80 rounded-lg p-2 text-[11px] text-amber-900">
@@ -473,6 +504,17 @@
               </thead>
               <tbody id="printStatementBody"></tbody>
             </table>
+          </div>
+
+          <!-- 6-MONTH SPENDING & VOLUME TREND CHART -->
+          <div class="pt-3 border-t border-slate-100 space-y-2">
+            <div class="flex items-center justify-between">
+              <h4 class="text-xs font-extrabold text-slate-800 flex items-center gap-1.5">
+                <i class="ph-fill ph-chart-bar text-sky-600"></i> గత 6 నెలల పాల ఖర్చుల గ్రాఫ్
+              </h4>
+              <span class="text-[10px] text-slate-400 font-semibold">6-Month Trend</span>
+            </div>
+            <div id="sixMonthSpendingChart" class="grid grid-cols-6 gap-2 items-end h-24 pt-4 px-1 bg-slate-50/70 rounded-xl border border-slate-200/70 pb-1.5"></div>
           </div>
 
           <!-- WhatsApp Share, PDF Receipt & App Share Buttons -->
@@ -541,8 +583,29 @@
           </div>
         </div>
 
+        <!-- Morning / Evening Split Inputs (Independent Milk Types & Rates) -->
+        <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-[11px] font-bold text-slate-700">🌅 ఉదయం & 🌇 సాయంత్రం విడివిడిగా:</span>
+            <span id="splitTotalPreview" class="text-[11px] font-extrabold text-sky-700">0.0 L (₹0)</span>
+          </div>
+          <div class="grid grid-cols-3 gap-1.5 items-center">
+            <div>
+              <label id="dayModalMorningLabel" class="text-[9px] font-bold text-amber-800 block truncate">🌅 🐃 (₹75)</label>
+              <input type="number" id="morningSplitInput" step="0.25" min="0" max="10" oninput="updateSplitPreview()" placeholder="1.0" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none focus:border-sky-500">
+            </div>
+            <div>
+              <label id="dayModalEveningLabel" class="text-[9px] font-bold text-sky-800 block truncate">🌇 🐄 (₹55)</label>
+              <input type="number" id="eveningSplitInput" step="0.25" min="0" max="10" oninput="updateSplitPreview()" placeholder="0.0" class="w-full bg-white border border-slate-300 rounded-lg px-2 py-1.5 text-xs font-bold focus:outline-none focus:border-sky-500">
+            </div>
+            <button onclick="applyMorningEveningSplit()" class="mt-3.5 bg-sky-600 hover:bg-sky-700 text-white py-1.5 px-2 rounded-lg text-[11px] font-bold">
+              సేవ్ Split
+            </button>
+          </div>
+        </div>
+
         <div>
-          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">కస్టమ్ లీటర్లు (Custom Ltr):</label>
+          <label class="text-[11px] font-bold text-slate-400 uppercase tracking-wider block mb-1">కస్టమ్ లీటర్లు (Custom Total Ltr):</label>
           <div class="flex items-center gap-2">
             <input type="number" id="customLitersInput" step="0.25" min="0" max="10" placeholder="e.g. 2.5" class="flex-1 border border-slate-300 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 font-semibold">
             <button onclick="applyCustomLiters()" class="bg-sky-600 hover:bg-sky-700 text-white px-4 py-2 rounded-xl text-xs font-bold">
@@ -619,55 +682,69 @@
       </div>
     </div>
 
-    <!-- MODAL 3: EDIT DELIVERY PREFERENCES (Quota, Milk Type, Shift & Area - Synced with Vendor) -->
+    <!-- MODAL 3: DUAL-SHIFT DELIVERY PREFERENCES (Morning & Evening Independent Milk Types, Quotas & Rates) -->
     <div id="quotaModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center pb-1 border-b border-slate-100">
-          <h4 class="font-bold text-slate-800 text-sm">పాల రకం, షిఫ్ట్ & రోజువారీ కోటా</h4>
+          <h4 class="font-bold text-slate-800 text-sm">ఉదయం & సాయంత్రం పాల సెట్టింగ్స్</h4>
           <button onclick="closeQuotaModal()" class="text-slate-400 hover:text-slate-600">
             <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
 
-        <div class="space-y-2.5">
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">పాల రకం (Milk Type):</label>
-            <select id="custMilkTypeSelect" onchange="autoAdjustSmartRate()" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-              <option value="Buffalo">🐃 గేదె పాలు (Buffalo Milk)</option>
-              <option value="Cow">🐄 ఆవు పాలు (Cow Milk)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">డెలివరీ సమయం (Shift):</label>
-            <select id="custShiftSelect" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-              <option value="Morning">🌅 ఉదయం (Morning)</option>
-              <option value="Evening">🌇 సాయంత్రం (Evening)</option>
-              <option value="Both">🔄 రెండు పూటలా (Both)</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">మీ ఏరియా / కాలనీ (Area):</label>
-            <input type="text" id="custAreaInputSelf" placeholder="ఉదా: హన్మకొండ / కాజీపేట" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-          </div>
-
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">రోజూ వచ్చే పాలు (లీటర్లలో):</label>
-            <select id="defaultQuotaSelect" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-              <option value="0.5">0.5 లీటరు (అర లీటర్)</option>
-              <option value="1.0">1.0 లీటరు (సాధారణం)</option>
-              <option value="1.5">1.5 లీటర్లు</option>
-              <option value="2.0">2.0 లీటర్లు</option>
-              <option value="2.5">2.5 లీటర్లు</option>
-              <option value="3.0">3.0 లీటర్లు</option>
-            </select>
+        <!-- MORNING SHIFT BOX -->
+        <div class="bg-amber-50/70 border border-amber-200 rounded-xl p-3 space-y-2">
+          <span class="text-xs font-extrabold text-amber-900 flex items-center gap-1">🌅 ఉదయం షిఫ్ట్ (Morning Shift)</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <div>
+              <label class="text-[9px] font-bold text-slate-600 block mb-0.5">పాల రకం:</label>
+              <select id="morningMilkTypeSelect" onchange="autoAdjustShiftRate('morning')" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-[11px] font-bold">
+                <option value="Buffalo">🐃 గేదె</option>
+                <option value="Cow">🐄 ఆవు</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[9px] font-bold text-slate-600 block mb-0.5">కోటా (L):</label>
+              <input type="number" id="morningQuotaInput" step="0.25" min="0" max="10" value="1.0" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            </div>
+            <div>
+              <label class="text-[9px] font-bold text-slate-600 block mb-0.5">ధర (₹/L):</label>
+              <input type="number" id="morningRateInput" min="10" max="300" value="75" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            </div>
           </div>
         </div>
 
+        <!-- EVENING SHIFT BOX -->
+        <div class="bg-sky-50/70 border border-sky-200 rounded-xl p-3 space-y-2">
+          <span class="text-xs font-extrabold text-sky-900 flex items-center gap-1">🌇 సాయంత్రం షిఫ్ట్ (Evening Shift)</span>
+          <div class="grid grid-cols-3 gap-1.5">
+            <div>
+              <label class="text-[9px] font-bold text-slate-600 block mb-0.5">పాల రకం:</label>
+              <select id="eveningMilkTypeSelect" onchange="autoAdjustShiftRate('evening')" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-[11px] font-bold">
+                <option value="Cow">🐄 ఆవు</option>
+                <option value="Buffalo">🐃 గేదె</option>
+              </select>
+            </div>
+            <div>
+              <label class="text-[9px] font-bold text-slate-600 block mb-0.5">కోటా (L):</label>
+              <input type="number" id="eveningQuotaInput" step="0.25" min="0" max="10" value="0" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            </div>
+            <div>
+              <label class="text-[9px] font-bold text-slate-600 block mb-0.5">ధర (₹/L):</label>
+              <input type="number" id="eveningRateInput" min="10" max="300" value="55" class="w-full p-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            </div>
+          </div>
+          <p class="text-[9px] text-slate-500">సాయంత్రం పాలు వద్దనుకుంటే కోటా 0 ఉంచండి.</p>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 mb-1 block">మీ ఏరియా / కాలనీ (Area):</label>
+          <input type="text" id="custAreaInputSelf" placeholder="ఉదా: హన్మకొండ / కాజీపేట" class="w-full p-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+        </div>
+
         <div class="flex gap-2 pt-1">
-          <button onclick="closeQuotaModal()" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
-          <button onclick="saveDefaultQuota()" class="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ & సింక్</button>
+          <button onclick="closeQuotaModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button onclick="saveDefaultQuota()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ & సింక్</button>
         </div>
       </div>
     </div>
@@ -792,6 +869,41 @@
 
   </div>
 
+    <!-- MODAL 7: FAMILY MEMBER LINK & SYNC -->
+    <div id="familyModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
+        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <i class="ph-fill ph-users-three text-indigo-600 text-base"></i> ఫ్యామిలీ సింక్ (Family Link)
+            </h4>
+            <p class="text-[10px] text-slate-500">కుటుంబ సభ్యుల నంబర్‌ను లింక్ చేస్తే ఇద్దరి ఫోన్లలో ఒకే లెక్క కనిపిస్తుంది</p>
+          </div>
+          <button onclick="closeFamilyModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <div id="familyLinkedStatusBox" class="hidden-force bg-indigo-50 border border-indigo-200 rounded-xl p-2.5 text-[11px] text-indigo-900 space-y-1">
+          <p class="font-bold" id="familyLinkedStatusText">ఫ్యామిలీ అకౌంట్ లింక్ అయింది!</p>
+          <button onclick="unlinkFamilyAccount()" class="text-[10px] text-rose-600 font-bold underline">లింక్ తొలగించు (Unlink)</button>
+        </div>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">కుటుంబ సభ్యుడి మొబైల్ నంబర్ (10 అంకెలు):</label>
+            <input type="tel" id="familyMemberPhoneInput" maxlength="10" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-600">
+            <p class="text-[10px] text-slate-400 mt-1">గమనిక: ఆ కుటుంబ సభ్యుడు ముందుగా యాప్‌లో Sign Up అయి ఉండాలి.</p>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeFamilyModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button id="linkFamilyBtn" onclick="linkFamilyMemberByPhone()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">లింక్ చేయండి</button>
+        </div>
+      </div>
+    </div>
+
   <!-- JAVASCRIPT LOGIC -->
   <script>
     // 1. SUPABASE CLIENT
@@ -813,6 +925,13 @@
     let custMilkType = 'Buffalo';
     let custShift = 'Morning';
     let custArea = 'General';
+
+    let morningMilkType = 'Buffalo';
+    let morningQuota = 1.0;
+    let morningRate = 75;
+    let eveningMilkType = 'Cow';
+    let eveningQuota = 0;
+    let eveningRate = 55;
     let isAutoMode = true;
     let monthRecords = {};
     let prevMonthRecords = {};
@@ -920,6 +1039,12 @@
           route_area: 'General',
           daily_qty: 1.0,
           price_per_ltr: 75,
+          morning_milk_type: 'Buffalo',
+          morning_qty: 1.0,
+          morning_rate: 75,
+          evening_milk_type: 'Cow',
+          evening_qty: 0,
+          evening_rate: 55,
           auto_mode: true
         }]).select().single();
 
@@ -957,23 +1082,40 @@
       localStorage.setItem('milkcount_last_account', JSON.stringify({ phone: user.phone, name: user.name }));
 
       document.getElementById('userPhoneBadge').innerText = `${user.name || 'User'} (${user.phone})`;
-      ratePerLiter = parseFloat(user.price_per_ltr || 70);
-      defaultDailyQuota = parseFloat(user.daily_qty || 1.0);
-      custMilkType = user.milk_type || 'Buffalo';
-      custShift = user.shift || 'Morning';
       custArea = user.route_area || 'General';
       isAutoMode = user.auto_mode !== false;
 
-      document.getElementById('ratePerLiterText').innerText = ratePerLiter;
-      document.getElementById('milkTypeHeaderTag').innerText = custMilkType === 'Cow' ? '🐄 Cow' : '🐃 Buffalo';
-      document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
+      morningMilkType = user.morning_milk_type || user.milk_type || 'Buffalo';
+      morningQuota = user.morning_qty !== undefined && user.morning_qty !== null
+        ? parseFloat(user.morning_qty)
+        : (user.shift === 'Evening' ? 0 : parseFloat(user.daily_qty || 1.0));
+      morningRate = parseFloat(user.morning_rate || user.price_per_ltr || (morningMilkType === 'Cow' ? 55 : 75));
 
-      const shiftIcon = custShift === 'Evening' ? '🌇' : custShift === 'Both' ? '🔄' : '🌅';
-      document.getElementById('prefMilkBadge').innerText = custMilkType === 'Cow' ? '🐄 ఆవు పాలు (Cow)' : '🐃 గేదె పాలు (Buffalo)';
-      document.getElementById('prefMilkBadge').className = custMilkType === 'Cow'
-        ? 'text-xs font-extrabold bg-sky-50 text-sky-800 border border-sky-200 px-2.5 py-1 rounded-xl shrink-0'
-        : 'text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-xl shrink-0';
-      document.getElementById('prefShiftAreaText').innerText = `${shiftIcon} ${custShift} • 📍 ${custArea} (${defaultDailyQuota}L)`;
+      eveningMilkType = user.evening_milk_type || 'Cow';
+      eveningQuota = user.evening_qty !== undefined && user.evening_qty !== null
+        ? parseFloat(user.evening_qty)
+        : (user.shift === 'Evening' ? parseFloat(user.daily_qty || 1.0) : 0);
+      eveningRate = parseFloat(user.evening_rate || (eveningMilkType === 'Cow' ? 55 : 75));
+
+      defaultDailyQuota = parseFloat((morningQuota + eveningQuota).toFixed(2)) || parseFloat(user.daily_qty || 1.0);
+      ratePerLiter = morningQuota > 0 ? morningRate : eveningRate;
+      custMilkType = morningQuota > 0 ? morningMilkType : eveningMilkType;
+      custShift = (morningQuota > 0 && eveningQuota > 0) ? 'Both' : (eveningQuota > 0 ? 'Evening' : 'Morning');
+
+      const mIcon = morningMilkType === 'Cow' ? '🐄' : '🐃';
+      const eIcon = eveningMilkType === 'Cow' ? '🐄' : '🐃';
+
+      document.getElementById('milkTypeHeaderTag').innerText = morningQuota > 0 ? `🌅 ${mIcon} ₹${morningRate}` : '🌅 Off';
+      document.getElementById('ratePerLiterHeaderSub').innerText = eveningQuota > 0 ? `🌇 ${eIcon} ₹${eveningRate}` : '🌇 Off';
+      document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటర్లు`;
+
+      document.getElementById('prefAreaSubText').innerText = `📍 ${custArea} • వెండర్‌తో సింక్ అయింది`;
+      document.getElementById('morningPrefDetail').innerText = morningQuota > 0
+        ? `${mIcon} ${morningQuota}L @ ₹${morningRate}`
+        : 'వద్దు (0L)';
+      document.getElementById('eveningPrefDetail').innerText = eveningQuota > 0
+        ? `${eIcon} ${eveningQuota}L @ ₹${eveningRate}`
+        : 'వద్దు (0L)';
     }
 
     async function setupUserSession(user, isNewUser = false) {
@@ -1108,17 +1250,17 @@
       const [{ data }, { data: prevData }, { data: vLedger }] = await Promise.all([
         db.from('customer_milk_logs')
           .select('*')
-          .eq('user_id', currentUser.id)
+          .eq('user_id', getHouseUserId())
           .gte('log_date', startDate)
           .lt('log_date', endDate),
         db.from('customer_milk_logs')
           .select('*')
-          .eq('user_id', currentUser.id)
+          .eq('user_id', getHouseUserId())
           .gte('log_date', prevStartDate)
           .lt('log_date', startDate),
         db.from('vendor_billing_ledger')
           .select('*')
-          .eq('customer_id', currentUser.id)
+          .eq('customer_id', getHouseUserId())
           .eq('month_key', mKey)
           .maybeSingle()
       ]);
@@ -1128,11 +1270,21 @@
       if (data) {
         data.forEach(item => {
           const dayNum = parseInt(item.log_date.split('-')[2]);
+          const totQ = parseFloat(item.quantity);
+          const mQ = item.morning_qty !== undefined && item.morning_qty !== null
+            ? parseFloat(item.morning_qty)
+            : (defaultDailyQuota > 0 ? parseFloat((totQ * (morningQuota / defaultDailyQuota)).toFixed(2)) : totQ);
+          const eQ = item.evening_qty !== undefined && item.evening_qty !== null
+            ? parseFloat(item.evening_qty)
+            : Math.max(0, parseFloat((totQ - mQ).toFixed(2)));
           monthRecords[dayNum] = {
             id: item.id,
             status: item.status === 'taken' ? 'delivered' : 'skipped',
-            liters: parseFloat(item.quantity),
-            quality_note: item.quality_note || ''
+            liters: totQ,
+            morning_qty: mQ,
+            evening_qty: eQ,
+            quality_note: item.quality_note || '',
+            vendor_delivered: Boolean(item.vendor_delivered)
           };
           if (item.quality_note) {
             dbQualityNotes[dayNum] = item.quality_note;
@@ -1186,54 +1338,63 @@
     }
 
     function openQuotaModal() {
-      document.getElementById('custMilkTypeSelect').value = custMilkType || 'Buffalo';
-      document.getElementById('custShiftSelect').value = custShift || 'Morning';
+      document.getElementById('morningMilkTypeSelect').value = morningMilkType || 'Buffalo';
+      document.getElementById('morningQuotaInput').value = morningQuota;
+      document.getElementById('morningRateInput').value = morningRate;
+      document.getElementById('eveningMilkTypeSelect').value = eveningMilkType || 'Cow';
+      document.getElementById('eveningQuotaInput').value = eveningQuota;
+      document.getElementById('eveningRateInput').value = eveningRate;
       document.getElementById('custAreaInputSelf').value = custArea || 'General';
-      document.getElementById('defaultQuotaSelect').value = defaultDailyQuota.toString();
       document.getElementById('quotaModal').classList.remove('hidden-force');
     }
     function closeQuotaModal() {
       document.getElementById('quotaModal').classList.add('hidden-force');
     }
-    function autoAdjustSmartRate() {
-      const mType = document.getElementById('custMilkTypeSelect').value;
-      if (mType === 'Cow' && (ratePerLiter === 75 || ratePerLiter === 70)) {
-        ratePerLiter = 55;
-      } else if (mType === 'Buffalo' && (ratePerLiter === 55 || ratePerLiter === 60)) {
-        ratePerLiter = 75;
-      }
+    function autoAdjustShiftRate(which) {
+      const typeEl = document.getElementById(which + 'MilkTypeSelect');
+      const rateEl = document.getElementById(which + 'RateInput');
+      if (typeEl.value === 'Cow' && (rateEl.value === '75' || rateEl.value === '70')) rateEl.value = '55';
+      else if (typeEl.value === 'Buffalo' && (rateEl.value === '55' || rateEl.value === '60')) rateEl.value = '75';
     }
     async function saveDefaultQuota() {
-      const val = parseFloat(document.getElementById('defaultQuotaSelect').value);
-      const newMilkType = document.getElementById('custMilkTypeSelect').value;
-      const newShift = document.getElementById('custShiftSelect').value;
+      const mType = document.getElementById('morningMilkTypeSelect').value;
+      const mQty = Math.max(0, parseFloat(document.getElementById('morningQuotaInput').value) || 0);
+      const mRate = Math.max(1, parseFloat(document.getElementById('morningRateInput').value) || 75);
+
+      const eType = document.getElementById('eveningMilkTypeSelect').value;
+      const eQty = Math.max(0, parseFloat(document.getElementById('eveningQuotaInput').value) || 0);
+      const eRate = Math.max(1, parseFloat(document.getElementById('eveningRateInput').value) || 55);
+
       const newArea = document.getElementById('custAreaInputSelf').value.trim() || 'General';
+      const totalQ = parseFloat((mQty + eQty).toFixed(2));
+      if (totalQ <= 0) return alert('ఉదయం లేదా సాయంత్రం కనీసం ఒక షిఫ్ట్‌లో కోటా నమోదు చేయండి.');
 
-      if (val && val > 0) {
-        defaultDailyQuota = val;
-        custMilkType = newMilkType;
-        custShift = newShift;
-        custArea = newArea;
+      const combinedShift = (mQty > 0 && eQty > 0) ? 'Both' : (eQty > 0 ? 'Evening' : 'Morning');
+      const primaryType = mQty > 0 ? mType : eType;
+      const primaryRate = mQty > 0 ? mRate : eRate;
 
-        currentUser.daily_qty = val;
-        currentUser.milk_type = newMilkType;
-        currentUser.shift = newShift;
-        currentUser.route_area = newArea;
-        currentUser.price_per_ltr = ratePerLiter;
+      const updatePayload = {
+        daily_qty: totalQ,
+        milk_type: primaryType,
+        shift: combinedShift,
+        route_area: newArea,
+        price_per_ltr: primaryRate,
+        morning_milk_type: mType,
+        morning_qty: mQty,
+        morning_rate: mRate,
+        evening_milk_type: eType,
+        evening_qty: eQty,
+        evening_rate: eRate
+      };
 
-        await db.from('customer_users').update({
-          daily_qty: val,
-          milk_type: newMilkType,
-          shift: newShift,
-          route_area: newArea,
-          price_per_ltr: ratePerLiter
-        }).eq('id', currentUser.id);
+      const { error } = await db.from('customer_users').update(updatePayload).eq('id', currentUser.id);
+      if (error) return alert('Error: ' + error.message);
 
-        applyUserProfileToState(currentUser);
-        closeQuotaModal();
-        showToast('మీ పాల వివరాలు సేవ్ & వెండర్‌కు సింక్ అయ్యాయి!');
-        renderApp();
-      }
+      Object.assign(currentUser, updatePayload);
+      applyUserProfileToState(currentUser);
+      closeQuotaModal();
+      showToast('ఉదయం & సాయంత్రం పాల వివరాలు వెండర్‌కు సింక్ అయ్యాయి!');
+      renderApp();
     }
 
     // 6. DAY MODAL & ACTIONS
@@ -1253,6 +1414,25 @@
       } else {
         customInput.value = '';
       }
+      const mIcon = morningMilkType === 'Cow' ? '🐄' : '🐃';
+      const eIcon = eveningMilkType === 'Cow' ? '🐄' : '🐃';
+      document.getElementById('dayModalMorningLabel').innerText = `🌅 ${mIcon} (₹${morningRate})`;
+      document.getElementById('dayModalEveningLabel').innerText = `🌇 ${eIcon} (₹${eveningRate})`;
+
+      const splits = getMonthSplits(currentViewingDate.getFullYear(), currentViewingDate.getMonth());
+      const daySplit = splits[day];
+      if (item && item.morning_qty !== undefined) {
+        document.getElementById('morningSplitInput').value = item.morning_qty;
+        document.getElementById('eveningSplitInput').value = item.evening_qty;
+      } else if (daySplit) {
+        document.getElementById('morningSplitInput').value = daySplit.m;
+        document.getElementById('eveningSplitInput').value = daySplit.e;
+      } else {
+        document.getElementById('morningSplitInput').value = morningQuota;
+        document.getElementById('eveningSplitInput').value = eveningQuota;
+      }
+      updateSplitPreview();
+
       const qNotes = getMonthQualityNotes(currentViewingDate.getFullYear(), currentViewingDate.getMonth());
       document.getElementById('customQualityInput').value = (item && item.quality_note) || qNotes[day] || '';
       document.getElementById('dayModal').classList.remove('hidden-force');
@@ -1263,7 +1443,7 @@
       selectedDayForModal = null;
     }
 
-    async function setModalDayValue(liters) {
+    async function setModalDayValue(liters, explicitM = null, explicitE = null) {
       if (!selectedDayForModal) return;
       const y = currentViewingDate.getFullYear();
       const m = String(currentViewingDate.getMonth() + 1).padStart(2, '0');
@@ -1273,12 +1453,27 @@
 
       const status = liters === 0 ? 'skipped' : 'taken';
       const quantity = liters;
+      let mQty = 0;
+      let eQty = 0;
+      if (liters > 0) {
+        if (explicitM !== null && explicitE !== null) {
+          mQty = explicitM;
+          eQty = explicitE;
+        } else if (defaultDailyQuota > 0) {
+          mQty = parseFloat((liters * (morningQuota / defaultDailyQuota)).toFixed(2));
+          eQty = Math.max(0, parseFloat((liters - mQty).toFixed(2)));
+        } else {
+          mQty = liters;
+        }
+      }
       const existingNote = (monthRecords[selectedDayForModal] && monthRecords[selectedDayForModal].quality_note) || null;
 
       const { error } = await db.from('customer_milk_logs').upsert({
-        user_id: currentUser.id,
+        user_id: getHouseUserId(),
         log_date: logDate,
         quantity: quantity,
+        morning_qty: mQty,
+        evening_qty: eQty,
         status: status,
         quality_note: existingNote
       }, { onConflict: 'user_id,log_date' });
@@ -1287,6 +1482,8 @@
         monthRecords[selectedDayForModal] = {
           status: status === 'taken' ? 'delivered' : 'skipped',
           liters: quantity,
+          morning_qty: mQty,
+          evening_qty: eQty,
           quality_note: existingNote || ''
         };
         if (liters === 0) {
@@ -1308,7 +1505,7 @@
       const d = String(selectedDayForModal).padStart(2, '0');
       const logDate = `${y}-${m}-${d}`;
 
-      await db.from('customer_milk_logs').delete().eq('user_id', currentUser.id).eq('log_date', logDate);
+      await db.from('customer_milk_logs').delete().eq('user_id', getHouseUserId()).eq('log_date', logDate);
       delete monthRecords[selectedDayForModal];
       removeQualityNoteForDay(currentViewingDate.getFullYear(), currentViewingDate.getMonth(), selectedDayForModal);
       showToast(`${selectedDayForModal}వ తేదీ రీసెట్ చేయబడింది!`);
@@ -1338,12 +1535,12 @@
       const isCurrentlySkipped = (item && item.status === 'skipped');
 
       if (isCurrentlySkipped) {
-        await db.from('customer_milk_logs').delete().eq('user_id', currentUser.id).eq('log_date', logDate);
+        await db.from('customer_milk_logs').delete().eq('user_id', getHouseUserId()).eq('log_date', logDate);
         delete monthRecords[dayNum];
         showToast(`రేపు (${dayNum}న) తిరిగి సాధారణ స్థితికి మారింది!`);
       } else {
         await db.from('customer_milk_logs').upsert({
-          user_id: currentUser.id,
+          user_id: getHouseUserId(),
           log_date: logDate,
           quantity: 0,
           status: 'skipped'
@@ -1373,7 +1570,7 @@
       const newVal = parseFloat((baseLiters + 0.5).toFixed(2));
 
       await db.from('customer_milk_logs').upsert({
-        user_id: currentUser.id,
+        user_id: getHouseUserId(),
         log_date: logDate,
         quantity: newVal,
         status: 'taken'
@@ -1499,8 +1696,12 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
       document.getElementById('currentMonthYearLabel').innerText = `${TELUGU_MONTHS[month]} ${year}`;
       document.getElementById('monthSubLabel').innerText = `${ENGLISH_MONTHS[month]} ${year}`;
-      document.getElementById('ratePerLiterText').innerText = ratePerLiter;
-      document.getElementById('billRatePerLiter').innerText = ratePerLiter;
+      const mIconHdr = morningMilkType === 'Cow' ? '🐄' : '🐃';
+      const eIconHdr = eveningMilkType === 'Cow' ? '🐄' : '🐃';
+      const hdrTag = document.getElementById('milkTypeHeaderTag');
+      const hdrSub = document.getElementById('ratePerLiterHeaderSub');
+      if (hdrTag) hdrTag.innerText = morningQuota > 0 ? `🌅 ${mIconHdr} ₹${morningRate}` : '🌅 Off';
+      if (hdrSub) hdrSub.innerText = eveningQuota > 0 ? `🌇 ${eIconHdr} ₹${eveningRate}` : '🌇 Off';
       document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
       document.getElementById('billMonthBadge').innerText = `${TELUGU_MONTHS[month]} ${year}`;
 
@@ -1510,6 +1711,8 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       let deliveredCount = 0;
       let skippedCount = 0;
       let totalLiters = 0;
+      let totalMorningLiters = 0;
+      let totalEveningLiters = 0;
 
       const grid = document.getElementById('calendarDaysGrid');
       grid.innerHTML = '';
@@ -1553,6 +1756,8 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
             if (isPastOrToday) {
               deliveredCount++;
               totalLiters += item.liters;
+              totalMorningLiters += (item.morning_qty !== undefined ? item.morning_qty : item.liters);
+              totalEveningLiters += (item.evening_qty !== undefined ? item.evening_qty : 0);
 
               const isExtra = item.liters > defaultDailyQuota;
               statusClass = isExtra 
@@ -1580,6 +1785,8 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         } else if (isPastOrToday && isAfterOrOnJoin && isAutoMode) {
           deliveredCount++;
           totalLiters += defaultDailyQuota;
+          totalMorningLiters += morningQuota;
+          totalEveningLiters += eveningQuota;
           statusClass = "bg-emerald-50/70 border-emerald-300 text-emerald-900";
           statusBadge = `
             <span class="text-[10px] font-extrabold text-emerald-600 leading-none">
@@ -1607,7 +1814,9 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         grid.appendChild(dayCard);
       }
 
-      const totalBill = Math.round(totalLiters * ratePerLiter);
+      const morningBill = Math.round(totalMorningLiters * morningRate);
+      const eveningBill = Math.round(totalEveningLiters * eveningRate);
+      const totalBill = morningBill + eveningBill;
       currentCalculatedBill = totalBill;
 
       document.getElementById('totalBillAmount').innerText = totalBill.toLocaleString('en-IN');
@@ -1618,13 +1827,19 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('billMonthTotalDays').innerText = `${daysInMonth} రోజులు`;
       document.getElementById('billDeliveredDays').innerText = `${deliveredCount} రోజులు`;
       document.getElementById('billSkippedDays').innerText = `${skippedCount} రోజులు`;
+      document.getElementById('billMorningTypeLabel').innerText = `${morningMilkType} @ ₹${morningRate}`;
+      document.getElementById('billMorningSummary').innerText = `${totalMorningLiters.toFixed(1)} L (₹${morningBill})`;
+      document.getElementById('billEveningTypeLabel').innerText = `${eveningMilkType} @ ₹${eveningRate}`;
+      document.getElementById('billEveningSummary').innerText = `${totalEveningLiters.toFixed(1)} L (₹${eveningBill})`;
       document.getElementById('billTotalLiters').innerText = `${totalLiters.toFixed(1)} L`;
       document.getElementById('billFinalAmount').innerText = totalBill.toLocaleString('en-IN');
 
+      updateLiveDeliveryBanner();
       updateMonthlyInsight(year, month, totalLiters);
       refreshBillQualitySummary(year, month);
       refreshLedgerUI(year, month, totalBill);
       buildPrintStatementTable(year, month, daysInMonth, now, userRegDate);
+      renderSixMonthSpendingChart();
     }
 
     // 10. CUSTOMER FEATURES LOGIC
@@ -1669,7 +1884,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         const m = String(cur.getMonth() + 1).padStart(2, '0');
         const d = String(cur.getDate()).padStart(2, '0');
         rows.push({
-          user_id: currentUser.id,
+          user_id: getHouseUserId(),
           log_date: `${y}-${m}-${d}`,
           quantity: 0,
           status: 'skipped'
@@ -1867,7 +2082,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         const payMode = (syncedVendorLedger && syncedVendorLedger.payment_mode) || 'Cash';
         const { data } = await db.from('vendor_billing_ledger').upsert({
           vendor_phone: currentUser.vendor_phone,
-          customer_id: currentUser.id,
+          customer_id: getHouseUserId(),
           month_key: mKey,
           prev_due: prevDue,
           paid_amount: paid,
@@ -1893,7 +2108,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         const mKey = `${year}-${String(month + 1).padStart(2, '0')}`;
         const { data } = await db.from('vendor_billing_ledger').upsert({
           vendor_phone: currentUser.vendor_phone,
-          customer_id: currentUser.id,
+          customer_id: getHouseUserId(),
           month_key: mKey,
           prev_due: prevDue,
           paid_amount: totalPayable,
@@ -2062,7 +2277,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       const dbStatus = (existing && existing.status === 'skipped') ? 'skipped' : 'taken';
 
       await db.from('customer_milk_logs').upsert({
-        user_id: currentUser.id,
+        user_id: getHouseUserId(),
         log_date: logDate,
         quantity: qty,
         status: dbStatus,
@@ -2099,7 +2314,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       const logDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       if (monthRecords[day]) {
         monthRecords[day].quality_note = '';
-        await db.from('customer_milk_logs').update({ quality_note: null }).eq('user_id', currentUser.id).eq('log_date', logDate);
+        await db.from('customer_milk_logs').update({ quality_note: null }).eq('user_id', getHouseUserId()).eq('log_date', logDate);
       }
 
       showToast(`${day}వ తేదీ నాణ్యత నోట్ తొలగించబడింది!`);
@@ -2127,6 +2342,210 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         row.classList.remove('hidden-force');
         txt.innerText = keys.map(d => `${d}న: ${notes[d]}`).join(' | ');
       }
+    }
+
+    // E2. EFFECTIVE HOUSEHOLD ID (Supports Family Sync!)
+    function getHouseUserId() {
+      if (!currentUser) return null;
+      return currentUser.family_head_id || currentUser.id;
+    }
+
+    // E3. FAMILY MEMBER LINKING LOGIC
+    function openFamilyModal() {
+      document.getElementById('familyMemberPhoneInput').value = '';
+      const statusBox = document.getElementById('familyLinkedStatusBox');
+      const statusTxt = document.getElementById('familyLinkedStatusText');
+      if (currentUser && currentUser.family_head_id) {
+        statusBox.classList.remove('hidden-force');
+        statusTxt.innerText = '✓ మీరు ఫ్యామిలీ మెంబర్‌గా ప్రైమరీ అకౌంట్‌కు లింక్ అయి ఉన్నారు.';
+      } else {
+        statusBox.classList.add('hidden-force');
+      }
+      document.getElementById('familyModal').classList.remove('hidden-force');
+    }
+
+    function closeFamilyModal() {
+      document.getElementById('familyModal').classList.add('hidden-force');
+    }
+
+    async function linkFamilyMemberByPhone() {
+      const famPhone = document.getElementById('familyMemberPhoneInput').value.trim();
+      if (famPhone.length !== 10 || isNaN(famPhone)) return alert('దయచేసి 10 అంకెల మొబైల్ నంబర్ నమోదు చేయండి.');
+      if (famPhone === currentUser.phone) return alert('మీ సొంత నంబర్ కాకుండా కుటుంబ సభ్యుడి నంబర్ ఇవ్వండి.');
+
+      const btn = document.getElementById('linkFamilyBtn');
+      btn.disabled = true;
+      btn.innerText = 'లింక్ అవుతోంది...';
+
+      const { data: memberUser, error: findErr } = await db
+        .from('customer_users')
+        .select('*')
+        .eq('phone', famPhone)
+        .maybeSingle();
+
+      if (findErr || !memberUser) {
+        btn.disabled = false;
+        btn.innerText = 'లింక్ చేయండి';
+        return alert('ఈ నంబర్ ఇంకా Customer App లో రిజిస్టర్ అవ్వలేదు. ముందుగా ఆ ఫోన్‌లో Sign Up చేయించండి.');
+      }
+
+      const houseId = getHouseUserId();
+      const { error: updErr } = await db
+        .from('customer_users')
+        .update({ family_head_id: houseId, vendor_phone: currentUser.vendor_phone || memberUser.vendor_phone })
+        .eq('id', memberUser.id);
+
+      btn.disabled = false;
+      btn.innerText = 'లింక్ చేయండి';
+
+      if (updErr) return alert('Error: ' + updErr.message);
+
+      closeFamilyModal();
+      showToast(`${memberUser.name || famPhone} ఫ్యామిలీ సింక్‌కు లింక్ అయ్యారు!`);
+    }
+
+    async function unlinkFamilyAccount() {
+      if (!confirm('ఫ్యామిలీ అకౌంట్ లింక్ తొలగించాలా?')) return;
+      await db.from('customer_users').update({ family_head_id: null }).eq('id', currentUser.id);
+      currentUser.family_head_id = null;
+      localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+      closeFamilyModal();
+      showToast('ఫ్యామిలీ లింక్ తొలగించబడింది!');
+      fetchMonthData(false);
+    }
+
+    // E4. MORNING / EVENING SPLIT HELPERS
+    function getSplitStorageKey(year, month) {
+      return `milk_split_${getHouseUserId()}_${year}_${String(month + 1).padStart(2, '0')}`;
+    }
+
+    function getMonthSplits(year, month) {
+      if (!currentUser) return {};
+      try {
+        return JSON.parse(localStorage.getItem(getSplitStorageKey(year, month))) || {};
+      } catch (e) {
+        return {};
+      }
+    }
+
+    function updateSplitPreview() {
+      const mVal = parseFloat(document.getElementById('morningSplitInput').value) || 0;
+      const eVal = parseFloat(document.getElementById('eveningSplitInput').value) || 0;
+      const tot = parseFloat((mVal + eVal).toFixed(2));
+      const amt = Math.round((mVal * morningRate) + (eVal * eveningRate));
+      document.getElementById('splitTotalPreview').innerText = `${tot} L (₹${amt})`;
+    }
+
+    function applyMorningEveningSplit() {
+      if (!selectedDayForModal) return;
+      const mVal = Math.max(0, parseFloat(document.getElementById('morningSplitInput').value) || 0);
+      const eVal = Math.max(0, parseFloat(document.getElementById('eveningSplitInput').value) || 0);
+      const tot = parseFloat((mVal + eVal).toFixed(2));
+
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const splits = getMonthSplits(year, month);
+      splits[selectedDayForModal] = { m: mVal, e: eVal };
+      localStorage.setItem(getSplitStorageKey(year, month), JSON.stringify(splits));
+
+      setModalDayValue(tot, mVal, eVal);
+    }
+
+    // E5. LIVE VENDOR DELIVERY STATUS & 6-MONTH SPENDING GRAPH
+    function updateLiveDeliveryBanner() {
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = now.getMonth();
+      const todayDay = now.getDate();
+
+      const titleEl = document.getElementById('liveDeliveryTitle');
+      const subEl = document.getElementById('familySyncSubLabel');
+      const iconEl = document.getElementById('liveDeliveryIcon');
+      if (!titleEl || !subEl || !iconEl) return;
+
+      const isViewingCurrentMonth = (currentViewingDate.getFullYear() === year && currentViewingDate.getMonth() === month);
+      const todayRec = isViewingCurrentMonth ? monthRecords[todayDay] : null;
+
+      if (todayRec && todayRec.status === 'skipped') {
+        titleEl.innerText = 'ఈరోజు పాలు: వద్దు (Skipped)';
+        iconEl.className = 'w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0';
+        iconEl.innerHTML = '<i class="ph-bold ph-prohibit text-base"></i>';
+      } else if (todayRec && todayRec.vendor_delivered) {
+        titleEl.innerText = `✅ ఈరోజు పాలు డెలివరీ అయ్యాయి (${todayRec.liters}L)`;
+        iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0';
+        iconEl.innerHTML = '<i class="ph-fill ph-check-circle text-base"></i>';
+      } else {
+        titleEl.innerText = 'ఈరోజు డెలివరీ: షెడ్యూల్ / పెండింగ్';
+        iconEl.className = 'w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0';
+        iconEl.innerHTML = '<i class="ph-bold ph-clock text-base"></i>';
+      }
+
+      subEl.innerText = currentUser.family_head_id
+        ? '👨‍👩‍👧‍👦 Family Sync Active • ఒకే ఇంటి లెక్క'
+        : (currentUser.vendor_phone ? `వెండర్ లింక్: ${currentUser.vendor_phone}` : 'వెండర్ నంబర్ లింక్ చేయండి');
+    }
+
+    async function renderSixMonthSpendingChart() {
+      const chartEl = document.getElementById('sixMonthSpendingChart');
+      if (!chartEl || !currentUser) return;
+
+      const houseId = getHouseUserId();
+      const now = new Date();
+      const sixStart = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+      const startIso = `${sixStart.getFullYear()}-${String(sixStart.getMonth() + 1).padStart(2, '0')}-01`;
+
+      const { data: logs } = await db.from('customer_milk_logs')
+        .select('log_date, quantity, status')
+        .eq('user_id', houseId)
+        .gte('log_date', startIso);
+
+      const logsMap = {};
+      if (logs) {
+        logs.forEach(l => {
+          logsMap[l.log_date] = { status: l.status, qty: parseFloat(l.quantity) || 0 };
+        });
+      }
+
+      const regDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
+      regDate.setHours(0, 0, 0, 0);
+
+      const monthsData = [];
+      let maxBill = 100;
+
+      for (let i = 5; i >= 0; i--) {
+        const dObj = new Date(now.getFullYear(), now.getMonth() - i, 1);
+        const y = dObj.getFullYear();
+        const m = dObj.getMonth();
+        const dCount = new Date(y, m + 1, 0).getDate();
+        let liters = 0;
+
+        for (let d = 1; d <= dCount; d++) {
+          const cur = new Date(y, m, d);
+          const iso = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+          const rec = logsMap[iso];
+          if (rec) {
+            if (rec.status === 'taken' && cur <= now) liters += rec.qty;
+          } else if (cur <= now && cur >= regDate && isAutoMode) {
+            liters += defaultDailyQuota;
+          }
+        }
+        const bill = Math.round(liters * ratePerLiter);
+        if (bill > maxBill) maxBill = bill;
+        monthsData.push({ label: TELUGU_MONTHS[m].slice(0, 3), bill, liters });
+      }
+
+      chartEl.innerHTML = '';
+      monthsData.forEach((item, idx) => {
+        const hPct = Math.max(12, Math.round((item.bill / maxBill) * 100));
+        const isCur = idx === 5;
+        chartEl.innerHTML += `
+          <div class="flex flex-col items-center gap-1 h-full justify-end">
+            <span class="text-[8px] font-extrabold text-slate-600">₹${item.bill}</span>
+            <div class="w-4/5 rounded-t-md transition-all ${isCur ? 'bg-sky-600' : 'bg-sky-200'}" style="height: ${hPct}%"></div>
+            <span class="text-[9px] font-bold text-slate-500">${item.label}</span>
+          </div>
+        `;
+      });
     }
 
     // F. Customer Profile & Change PIN

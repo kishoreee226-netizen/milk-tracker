@@ -938,6 +938,8 @@
     let syncedVendorLedger = null;
     let pendingMilkmanAlertMsg = '';
     let currentCalculatedBill = 0;
+    let custRealtimeChannel = null;
+    let custAutoSyncTimer = null;
 
     function isFutureDate(year, month, day) {
       const now = new Date();
@@ -1135,6 +1137,7 @@
       updateAutoModeUI();
       updateMilkmanCardUI();
       fetchMonthData(false);
+      startCustomerAutoLiveSync();
 
       if (isNewUser) {
         setTimeout(() => {
@@ -1159,7 +1162,56 @@
       }
     }
 
+    function stopCustomerAutoLiveSync() {
+      if (custAutoSyncTimer) {
+        clearInterval(custAutoSyncTimer);
+        custAutoSyncTimer = null;
+      }
+      if (custRealtimeChannel) {
+        db.removeChannel(custRealtimeChannel);
+        custRealtimeChannel = null;
+      }
+    }
+
+    function startCustomerAutoLiveSync() {
+      stopCustomerAutoLiveSync();
+      if (!currentUser) return;
+      const houseId = getHouseUserId();
+
+      // 1. Supabase Realtime listener for instant updates without manual refresh
+      try {
+        custRealtimeChannel = db
+          .channel(`cust-live-${houseId}`)
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'customer_milk_logs', filter: `user_id=eq.${houseId}` }, () => {
+            fetchMonthData(false);
+          })
+          .on('postgres_changes', { event: 'UPDATE', schema: 'public', table: 'customer_users', filter: `id=eq.${houseId}` }, () => {
+            fetchMonthData(false);
+          })
+          .on('postgres_changes', { event: '*', schema: 'public', table: 'vendor_billing_ledger', filter: `customer_id=eq.${houseId}` }, () => {
+            fetchMonthData(false);
+          })
+          .subscribe();
+      } catch (e) {
+        console.log('Realtime fallback to polling:', e);
+      }
+
+      // 2. Silent background polling every 15 seconds while tab is visible
+      custAutoSyncTimer = setInterval(() => {
+        if (currentUser && !document.hidden) {
+          fetchMonthData(false);
+        }
+      }, 15000);
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (!document.hidden && currentUser) {
+        fetchMonthData(false);
+      }
+    });
+
     function logoutCustomer() {
+      stopCustomerAutoLiveSync();
       localStorage.removeItem('milk_self_customer');
       currentUser = null;
       document.getElementById('mainAppSection').classList.add('hidden-force');

@@ -146,6 +146,9 @@
                 <button onclick="fetchMonthData(true)" title="వెండర్ అప్‌డేట్స్ సింక్ చేయండి" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white flex items-center gap-0.5">
                   <i id="custSyncIcon" class="ph-bold ph-arrows-clockwise text-[10px]"></i> సింక్
                 </button>
+                <button onclick="openSupportModal()" class="text-[10px] bg-amber-400/25 hover:bg-amber-400/35 border border-amber-200/40 px-1.5 py-0.5 rounded text-amber-100 font-bold flex items-center gap-0.5">
+                  <i class="ph-bold ph-ticket text-[10px]"></i> సపోర్ట్
+                </button>
                 <button onclick="logoutCustomer()" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white transition-colors">లాగౌట్</button>
               </div>
             </div>
@@ -531,11 +534,17 @@
               </button>
             </div>
 
-            <button onclick="shareAppLink()" class="w-full bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-4 rounded-xl flex items-center justify-center gap-2 text-xs">
-              <i class="ph-bold ph-share-network text-base text-sky-600"></i>
-              యాప్ లింక్ షేర్ చేయండి (Share App Link)
-            </button>
-            <p class="text-[10px] text-center text-slate-400">పాలబ్బాయికి బిల్ పంపడానికి, PDF డౌన్‌లోడ్ చేసుకోవడానికి లేదా యాప్ షేర్ చేయడానికి</p>
+            <div class="grid grid-cols-2 gap-2">
+              <button onclick="shareAppLink()" class="bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                <i class="ph-bold ph-share-network text-sm text-sky-600"></i>
+                యాప్ షేర్ చేయండి
+              </button>
+              <button onclick="openSupportModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 active:scale-[0.98] transition-all text-amber-900 font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs">
+                <i class="ph-fill ph-ticket text-sm text-amber-600"></i>
+                Raise Ticket / సపోర్ట్
+              </button>
+            </div>
+            <p class="text-[10px] text-center text-slate-400">పాల సమస్యలకు వెండర్‌కు కాల్ చేయండి • యాప్ టెక్నికల్ సమస్యలకు Raise Ticket నొక్కండి</p>
           </div>
         </section>
 
@@ -904,6 +913,56 @@
       </div>
     </div>
 
+    <!-- MODAL 8: IN-APP SUPPORT TICKET (PhonePe / GPay Style Raise a Ticket) -->
+    <div id="supportModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+          <div>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+              <i class="ph-fill ph-ticket text-amber-600 text-base"></i> యాప్ సపోర్ట్ (Raise a Ticket)
+            </h4>
+            <p class="text-[10px] text-slate-500">యాప్ టెక్నికల్ సమస్యలు & ఫీడ్‌బ్యాక్ (Admin Support)</p>
+          </div>
+          <button onclick="closeSupportModal()" class="text-slate-400 hover:text-slate-600">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
+        </div>
+
+        <div class="bg-sky-50 border border-sky-200/80 rounded-xl p-2.5 text-[10px] text-sky-900 leading-relaxed">
+          💡 <strong>గమనిక:</strong> పాలు రాలేదు, పాల నాణ్యత, లేదా సెలవుల కోసం <strong>పాలబ్బాయి (Vendor)</strong> కి తెలపండి. యాప్ పనితీరు, సింక్, లేదా ఫీడ్‌బ్యాక్ కోసం కింద టికెట్ రైజ్ చేయండి.
+        </div>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">సమస్య రకం (Category):</label>
+            <select id="ticketCategorySelect" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+              <option value="Sync / App Issue">🔄 డేటా సింక్ / యాప్ సమస్య</option>
+              <option value="PIN / Account Issue">🔐 PIN / అకౌంట్ లాగిన్ సమస్య</option>
+              <option value="Billing Bug">🧾 బిల్లు లెక్క టెక్నికల్ తేడా</option>
+              <option value="Feedback / Feature">💡 కొత్త ఫీచర్ సలహా / ఫీడ్‌బ్యాక్</option>
+            </select>
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">వివరాలు రాయండి (Description):</label>
+            <textarea id="ticketDescInput" rows="2" placeholder="మీ సమస్య లేదా సలహాను ఇక్కడ క్లుప్తంగా రాయండి..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-sky-500"></textarea>
+          </div>
+          <button id="submitTicketBtn" onclick="submitSupportTicket()" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold shadow-xs transition-all">
+            టికెట్ పంపండి (Submit Ticket)
+          </button>
+        </div>
+
+        <div class="pt-2.5 border-t border-slate-100 space-y-2">
+          <div class="flex items-center justify-between">
+            <span class="text-xs font-extrabold text-slate-700">నా టికెట్లు (My Tickets)</span>
+            <button onclick="loadMySupportTickets()" class="text-[10px] text-sky-600 font-bold hover:underline">రిఫ్రెష్ ↻</button>
+          </div>
+          <div id="myTicketsListContainer" class="space-y-2 max-h-44 overflow-y-auto">
+            <p class="text-[11px] text-slate-400 text-center py-2">ఇంకా టికెట్లు ఏవీ లేవు.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
   <!-- JAVASCRIPT LOGIC -->
   <script>
     // 1. SUPABASE CLIENT
@@ -953,8 +1012,33 @@
     }
 
     // 2. LIFECYCLE & AUTHENTICATION
+    async function logCustomerAnalytics(eventType, userObj = null) {
+      try {
+        const u = userObj || currentUser;
+        await db.from('app_analytics').insert([{
+          event_type: eventType,
+          app_type: 'customer',
+          user_name: u ? (u.name || 'Customer') : null,
+          user_phone: u ? u.phone : null
+        }]);
+      } catch (e) {}
+    }
+
+    window.addEventListener('appinstalled', () => {
+      localStorage.setItem('mc_cust_pwa_installed', '1');
+      logCustomerAnalytics('install');
+    });
+
     window.onload = function() {
       checkAuth();
+      if (!sessionStorage.getItem('mc_cust_visit_logged')) {
+        sessionStorage.setItem('mc_cust_visit_logged', '1');
+        logCustomerAnalytics('visit');
+      }
+      if (window.matchMedia('(display-mode: standalone)').matches && !localStorage.getItem('mc_cust_pwa_installed')) {
+        localStorage.setItem('mc_cust_pwa_installed', '1');
+        logCustomerAnalytics('install');
+      }
       if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {
         navigator.serviceWorker.register('./sw.js').catch(function(err) {
           console.log('SW registration skipped or file missing:', err);
@@ -1133,6 +1217,15 @@
       }
 
       await syncVendorPhoneOnSessionStart(currentUser);
+
+      // Update last_login_at and log login analytics once per session
+      try {
+        await db.from('customer_users').update({ last_login_at: new Date().toISOString() }).eq('id', currentUser.id);
+        if (!sessionStorage.getItem('mc_cust_login_logged')) {
+          sessionStorage.setItem('mc_cust_login_logged', '1');
+          logCustomerAnalytics('login', currentUser);
+        }
+      } catch (e) {}
 
       updateAutoModeUI();
       updateMilkmanCardUI();
@@ -2644,6 +2737,87 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('userPhoneBadge').innerText = `${newName} (${currentUser.phone})`;
       closeProfileModal();
       showToast('మీ పేరు మరియు కొత్త PIN అప్‌డేట్ అయ్యాయి!');
+    }
+
+    // G. IN-APP SUPPORT TICKETS (Raise a Ticket & View Admin Replies)
+    function openSupportModal() {
+      if (!currentUser) return;
+      document.getElementById('ticketDescInput').value = '';
+      document.getElementById('supportModal').classList.remove('hidden-force');
+      loadMySupportTickets();
+    }
+
+    function closeSupportModal() {
+      document.getElementById('supportModal').classList.add('hidden-force');
+    }
+
+    async function submitSupportTicket() {
+      if (!currentUser) return;
+      const category = document.getElementById('ticketCategorySelect').value;
+      const description = document.getElementById('ticketDescInput').value.trim();
+      if (!description) return alert('దయచేసి మీ సమస్య లేదా సలహా వివరాలను రాయండి.');
+
+      const ticketCode = 'MC-' + Math.floor(1000 + Math.random() * 9000);
+      const btn = document.getElementById('submitTicketBtn');
+      btn.disabled = true;
+      btn.innerText = 'పంపబడుతోంది...';
+
+      const { error } = await db.from('support_tickets').insert([{
+        ticket_code: ticketCode,
+        user_role: 'customer',
+        user_name: currentUser.name || 'Customer',
+        user_phone: currentUser.phone,
+        category: category,
+        description: description,
+        status: 'Open'
+      }]);
+
+      btn.disabled = false;
+      btn.innerText = 'టికెట్ పంపండి (Submit Ticket)';
+
+      if (error) return alert('Error: ' + error.message);
+
+      document.getElementById('ticketDescInput').value = '';
+      showToast(`టికెట్ #${ticketCode} అడ్మిన్‌కు పంపబడింది!`);
+      loadMySupportTickets();
+    }
+
+    async function loadMySupportTickets() {
+      if (!currentUser) return;
+      const listEl = document.getElementById('myTicketsListContainer');
+      const { data, error } = await db.from('support_tickets')
+        .select('*')
+        .eq('user_phone', currentUser.phone)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error || !data || data.length === 0) {
+        listEl.innerHTML = `<p class="text-[11px] text-slate-400 text-center py-2">ఇంకా టికెట్లు ఏవీ లేవు.</p>`;
+        return;
+      }
+
+      listEl.innerHTML = data.map(t => {
+        const isResolved = t.status === 'Resolved';
+        const dateStr = t.created_at ? new Date(t.created_at).toLocaleDateString('en-IN', { day: '2-digit', month: 'short' }) : '';
+        return `
+          <div class="border ${isResolved ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50'} rounded-xl p-2.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <span class="text-[10px] font-black text-slate-700">#${t.ticket_code} • ${t.category}</span>
+              <span class="text-[9px] font-extrabold px-1.5 py-0.5 rounded-full ${isResolved ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'}">
+                ${isResolved ? 'Resolved ✓' : 'Open'}
+              </span>
+            </div>
+            <p class="text-[11px] text-slate-700">${t.description}</p>
+            <span class="text-[9px] text-slate-400 block">${dateStr}</span>
+            ${t.admin_reply ? `
+              <div class="mt-1.5 pt-1.5 border-t border-emerald-200/80 bg-white rounded-lg p-2 text-[10px] text-emerald-950">
+                <strong class="text-emerald-700 block">👨‍💻 Admin సమాధానం:</strong>
+                ${t.admin_reply}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }).join('');
     }
   </script>
 </body>

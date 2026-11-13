@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="./logo-512.png">
 
   <!-- PWA Web App Settings -->
-  <link rel="manifest" href="./manifest.json?v=4">
+  <link rel="manifest" href="./manifest.json?v=5">
   <meta name="theme-color" content="#0284c7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -130,11 +130,11 @@
       <!-- TOP HEADER -->
       <header class="bg-gradient-to-r from-sky-600 via-brand-600 to-blue-700 text-white p-4 sticky top-0 z-30 shadow-md">
         <div class="flex items-center justify-between">
-          <div class="flex items-center gap-2.5">
-            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner">
+          <div class="flex items-center gap-2.5 min-w-0">
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0">
               <i class="ph-bold ph-drop text-2xl text-amber-200"></i>
             </div>
-            <div>
+            <div class="min-w-0">
               <h1 class="text-lg font-bold tracking-tight leading-tight flex items-center gap-1.5">
                 MilkCount <span class="text-xs bg-white/20 px-2 py-0.5 rounded-full font-medium">పాల లెక్క</span>
               </h1>
@@ -143,17 +143,20 @@
                   <span id="userPhoneBadge">User</span>
                   <i class="ph-bold ph-pencil-simple text-[10px]"></i>
                 </button>
+                <button onclick="fetchMonthData(true)" title="వెండర్ అప్‌డేట్స్ సింక్ చేయండి" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white flex items-center gap-0.5">
+                  <i id="custSyncIcon" class="ph-bold ph-arrows-clockwise text-[10px]"></i> సింక్
+                </button>
                 <button onclick="logoutCustomer()" class="text-[10px] bg-white/20 hover:bg-white/30 px-1.5 py-0.5 rounded text-white transition-colors">లాగౌట్</button>
               </div>
             </div>
           </div>
 
-          <!-- Editable Price Badge -->
-          <button onclick="openPriceModal()" class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 transition-all text-xs px-2.5 py-1.5 rounded-lg border border-white/25 shadow-sm text-left">
+          <!-- Editable Price & Milk Type Badge -->
+          <button onclick="openPriceModal()" class="flex items-center gap-1.5 bg-white/15 hover:bg-white/25 active:scale-95 transition-all text-xs px-2.5 py-1.5 rounded-lg border border-white/25 shadow-sm text-left shrink-0">
             <i class="ph ph-currency-inr text-amber-300 text-sm"></i>
             <div>
-              <div class="text-[9px] uppercase tracking-wider text-sky-200 font-medium leading-none">ధర / రేటు</div>
-              <div class="font-bold text-white text-xs leading-tight">₹<span id="ratePerLiterText">70</span>/L</div>
+              <div id="milkTypeHeaderTag" class="text-[9px] uppercase tracking-wider text-sky-200 font-bold leading-none">🐃 Buffalo</div>
+              <div class="font-bold text-white text-xs leading-tight">₹<span id="ratePerLiterText">75</span>/L</div>
             </div>
             <i class="ph ph-pencil-simple text-xs opacity-75 ml-0.5"></i>
           </button>
@@ -307,6 +310,20 @@
           </button>
         </section>
 
+        <!-- DELIVERY PREFERENCES BAR (Milk Type, Shift & Default Quota synced with Vendor) -->
+        <section class="bg-white border border-slate-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2">
+          <div class="flex items-center gap-2 min-w-0">
+            <span id="prefMilkBadge" class="text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-xl shrink-0">🐃 గేదె పాలు</span>
+            <div class="min-w-0">
+              <span id="prefShiftAreaText" class="text-xs font-bold text-slate-700 block truncate">🌅 Morning • 📍 General</span>
+              <span class="text-[10px] text-slate-400 block">వెండర్ యాప్‌తో సింక్ అయింది</span>
+            </div>
+          </div>
+          <button onclick="openQuotaModal()" class="text-[11px] font-bold bg-sky-50 hover:bg-sky-100 text-sky-700 border border-sky-200 px-2.5 py-1.5 rounded-xl shrink-0 active:scale-95">
+            మార్చండి
+          </button>
+        </section>
+
         <!-- MONTHLY CALENDAR -->
         <section id="calendarSection" class="bg-white border border-slate-200 rounded-2xl p-3.5 shadow-sm">
           <div class="flex items-center justify-between mb-3">
@@ -390,7 +407,7 @@
             </div>
             <div class="flex justify-between text-slate-600">
               <span>లీటరు ధర (Rate per Liter):</span>
-              <span class="font-medium text-slate-800">₹<span id="billRatePerLiter">70</span></span>
+              <span class="font-medium text-slate-800">₹<span id="billRatePerLiter">75</span></span>
             </div>
 
             <div id="billQualitySummaryRow" class="hidden-force bg-amber-50 border border-amber-200/80 rounded-lg p-2 text-[11px] text-amber-900">
@@ -404,13 +421,16 @@
             </div>
           </div>
 
-          <!-- PAYMENT & BALANCE LEDGER -->
+          <!-- PAYMENT & BALANCE LEDGER (Synced with Vendor Billing Ledger) -->
           <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 space-y-2.5">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
                 <i class="ph-bold ph-wallet text-sky-600"></i> పేమెంట్ & బాకీ వివరాలు
               </span>
-              <span id="paymentStatusPill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">చెల్లించాలి (Pending)</span>
+              <div class="flex items-center gap-1.5">
+                <span id="paymentModeBadge" class="hidden-force text-[9px] font-bold px-1.5 py-0.5 rounded bg-sky-100 text-sky-800">Cash</span>
+                <span id="paymentStatusPill" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800">చెల్లించాలి (Pending)</span>
+              </div>
             </div>
 
             <div class="grid grid-cols-2 gap-2 text-xs">
@@ -531,11 +551,11 @@
           </div>
         </div>
 
-        <!-- Quality & SNF / Issue Note Section -->
+        <!-- Quality & SNF / Issue Note Section (Synced directly with Vendor App!) -->
         <div class="pt-2 border-t border-slate-100 space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
-              <i class="ph-bold ph-seal-warning text-amber-500"></i> పాల నాణ్యత / సమస్య నోట్:
+              <i class="ph-bold ph-seal-warning text-amber-500"></i> పాల నాణ్యత / సమస్య నోట్ (వెండర్‌కు వెళ్తుంది):
             </label>
             <button onclick="clearDayQualityNote()" class="text-[10px] text-slate-400 hover:text-rose-600 font-semibold">క్లియర్</button>
           </div>
@@ -569,17 +589,24 @@
       </div>
     </div>
 
-    <!-- MODAL 2: EDIT MILK RATE -->
+    <!-- MODAL 2: EDIT MILK RATE (With Smart Rate Presets) -->
     <div id="priceModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
         <div class="flex justify-between items-center pb-1 border-b border-slate-100">
-          <h4 class="font-bold text-slate-800 text-sm">లీటరు ధర మార్చండి (Rate)</h4>
+          <h4 class="font-bold text-slate-800 text-sm">లీటరు ధర మార్చండి (Smart Rate)</h4>
           <button onclick="closePriceModal()" class="text-slate-400 hover:text-slate-600">
             <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
         <div>
-          <label class="text-xs text-slate-500 mb-1 block">1 లీటరు పాల రేటు (రూపాయల్లో):</label>
+          <label class="text-[11px] font-bold text-slate-500 mb-1.5 block">త్వరిత ధర ఎంచుకోండి (Quick Rate):</label>
+          <div class="grid grid-cols-4 gap-1.5 mb-2.5">
+            <button onclick="document.getElementById('rateInput').value='55'" class="py-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold">₹55</button>
+            <button onclick="document.getElementById('rateInput').value='60'" class="py-1.5 rounded-lg bg-sky-50 border border-sky-200 text-sky-800 text-xs font-bold">₹60</button>
+            <button onclick="document.getElementById('rateInput').value='70'" class="py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">₹70</button>
+            <button onclick="document.getElementById('rateInput').value='75'" class="py-1.5 rounded-lg bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold">₹75</button>
+          </div>
+          <label class="text-xs text-slate-500 mb-1 block">లేదా కస్టమ్ రేటు (రూపాయల్లో):</label>
           <div class="relative">
             <span class="absolute left-3 top-2.5 text-slate-400 font-bold">₹</span>
             <input type="number" id="rateInput" min="10" max="300" class="w-full pl-8 pr-3 py-2 border border-slate-300 rounded-xl text-base font-bold focus:outline-none focus:border-sky-500">
@@ -592,29 +619,55 @@
       </div>
     </div>
 
-    <!-- MODAL 3: EDIT DEFAULT QUOTA -->
+    <!-- MODAL 3: EDIT DELIVERY PREFERENCES (Quota, Milk Type, Shift & Area - Synced with Vendor) -->
     <div id="quotaModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-4">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
         <div class="flex justify-between items-center pb-1 border-b border-slate-100">
-          <h4 class="font-bold text-slate-800 text-sm">రోజువారీ స్థిర పరిమాణం</h4>
+          <h4 class="font-bold text-slate-800 text-sm">పాల రకం, షిఫ్ట్ & రోజువారీ కోటా</h4>
           <button onclick="closeQuotaModal()" class="text-slate-400 hover:text-slate-600">
             <i class="ph-bold ph-x text-sm"></i>
           </button>
         </div>
-        <div>
-          <label class="text-xs text-slate-500 mb-1 block">రోజూ వచ్చే పాలు (లీటర్లలో):</label>
-          <select id="defaultQuotaSelect" class="w-full p-2.5 border border-slate-300 rounded-xl text-sm font-bold focus:outline-none focus:border-sky-500">
-            <option value="0.5">0.5 లీటరు (అర లీటర్)</option>
-            <option value="1.0">1.0 లీటరు (సాధారణం)</option>
-            <option value="1.5">1.5 లీటర్లు</option>
-            <option value="2.0">2.0 లీటర్లు</option>
-            <option value="2.5">2.5 లీటర్లు</option>
-            <option value="3.0">3.0 లీటర్లు</option>
-          </select>
+
+        <div class="space-y-2.5">
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">పాల రకం (Milk Type):</label>
+            <select id="custMilkTypeSelect" onchange="autoAdjustSmartRate()" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+              <option value="Buffalo">🐃 గేదె పాలు (Buffalo Milk)</option>
+              <option value="Cow">🐄 ఆవు పాలు (Cow Milk)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">డెలివరీ సమయం (Shift):</label>
+            <select id="custShiftSelect" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+              <option value="Morning">🌅 ఉదయం (Morning)</option>
+              <option value="Evening">🌇 సాయంత్రం (Evening)</option>
+              <option value="Both">🔄 రెండు పూటలా (Both)</option>
+            </select>
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">మీ ఏరియా / కాలనీ (Area):</label>
+            <input type="text" id="custAreaInputSelf" placeholder="ఉదా: హన్మకొండ / కాజీపేట" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+          </div>
+
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">రోజూ వచ్చే పాలు (లీటర్లలో):</label>
+            <select id="defaultQuotaSelect" class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+              <option value="0.5">0.5 లీటరు (అర లీటర్)</option>
+              <option value="1.0">1.0 లీటరు (సాధారణం)</option>
+              <option value="1.5">1.5 లీటర్లు</option>
+              <option value="2.0">2.0 లీటర్లు</option>
+              <option value="2.5">2.5 లీటర్లు</option>
+              <option value="3.0">3.0 లీటర్లు</option>
+            </select>
+          </div>
         </div>
-        <div class="flex gap-2">
+
+        <div class="flex gap-2 pt-1">
           <button onclick="closeQuotaModal()" class="flex-1 py-2 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
-          <button onclick="saveDefaultQuota()" class="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్</button>
+          <button onclick="saveDefaultQuota()" class="flex-1 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ & సింక్</button>
         </div>
       </div>
     </div>
@@ -755,11 +808,15 @@
     let currentUser = null;
     let savedUserCache = null;
     let isSignUpMode = false;
-    let ratePerLiter = 70;
+    let ratePerLiter = 75;
     let defaultDailyQuota = 1.0;
+    let custMilkType = 'Buffalo';
+    let custShift = 'Morning';
+    let custArea = 'General';
     let isAutoMode = true;
     let monthRecords = {};
     let prevMonthRecords = {};
+    let syncedVendorLedger = null;
     let pendingMilkmanAlertMsg = '';
     let currentCalculatedBill = 0;
 
@@ -768,6 +825,10 @@
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const targetDate = new Date(year, month, day);
       return targetDate > todayStart;
+    }
+
+    function getMonthKey(d) {
+      return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
     }
 
     // 2. LIFECYCLE & AUTHENTICATION
@@ -854,8 +915,11 @@
           name: name,
           phone: phone,
           pin: pin,
+          milk_type: 'Buffalo',
+          shift: 'Morning',
+          route_area: 'General',
           daily_qty: 1.0,
-          price_per_ltr: 70,
+          price_per_ltr: 75,
           auto_mode: true
         }]).select().single();
 
@@ -887,33 +951,53 @@
       }
     }
 
-    async function setupUserSession(user, isNewUser = false) {
+    function applyUserProfileToState(user) {
       currentUser = user;
       localStorage.setItem('milk_self_customer', JSON.stringify(user));
       localStorage.setItem('milkcount_last_account', JSON.stringify({ phone: user.phone, name: user.name }));
 
-      document.getElementById('authSection').classList.add('hidden-force');
-      document.getElementById('mainAppSection').classList.remove('hidden-force');
       document.getElementById('userPhoneBadge').innerText = `${user.name || 'User'} (${user.phone})`;
-
       ratePerLiter = parseFloat(user.price_per_ltr || 70);
       defaultDailyQuota = parseFloat(user.daily_qty || 1.0);
+      custMilkType = user.milk_type || 'Buffalo';
+      custShift = user.shift || 'Morning';
+      custArea = user.route_area || 'General';
       isAutoMode = user.auto_mode !== false;
 
       document.getElementById('ratePerLiterText').innerText = ratePerLiter;
+      document.getElementById('milkTypeHeaderTag').innerText = custMilkType === 'Cow' ? '🐄 Cow' : '🐃 Buffalo';
       document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
 
-      // Sync local milkman phone with DB vendor_phone if saved locally or in DB
-      await syncVendorPhoneOnSessionStart(user);
+      const shiftIcon = custShift === 'Evening' ? '🌇' : custShift === 'Both' ? '🔄' : '🌅';
+      document.getElementById('prefMilkBadge').innerText = custMilkType === 'Cow' ? '🐄 ఆవు పాలు (Cow)' : '🐃 గేదె పాలు (Buffalo)';
+      document.getElementById('prefMilkBadge').className = custMilkType === 'Cow'
+        ? 'text-xs font-extrabold bg-sky-50 text-sky-800 border border-sky-200 px-2.5 py-1 rounded-xl shrink-0'
+        : 'text-xs font-extrabold bg-amber-50 text-amber-800 border border-amber-200 px-2.5 py-1 rounded-xl shrink-0';
+      document.getElementById('prefShiftAreaText').innerText = `${shiftIcon} ${custShift} • 📍 ${custArea} (${defaultDailyQuota}L)`;
+    }
+
+    async function setupUserSession(user, isNewUser = false) {
+      applyUserProfileToState(user);
+
+      document.getElementById('authSection').classList.add('hidden-force');
+      document.getElementById('mainAppSection').classList.remove('hidden-force');
+
+      // Refresh latest user record from DB (in case vendor updated milk_type, shift, rate, quota, etc.)
+      const { data: freshUser } = await db.from('customer_users').select('*').eq('id', user.id).maybeSingle();
+      if (freshUser) {
+        applyUserProfileToState(freshUser);
+      }
+
+      await syncVendorPhoneOnSessionStart(currentUser);
 
       updateAutoModeUI();
       updateMilkmanCardUI();
-      fetchMonthData();
+      fetchMonthData(false);
 
       if (isNewUser) {
         setTimeout(() => {
           openQuotaModal();
-          showToast("స్వాగతం! దయచేసి మీ రోజువారీ పాల కోటాను సరిచూసుకోండి.");
+          showToast("స్వాగతం! దయచేసి మీ పాల రకం, షిఫ్ట్ & కోటా సెట్ చేసుకోండి.");
         }, 500);
       }
     }
@@ -987,17 +1071,29 @@
       }
     }
 
-    // 4. MONTH NAVIGATION & DATA FETCHING
+    // 4. MONTH NAVIGATION & DATA FETCHING (Synced with Vendor Updates!)
     function changeMonth(delta) {
       currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
-      fetchMonthData();
+      fetchMonthData(false);
     }
 
-    async function fetchMonthData() {
+    async function fetchMonthData(manualSync = false) {
+      const syncIcon = document.getElementById('custSyncIcon');
+      if (syncIcon) syncIcon.classList.add('animate-spin');
+
+      // Also refresh customer profile settings from DB so vendor edits reflect immediately
+      const { data: latestUser } = await db.from('customer_users').select('*').eq('id', currentUser.id).maybeSingle();
+      if (latestUser) {
+        applyUserProfileToState(latestUser);
+        updateAutoModeUI();
+        updateMilkmanCardUI();
+      }
+
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
       const monthStr = String(month + 1).padStart(2, '0');
       const startDate = `${year}-${monthStr}-01`;
+      const mKey = `${year}-${monthStr}`;
 
       const nextMonthDate = new Date(year, month + 1, 1);
       const nextYear = nextMonthDate.getFullYear();
@@ -1009,7 +1105,7 @@
       const prevMonthStr = String(prevMonthDate.getMonth() + 1).padStart(2, '0');
       const prevStartDate = `${prevYear}-${prevMonthStr}-01`;
 
-      const [{ data }, { data: prevData }] = await Promise.all([
+      const [{ data }, { data: prevData }, { data: vLedger }] = await Promise.all([
         db.from('customer_milk_logs')
           .select('*')
           .eq('user_id', currentUser.id)
@@ -1019,19 +1115,34 @@
           .select('*')
           .eq('user_id', currentUser.id)
           .gte('log_date', prevStartDate)
-          .lt('log_date', startDate)
+          .lt('log_date', startDate),
+        db.from('vendor_billing_ledger')
+          .select('*')
+          .eq('customer_id', currentUser.id)
+          .eq('month_key', mKey)
+          .maybeSingle()
       ]);
 
       monthRecords = {};
+      const dbQualityNotes = {};
       if (data) {
         data.forEach(item => {
           const dayNum = parseInt(item.log_date.split('-')[2]);
           monthRecords[dayNum] = {
             id: item.id,
             status: item.status === 'taken' ? 'delivered' : 'skipped',
-            liters: parseFloat(item.quantity)
+            liters: parseFloat(item.quantity),
+            quality_note: item.quality_note || ''
           };
+          if (item.quality_note) {
+            dbQualityNotes[dayNum] = item.quality_note;
+          }
         });
+      }
+      // Merge DB quality notes into local cache
+      if (Object.keys(dbQualityNotes).length > 0) {
+        const merged = Object.assign({}, getMonthQualityNotes(year, month), dbQualityNotes);
+        localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(merged));
       }
 
       prevMonthRecords = {};
@@ -1045,10 +1156,15 @@
           };
         });
       }
+
+      syncedVendorLedger = vLedger || null;
+
+      if (syncIcon) syncIcon.classList.remove('animate-spin');
+      if (manualSync) showToast('వెండర్ డేటాతో సింక్ అయ్యింది!');
       renderApp();
     }
 
-    // 5. SETTINGS MODALS (PRICE & QUOTA)
+    // 5. SETTINGS MODALS (SMART RATE & DELIVERY PREFERENCES)
     function openPriceModal() {
       document.getElementById('rateInput').value = ratePerLiter;
       document.getElementById('priceModal').classList.remove('hidden-force');
@@ -1070,21 +1186,52 @@
     }
 
     function openQuotaModal() {
+      document.getElementById('custMilkTypeSelect').value = custMilkType || 'Buffalo';
+      document.getElementById('custShiftSelect').value = custShift || 'Morning';
+      document.getElementById('custAreaInputSelf').value = custArea || 'General';
       document.getElementById('defaultQuotaSelect').value = defaultDailyQuota.toString();
       document.getElementById('quotaModal').classList.remove('hidden-force');
     }
     function closeQuotaModal() {
       document.getElementById('quotaModal').classList.add('hidden-force');
     }
+    function autoAdjustSmartRate() {
+      const mType = document.getElementById('custMilkTypeSelect').value;
+      if (mType === 'Cow' && (ratePerLiter === 75 || ratePerLiter === 70)) {
+        ratePerLiter = 55;
+      } else if (mType === 'Buffalo' && (ratePerLiter === 55 || ratePerLiter === 60)) {
+        ratePerLiter = 75;
+      }
+    }
     async function saveDefaultQuota() {
       const val = parseFloat(document.getElementById('defaultQuotaSelect').value);
+      const newMilkType = document.getElementById('custMilkTypeSelect').value;
+      const newShift = document.getElementById('custShiftSelect').value;
+      const newArea = document.getElementById('custAreaInputSelf').value.trim() || 'General';
+
       if (val && val > 0) {
         defaultDailyQuota = val;
+        custMilkType = newMilkType;
+        custShift = newShift;
+        custArea = newArea;
+
         currentUser.daily_qty = val;
-        localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
-        await db.from('customer_users').update({ daily_qty: val }).eq('id', currentUser.id);
+        currentUser.milk_type = newMilkType;
+        currentUser.shift = newShift;
+        currentUser.route_area = newArea;
+        currentUser.price_per_ltr = ratePerLiter;
+
+        await db.from('customer_users').update({
+          daily_qty: val,
+          milk_type: newMilkType,
+          shift: newShift,
+          route_area: newArea,
+          price_per_ltr: ratePerLiter
+        }).eq('id', currentUser.id);
+
+        applyUserProfileToState(currentUser);
         closeQuotaModal();
-        showToast(`డిఫాల్ట్ కోటా ${defaultDailyQuota}L గా మారింది!`);
+        showToast('మీ పాల వివరాలు సేవ్ & వెండర్‌కు సింక్ అయ్యాయి!');
         renderApp();
       }
     }
@@ -1107,7 +1254,7 @@
         customInput.value = '';
       }
       const qNotes = getMonthQualityNotes(currentViewingDate.getFullYear(), currentViewingDate.getMonth());
-      document.getElementById('customQualityInput').value = qNotes[day] || '';
+      document.getElementById('customQualityInput').value = (item && item.quality_note) || qNotes[day] || '';
       document.getElementById('dayModal').classList.remove('hidden-force');
     }
 
@@ -1126,18 +1273,21 @@
 
       const status = liters === 0 ? 'skipped' : 'taken';
       const quantity = liters;
+      const existingNote = (monthRecords[selectedDayForModal] && monthRecords[selectedDayForModal].quality_note) || null;
 
       const { error } = await db.from('customer_milk_logs').upsert({
         user_id: currentUser.id,
         log_date: logDate,
         quantity: quantity,
-        status: status
+        status: status,
+        quality_note: existingNote
       }, { onConflict: 'user_id,log_date' });
 
       if (!error) {
         monthRecords[selectedDayForModal] = {
           status: status === 'taken' ? 'delivered' : 'skipped',
-          liters: quantity
+          liters: quantity,
+          quality_note: existingNote || ''
         };
         if (liters === 0) {
           showToast(`${selectedDayForModal}వ తేదీ పాలు వద్దు అని మార్క్ చేశాం!`);
@@ -1198,7 +1348,7 @@
           quantity: 0,
           status: 'skipped'
         }, { onConflict: 'user_id,log_date' });
-        monthRecords[dayNum] = { status: 'skipped', liters: 0 };
+        monthRecords[dayNum] = { status: 'skipped', liters: 0, quality_note: '' };
         showToast(`రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
         promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip) అని తెలియజేస్తున్నాము. - ${currentUser.name || 'Customer'}`);
       }
@@ -1229,7 +1379,7 @@
         status: 'taken'
       }, { onConflict: 'user_id,log_date' });
 
-      monthRecords[dayNum] = { status: 'delivered', liters: newVal };
+      monthRecords[dayNum] = { status: 'delivered', liters: newVal, quality_note: '' };
       showToast(`రేపు (${dayNum}న) +0.5L షెడ్యూల్ చేశాం! మొత్తం: ${newVal}L`);
       promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి మొత్తం ${newVal}L పాలు కావాలి (+0.5L ఎక్స్‌ట్రా). - ${currentUser.name || 'Customer'}`);
       renderApp();
@@ -1283,14 +1433,14 @@
 📅 *నెల:* ${monthNameTel} (${monthNameEng}) ${year}
 ✅ *పాలు తీసుకున్న రోజులు:* ${deliveredDays} రోజులు
 ❌ *సెలవులు (ఆపిన రోజులు):* ${skippedDays} రోజులు
-🍶 *మొత్తం పాల పరిమాణం:* ${totalLiters.toFixed(1)} లీటర్లు
+🍶 *మొత్తం పాల పరిమాణం:* ${totalLiters.toFixed(1)} లీటర్లు (${custMilkType})
 💰 *లీటరు ధర:* ₹${ratePerLiter}
 -------------------------------------
 💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*
 -------------------------------------
 _MilkCount యాప్ ద్వారా రూపొందించబడింది._`;
 
-      const ledger = getMonthLedger(year, month);
+      const ledger = getEffectiveLedger(year, month);
       let extraBillLines = '';
       if (ledger.prevDue > 0 || ledger.paid > 0) {
         const netDue = Math.max(0, (totalAmount + ledger.prevDue) - ledger.paid);
@@ -1304,8 +1454,12 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       const qEntries = Object.keys(qNotes).sort((a, b) => Number(a) - Number(b));
       let qualityWaLines = '';
       if (qEntries.length > 0) {
-        const listStr = qEntries.map(d => `• ${d}న: ${qNotes[d]}`).join('\n');
-        qualityWaLines = `\n⚠️ *నాణ్యత / సమస్యల వివరాలు:*\n${listStr}\n-------------------------------------`;
+        const listStr = qEntries.map(d => `• ${d}న: ${qNotes[d]}`).join('
+');
+        qualityWaLines = `
+⚠️ *నాణ్యత / సమస్యల వివరాలు:*
+${listStr}
+-------------------------------------`;
       }
 
       const finalWaMessage = textMessage
@@ -1315,7 +1469,8 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         )
         .replace(
           `_MilkCount యాప్ ద్వారా రూపొందించబడింది._`,
-          `${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`
+          `${qualityWaLines ? qualityWaLines + '
+' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`
         );
 
       const encoded = encodeURIComponent(finalWaMessage);
@@ -1329,7 +1484,9 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
     function shareAppLink() {
       const appUrl = 'https://kishoreee226-netizen.github.io/milk-tracker/';
-      const shareText = `🥛 *MilkCount - పాల లెక్క యాప్*\nరోజువారీ పాల లెక్కలు, ఆటో బిల్లింగ్ మరియు వాట్సాప్ బిల్ రిపోర్ట్ కోసం ఈ యాప్ ఇన్‌స్టాల్ చేసుకోండి:\n${appUrl}`;
+      const shareText = `🥛 *MilkCount - పాల లెక్క యాప్*
+రోజువారీ పాల లెక్కలు, ఆటో బిల్లింగ్ మరియు వాట్సాప్ బిల్ రిపోర్ట్ కోసం ఈ యాప్ ఇన్‌స్టాల్ చేసుకోండి:
+${appUrl}`;
 
       if (navigator.share) {
         navigator.share({
@@ -1442,11 +1599,12 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         dayCard.onclick = () => openDayModal(day);
         dayCard.className = `relative h-14 sm:h-16 rounded-xl border p-1.5 flex flex-col justify-between items-center transition-all active:scale-95 cursor-pointer shadow-xs ${statusClass} ${isToday ? 'ring-2 ring-sky-500 ring-offset-1 font-bold' : ''}`;
 
-        const hasQualityNote = Boolean(monthQualityNotes[day]);
+        const qNoteText = (item && item.quality_note) || monthQualityNotes[day] || '';
+        const hasQualityNote = Boolean(qNoteText);
         dayCard.innerHTML = `
           <div class="w-full flex items-center justify-between text-[11px] leading-none">
             <span class="${isToday ? 'bg-sky-600 text-white w-4 h-4 rounded-full flex items-center justify-center font-bold' : 'font-semibold text-slate-700'}">${day}</span>
-            ${hasQualityNote ? '<span title="' + monthQualityNotes[day] + '" class="w-2 h-2 rounded-full bg-amber-500 ring-1 ring-white"></span>' : (isToday ? '<span class="text-[8px] bg-sky-100 text-sky-800 px-1 rounded font-bold">నేడు</span>' : '')}
+            ${hasQualityNote ? '<span title="' + qNoteText + '" class="w-2 h-2 rounded-full bg-amber-500 ring-1 ring-white"></span>' : (isToday ? '<span class="text-[8px] bg-sky-100 text-sky-800 px-1 rounded font-bold">నేడు</span>' : '')}
           </div>
           <div class="my-auto py-0.5 text-center">
             ${statusBadge}
@@ -1538,7 +1696,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       closeVacationModal();
       showToast(`${diffDays} రోజుల సెలవులు నమోదు చేయబడ్డాయి!`);
       promptMilkmanAlert(`నమస్కారం, ${startStr} నుండి ${endStr} వరకు (${diffDays} రోజులు) మేము ఊరికి వెళ్తున్నాము, పాలు పోయవద్దు. - ${currentUser.name || 'Customer'}`);
-      fetchMonthData();
+      fetchMonthData(false);
     }
 
     // B. Milkman Contact, Vendor Auto-Lookup & DB Sync
@@ -1628,7 +1786,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       btn.disabled = true;
       btn.innerText = 'సేవ్ అవుతోంది...';
 
-      // Link customer record to vendor_phone in Supabase so it appears in Vendor App!
       const vendorPhoneToSave = phone.length === 10 ? phone : null;
       const { error } = await db
         .from('customer_users')
@@ -1684,31 +1841,53 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
     }
 
-    // C. Payment & Due Ledger + UPI Pay
+    // C. Payment & Due Ledger + UPI Pay (Synced with Vendor Billing Ledger!)
     function getLedgerKey(year, month) {
       return `milk_ledger_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
 
-    function getMonthLedger(year, month) {
+    function getEffectiveLedger(year, month) {
+      if (syncedVendorLedger) {
+        return {
+          prevDue: parseFloat(syncedVendorLedger.prev_due) || 0,
+          paid: parseFloat(syncedVendorLedger.paid_amount) || 0,
+          paymentMode: syncedVendorLedger.payment_mode || 'Cash'
+        };
+      }
       try {
-        return JSON.parse(localStorage.getItem(getLedgerKey(year, month))) || { prevDue: 0, paid: 0 };
+        return JSON.parse(localStorage.getItem(getLedgerKey(year, month))) || { prevDue: 0, paid: 0, paymentMode: '' };
       } catch (e) {
-        return { prevDue: 0, paid: 0 };
+        return { prevDue: 0, paid: 0, paymentMode: '' };
       }
     }
 
-    function saveMonthLedger() {
+    async function saveMonthLedger() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
       const prevDue = Math.max(0, parseFloat(document.getElementById('prevDueInput').value) || 0);
       const paid = Math.max(0, parseFloat(document.getElementById('paidAmountInput').value) || 0);
 
       localStorage.setItem(getLedgerKey(year, month), JSON.stringify({ prevDue, paid }));
+
+      if (currentUser.vendor_phone) {
+        const mKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+        const payMode = (syncedVendorLedger && syncedVendorLedger.payment_mode) || 'Cash';
+        const { data } = await db.from('vendor_billing_ledger').upsert({
+          vendor_phone: currentUser.vendor_phone,
+          customer_id: currentUser.id,
+          month_key: mKey,
+          prev_due: prevDue,
+          paid_amount: paid,
+          payment_mode: payMode
+        }, { onConflict: 'vendor_phone,customer_id,month_key' }).select().maybeSingle();
+        if (data) syncedVendorLedger = data;
+      }
+
       refreshLedgerUI(year, month, currentCalculatedBill);
       showToast('పేమెంట్ వివరాలు అప్‌డేట్ అయ్యాయి!');
     }
 
-    function markFullBillPaid() {
+    async function markFullBillPaid() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
       const prevDue = Math.max(0, parseFloat(document.getElementById('prevDueInput').value) || 0);
@@ -1716,12 +1895,26 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
 
       document.getElementById('paidAmountInput').value = totalPayable;
       localStorage.setItem(getLedgerKey(year, month), JSON.stringify({ prevDue, paid: totalPayable }));
+
+      if (currentUser.vendor_phone) {
+        const mKey = `${year}-${String(month + 1).padStart(2, '0')}`;
+        const { data } = await db.from('vendor_billing_ledger').upsert({
+          vendor_phone: currentUser.vendor_phone,
+          customer_id: currentUser.id,
+          month_key: mKey,
+          prev_due: prevDue,
+          paid_amount: totalPayable,
+          payment_mode: 'UPI'
+        }, { onConflict: 'vendor_phone,customer_id,month_key' }).select().maybeSingle();
+        if (data) syncedVendorLedger = data;
+      }
+
       refreshLedgerUI(year, month, currentCalculatedBill);
       showToast(`₹${totalPayable} చెల్లించినట్లు (PAID) మార్క్ చేయబడింది!`);
     }
 
     function refreshLedgerUI(year, month, billAmount) {
-      const ledger = getMonthLedger(year, month);
+      const ledger = getEffectiveLedger(year, month);
       document.getElementById('prevDueInput').value = ledger.prevDue || '';
       document.getElementById('paidAmountInput').value = ledger.paid || '';
 
@@ -1729,7 +1922,15 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       const netBalance = totalPayable - ledger.paid;
       const netEl = document.getElementById('netBalanceText');
       const pillEl = document.getElementById('paymentStatusPill');
+      const modeEl = document.getElementById('paymentModeBadge');
       const stampEl = document.getElementById('billPaidStampTop');
+
+      if (ledger.paid > 0 && ledger.paymentMode) {
+        modeEl.innerText = ledger.paymentMode === 'UPI' ? '📱 UPI' : '💵 Cash';
+        modeEl.classList.remove('hidden-force');
+      } else {
+        modeEl.classList.add('hidden-force');
+      }
 
       if (totalPayable > 0 && netBalance <= 0) {
         netEl.innerText = netBalance < 0 ? `₹0 (అడ్వాన్స్: ₹${Math.abs(netBalance)})` : '₹0 (Clear)';
@@ -1837,7 +2038,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.print();
     }
 
-    // E. Quality & SNF / Issue Log (Per-Day Notes)
+    // E. Quality & SNF / Issue Log (Synced directly to Supabase for Vendor Alerts!)
     function getQualityStorageKey(year, month) {
       return `milk_quality_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
@@ -1851,15 +2052,37 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
     }
 
-    function setDayQualityNote(noteText) {
+    async function setDayQualityNote(noteText) {
       if (!selectedDayForModal) return;
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
+      const day = selectedDayForModal;
       const notes = getMonthQualityNotes(year, month);
-      notes[selectedDayForModal] = noteText;
+      notes[day] = noteText;
       localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(notes));
       document.getElementById('customQualityInput').value = noteText;
-      showToast(`${selectedDayForModal}వ తేదీ: "${noteText}" నమోదైంది!`);
+
+      // Sync quality_note to Supabase customer_milk_logs so Vendor gets instant Quality Alert!
+      const logDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      const existing = monthRecords[day];
+      const qty = existing ? existing.liters : defaultDailyQuota;
+      const dbStatus = (existing && existing.status === 'skipped') ? 'skipped' : 'taken';
+
+      await db.from('customer_milk_logs').upsert({
+        user_id: currentUser.id,
+        log_date: logDate,
+        quantity: qty,
+        status: dbStatus,
+        quality_note: noteText
+      }, { onConflict: 'user_id,log_date' });
+
+      if (!monthRecords[day]) {
+        monthRecords[day] = { status: dbStatus === 'taken' ? 'delivered' : 'skipped', liters: qty, quality_note: noteText };
+      } else {
+        monthRecords[day].quality_note = noteText;
+      }
+
+      showToast(`${day}వ తేదీ: "${noteText}" వెండర్‌కు పంపబడింది!`);
       renderApp();
     }
 
@@ -1872,11 +2095,21 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       setDayQualityNote(val);
     }
 
-    function clearDayQualityNote() {
+    async function clearDayQualityNote() {
       if (!selectedDayForModal) return;
-      removeQualityNoteForDay(currentViewingDate.getFullYear(), currentViewingDate.getMonth(), selectedDayForModal);
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const day = selectedDayForModal;
+      removeQualityNoteForDay(year, month, day);
       document.getElementById('customQualityInput').value = '';
-      showToast(`${selectedDayForModal}వ తేదీ నాణ్యత నోట్ తొలగించబడింది!`);
+
+      const logDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+      if (monthRecords[day]) {
+        monthRecords[day].quality_note = '';
+        await db.from('customer_milk_logs').update({ quality_note: null }).eq('user_id', currentUser.id).eq('log_date', logDate);
+      }
+
+      showToast(`${day}వ తేదీ నాణ్యత నోట్ తొలగించబడింది!`);
       renderApp();
     }
 

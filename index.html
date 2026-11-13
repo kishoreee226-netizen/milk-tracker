@@ -1454,12 +1454,8 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       const qEntries = Object.keys(qNotes).sort((a, b) => Number(a) - Number(b));
       let qualityWaLines = '';
       if (qEntries.length > 0) {
-        const listStr = qEntries.map(d => `• ${d}న: ${qNotes[d]}`).join('
-');
-        qualityWaLines = `
-⚠️ *నాణ్యత / సమస్యల వివరాలు:*
-${listStr}
--------------------------------------`;
+        const listStr = qEntries.map(d => `• ${d}న: ${qNotes[d]}`).join('\n');
+        qualityWaLines = `\n⚠️ *నాణ్యత / సమస్యల వివరాలు:*\n${listStr}\n-------------------------------------`;
       }
 
       const finalWaMessage = textMessage
@@ -1469,8 +1465,7 @@ ${listStr}
         )
         .replace(
           `_MilkCount యాప్ ద్వారా రూపొందించబడింది._`,
-          `${qualityWaLines ? qualityWaLines + '
-' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`
+          `${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`
         );
 
       const encoded = encodeURIComponent(finalWaMessage);
@@ -1484,9 +1479,7 @@ ${listStr}
 
     function shareAppLink() {
       const appUrl = 'https://kishoreee226-netizen.github.io/milk-tracker/';
-      const shareText = `🥛 *MilkCount - పాల లెక్క యాప్*
-రోజువారీ పాల లెక్కలు, ఆటో బిల్లింగ్ మరియు వాట్సాప్ బిల్ రిపోర్ట్ కోసం ఈ యాప్ ఇన్‌స్టాల్ చేసుకోండి:
-${appUrl}`;
+      const shareText = `🥛 *MilkCount - పాల లెక్క యాప్*\nరోజువారీ పాల లెక్కలు, ఆటో బిల్లింగ్ మరియు వాట్సాప్ బిల్ రిపోర్ట్ కోసం ఈ యాప్ ఇన్‌స్టాల్ చేసుకోండి:\n${appUrl}`;
 
       if (navigator.share) {
         navigator.share({

@@ -74,7 +74,7 @@
 
       <div class="w-full bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-xs">
 
-        <!-- Quick PIN Lock Container (గతంలో లాగిన్ అయిన నంబర్ కోసం) -->
+        <!-- Quick PIN Lock Container -->
         <div id="quickPinContainer" class="hidden-force text-center space-y-3">
           <div class="w-12 h-12 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center mx-auto text-lg font-bold">
             <i class="ph-bold ph-user"></i>
@@ -292,7 +292,7 @@
             <span class="text-[9px] text-rose-600 font-medium block">Skipped</span>
           </div>
 
-          <!-- 3rd Box: Milkman Contact & Settings -->
+          <!-- 3rd Box: Milkman Contact & Vendor Link -->
           <button onclick="openMilkmanModal()" class="bg-white border border-sky-200 hover:bg-sky-50/70 active:scale-95 transition-all rounded-xl p-2.5 shadow-xs text-left flex flex-col justify-between">
             <div class="flex items-center justify-between w-full">
               <span class="text-[10px] font-bold text-sky-700">పాలబ్బాయి</span>
@@ -652,7 +652,7 @@
       </div>
     </div>
 
-    <!-- MODAL 5: MILKMAN CONTACT & UPI SETTINGS -->
+    <!-- MODAL 5: MILKMAN CONTACT, VENDOR SYNC & UPI SETTINGS -->
     <div id="milkmanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
       <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
         <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
@@ -660,7 +660,7 @@
             <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
               <i class="ph-fill ph-user-circle text-sky-600"></i> పాలబ్బాయి వివరాలు (Milkman)
             </h4>
-            <p class="text-[10px] text-slate-500">నేరుగా కాల్, వాట్సాప్ & UPI పేమెంట్ కోసం</p>
+            <p class="text-[10px] text-slate-500">నంబర్ సేవ్ చేస్తే వెండర్ యాప్‌కు ఆటోమేటిక్‌గా లింక్ అవుతుంది</p>
           </div>
           <button onclick="closeMilkmanModal()" class="text-slate-400 hover:text-slate-600">
             <i class="ph-bold ph-x text-sm"></i>
@@ -669,12 +669,13 @@
 
         <div class="space-y-2.5">
           <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">పాలబ్బాయి పేరు (Name):</label>
-            <input type="text" id="milkmanNameInput" placeholder="ఉదా: రాజు గారు" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">వాట్సాప్ / ఫోన్ నంబర్ (10 అంకెలు):</label>
+            <input type="tel" id="milkmanPhoneInput" maxlength="10" oninput="lookupVendorByPhone(this.value)" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+            <p id="vendorLookupHint" class="hidden-force text-[10px] text-emerald-700 font-bold mt-1"></p>
           </div>
           <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">వాట్సాప్ / ఫోన్ నంబర్ (10 అంకెలు):</label>
-            <input type="tel" id="milkmanPhoneInput" maxlength="10" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+            <label class="text-[11px] font-bold text-slate-600 mb-1 block">పాలబ్బాయి / డెయిరీ పేరు (Name):</label>
+            <input type="text" id="milkmanNameInput" placeholder="ఉదా: రాజు గారు" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
           </div>
           <div>
             <label class="text-[11px] font-bold text-slate-600 mb-1 block">UPI ID (GPay / PhonePe కోసం - ఐచ్ఛికం):</label>
@@ -694,7 +695,7 @@
 
         <div class="flex gap-2 pt-1">
           <button onclick="closeMilkmanModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
-          <button onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
+          <button id="saveMilkmanBtn" onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
         </div>
       </div>
     </div>
@@ -756,13 +757,12 @@
     let isSignUpMode = false;
     let ratePerLiter = 70;
     let defaultDailyQuota = 1.0;
-    let isAutoMode = true; // Auto Fill Mode Toggle
+    let isAutoMode = true;
     let monthRecords = {};
     let prevMonthRecords = {};
     let pendingMilkmanAlertMsg = '';
     let currentCalculatedBill = 0;
 
-    // Helper: Check if a given (year, month, day) is in the future (strictly after today)
     function isFutureDate(year, month, day) {
       const now = new Date();
       const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
@@ -887,7 +887,7 @@
       }
     }
 
-    function setupUserSession(user, isNewUser = false) {
+    async function setupUserSession(user, isNewUser = false) {
       currentUser = user;
       localStorage.setItem('milk_self_customer', JSON.stringify(user));
       localStorage.setItem('milkcount_last_account', JSON.stringify({ phone: user.phone, name: user.name }));
@@ -903,6 +903,9 @@
       document.getElementById('ratePerLiterText').innerText = ratePerLiter;
       document.getElementById('defaultQuotaLabel').innerText = `${defaultDailyQuota} లీటరు`;
 
+      // Sync local milkman phone with DB vendor_phone if saved locally or in DB
+      await syncVendorPhoneOnSessionStart(user);
+
       updateAutoModeUI();
       updateMilkmanCardUI();
       fetchMonthData();
@@ -912,6 +915,21 @@
           openQuotaModal();
           showToast("స్వాగతం! దయచేసి మీ రోజువారీ పాల కోటాను సరిచూసుకోండి.");
         }, 500);
+      }
+    }
+
+    async function syncVendorPhoneOnSessionStart(user) {
+      const localM = getMilkmanProfile();
+      if (localM.phone && localM.phone.length === 10 && user.vendor_phone !== localM.phone) {
+        const { error } = await db.from('customer_users').update({ vendor_phone: localM.phone }).eq('id', user.id);
+        if (!error) {
+          currentUser.vendor_phone = localM.phone;
+          localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+        }
+      } else if (!localM.phone && user.vendor_phone && user.vendor_phone.length === 10) {
+        const { data: vData } = await db.from('vendors').select('name').eq('phone', user.vendor_phone).maybeSingle();
+        const vName = vData && vData.name ? vData.name : localM.name;
+        localStorage.setItem(`milkman_profile_${user.id}`, JSON.stringify({ name: vName || '', phone: user.vendor_phone, upi: localM.upi || '' }));
       }
     }
 
@@ -935,7 +953,7 @@
       setTimeout(() => {
         toast.classList.remove('opacity-100', 'translate-y-0');
         toast.classList.add('opacity-0', 'translate-y-4');
-      }, 2200);
+      }, 2400);
     }
 
     // 3. AUTO FILL MODE TOGGLE LOGIC
@@ -1324,7 +1342,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
     }
 
-    // 9. CALENDAR & APP RENDER (Auto-Mode + Registration-Date Aware + Future Scheduled Blue Badge)
+    // 9. CALENDAR & APP RENDER
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -1383,7 +1401,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         if (item) {
           if (item.status === 'delivered') {
             if (isPastOrToday) {
-              // Past or Today: Green & Counted in Bill
               deliveredCount++;
               totalLiters += item.liters;
 
@@ -1398,7 +1415,6 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
                 </span>
               `;
             } else {
-              // Future Scheduled Date: Blue Badge & NOT Counted in Bill yet
               statusClass = "bg-sky-50 border-sky-400 text-sky-950 shadow-xs";
               statusBadge = `
                 <span class="text-[10px] font-extrabold text-sky-700 leading-none flex items-center gap-0.5">
@@ -1454,22 +1470,15 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('billTotalLiters').innerText = `${totalLiters.toFixed(1)} L`;
       document.getElementById('billFinalAmount').innerText = totalBill.toLocaleString('en-IN');
 
-      // Update Monthly Comparison Insight (Feature #5)
       updateMonthlyInsight(year, month, totalLiters);
-
-      // Update Quality Summary in Bill Statement
       refreshBillQualitySummary(year, month);
-
-      // Update Payment & Due Ledger UI (Feature #2)
       refreshLedgerUI(year, month, totalBill);
-
-      // Build Print Statement Table (Feature #5)
       buildPrintStatementTable(year, month, daysInMonth, now, userRegDate);
     }
 
-    // 10. NEW CUSTOMER FEATURES LOGIC (Vacation, Milkman Profile, Payment Ledger, Insights & PDF)
+    // 10. CUSTOMER FEATURES LOGIC
 
-    // A. Vacation Date-Range Skip (Feature #1)
+    // A. Vacation Date-Range Skip
     function openVacationModal() {
       const y = currentViewingDate.getFullYear();
       const m = String(currentViewingDate.getMonth() + 1).padStart(2, '0');
@@ -1532,13 +1541,17 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       fetchMonthData();
     }
 
-    // B. Milkman Contact & Quick WhatsApp Alert (Feature #4)
+    // B. Milkman Contact, Vendor Auto-Lookup & DB Sync
     function getMilkmanProfile() {
       if (!currentUser) return { name: '', phone: '', upi: '' };
       try {
-        return JSON.parse(localStorage.getItem(`milkman_profile_${currentUser.id}`)) || { name: '', phone: '', upi: '' };
+        const saved = JSON.parse(localStorage.getItem(`milkman_profile_${currentUser.id}`)) || { name: '', phone: '', upi: '' };
+        if (!saved.phone && currentUser.vendor_phone) {
+          saved.phone = currentUser.vendor_phone;
+        }
+        return saved;
       } catch (e) {
-        return { name: '', phone: '', upi: '' };
+        return { name: '', phone: currentUser.vendor_phone || '', upi: '' };
       }
     }
 
@@ -1557,11 +1570,36 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
     }
 
+    async function lookupVendorByPhone(phoneVal) {
+      const hintEl = document.getElementById('vendorLookupHint');
+      const clean = (phoneVal || '').trim();
+      if (clean.length !== 10 || isNaN(clean)) {
+        hintEl.classList.add('hidden-force');
+        return;
+      }
+      const { data: vData } = await db.from('vendors').select('name').eq('phone', clean).maybeSingle();
+      if (vData && vData.name) {
+        hintEl.innerText = `✓ MilkCount వెండర్ గుర్తించబడ్డారు: ${vData.name}`;
+        hintEl.classList.remove('hidden-force');
+        const nameInput = document.getElementById('milkmanNameInput');
+        if (!nameInput.value.trim()) {
+          nameInput.value = vData.name;
+        }
+      } else {
+        hintEl.classList.add('hidden-force');
+      }
+    }
+
     function openMilkmanModal() {
       const m = getMilkmanProfile();
       document.getElementById('milkmanNameInput').value = m.name || '';
       document.getElementById('milkmanPhoneInput').value = m.phone || '';
       document.getElementById('milkmanUpiInput').value = m.upi || '';
+      document.getElementById('vendorLookupHint').classList.add('hidden-force');
+
+      if (m.phone && m.phone.length === 10) {
+        lookupVendorByPhone(m.phone);
+      }
 
       const actionsDiv = document.getElementById('milkmanDirectActions');
       if (m.phone && m.phone.length === 10) {
@@ -1577,7 +1615,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       document.getElementById('milkmanModal').classList.add('hidden-force');
     }
 
-    function saveMilkmanProfile() {
+    async function saveMilkmanProfile() {
       const name = document.getElementById('milkmanNameInput').value.trim();
       const phone = document.getElementById('milkmanPhoneInput').value.trim();
       const upi = document.getElementById('milkmanUpiInput').value.trim();
@@ -1586,10 +1624,33 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         return alert('దయచేసి 10 అంకెల సరైన మొబైల్ నంబర్ నమోదు చేయండి.');
       }
 
+      const btn = document.getElementById('saveMilkmanBtn');
+      btn.disabled = true;
+      btn.innerText = 'సేవ్ అవుతోంది...';
+
+      // Link customer record to vendor_phone in Supabase so it appears in Vendor App!
+      const vendorPhoneToSave = phone.length === 10 ? phone : null;
+      const { error } = await db
+        .from('customer_users')
+        .update({ vendor_phone: vendorPhoneToSave })
+        .eq('id', currentUser.id);
+
+      btn.disabled = false;
+      btn.innerText = 'సేవ్ చేయండి';
+
+      if (error) {
+        return alert('Sync Error: ' + error.message);
+      }
+
+      currentUser.vendor_phone = vendorPhoneToSave;
+      localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
       localStorage.setItem(`milkman_profile_${currentUser.id}`, JSON.stringify({ name, phone, upi }));
+
       updateMilkmanCardUI();
       closeMilkmanModal();
-      showToast('పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
+      showToast(vendorPhoneToSave
+        ? 'పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి & వెండర్ యాప్‌కు లింక్ అయ్యాయి!'
+        : 'పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
     }
 
     function chatMilkmanWhatsApp() {
@@ -1623,7 +1684,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
     }
 
-    // C. Payment & Due Ledger + UPI Pay (Feature #2)
+    // C. Payment & Due Ledger + UPI Pay
     function getLedgerKey(year, month) {
       return `milk_ledger_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
@@ -1701,7 +1762,7 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       window.location.href = `upi://pay?pa=${encodeURIComponent(m.upi)}&pn=${payeeName}&am=${amountToPay}&cu=INR&tn=${note}`;
     }
 
-    // D. Monthly Insights Comparison & PDF/Print Receipt (Feature #5)
+    // D. Monthly Insights Comparison & PDF/Print Receipt
     function updateMonthlyInsight(year, month, currentLiters) {
       const insightEl = document.getElementById('monthlyComparisonBadge');
       if (!insightEl) return;

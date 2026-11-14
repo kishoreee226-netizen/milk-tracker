@@ -534,16 +534,22 @@
               </button>
             </div>
 
-            <div class="grid grid-cols-2 gap-2">
-              <button onclick="shareAppLink()" class="bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs">
-                <i class="ph-bold ph-share-network text-sm text-sky-600"></i>
-                యాప్ షేర్ చేయండి
-              </button>
-              <button onclick="openSupportModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 active:scale-[0.98] transition-all text-amber-900 font-bold py-2.5 px-3 rounded-xl flex items-center justify-center gap-1.5 text-xs">
-                <i class="ph-fill ph-ticket text-sm text-amber-600"></i>
-                Raise Ticket / సపోర్ట్
-              </button>
-            </div>
+    <!-- 3 బటన్లు నీట్‌గా ఉండేలా గ్రిడ్ మార్పు -->
+    <div class="grid grid-cols-3 gap-2">
+                <button onclick="shareAppLink()" class="bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
+                  <i class="ph-bold ph-share-network text-sm text-sky-600"></i>
+                  కస్టమర్ యాప్
+                </button>
+                <button onclick="openSupportModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 active:scale-[0.98] transition-all text-amber-900 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
+                  <i class="ph-fill ph-ticket text-sm text-amber-600"></i>
+                  Raise Ticket
+                </button>
+                <button onclick="shareVendorApp()" class="bg-teal-600 hover:bg-teal-700 active:scale-[0.98] transition-all text-white font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
+                  <i class="ph-fill ph-truck text-sm text-amber-200"></i>
+                  వెండర్ యాప్
+                </button>
+              </div>
+
             <p class="text-[10px] text-center text-slate-400">పాల సమస్యలకు వెండర్‌కు కాల్ చేయండి • యాప్ టెక్నికల్ సమస్యలకు Raise Ticket నొక్కండి</p>
           </div>
         </section>

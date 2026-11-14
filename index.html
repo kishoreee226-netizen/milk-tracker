@@ -963,7 +963,7 @@
       </div>
     </div>
 
-  <!-- JAVASCRIPT LOGIC -->
+    <!-- JAVASCRIPT LOGIC -->
   <script>
     // 1. SUPABASE CLIENT
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
@@ -1688,9 +1688,11 @@
           user_id: getHouseUserId(),
           log_date: logDate,
           quantity: 0,
+          morning_qty: 0,
+          evening_qty: 0,
           status: 'skipped'
         }, { onConflict: 'user_id,log_date' });
-        monthRecords[dayNum] = { status: 'skipped', liters: 0, quality_note: '' };
+        monthRecords[dayNum] = { status: 'skipped', liters: 0, morning_qty: 0, evening_qty: 0, quality_note: '' };
         showToast(`రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
         promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip) అని తెలియజేస్తున్నాము. - ${currentUser.name || 'Customer'}`);
       }
@@ -1698,6 +1700,7 @@
       renderApp();
     }
 
+    // FIX 1: addExtraTomorrow - Syncs morning_qty and evening_qty accurately
     async function addExtraTomorrow() {
       const now = new Date();
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -1713,15 +1716,34 @@
       if (item && item.status === 'delivered') baseLiters = item.liters;
 
       const newVal = parseFloat((baseLiters + 0.5).toFixed(2));
+      let mQty = 0;
+      let eQty = 0;
+      if (defaultDailyQuota > 0) {
+        mQty = parseFloat(((morningQuota / defaultDailyQuota) * newVal).toFixed(2));
+        eQty = Math.max(0, parseFloat((newVal - mQty).toFixed(2)));
+      } else {
+        mQty = newVal;
+        eQty = 0;
+      }
 
       await db.from('customer_milk_logs').upsert({
         user_id: getHouseUserId(),
         log_date: logDate,
         quantity: newVal,
+        morning_qty: mQty,
+        evening_qty: eQty,
         status: 'taken'
       }, { onConflict: 'user_id,log_date' });
 
-      monthRecords[dayNum] = { status: 'delivered', liters: newVal, quality_note: '' };
+      if (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth()) {
+        monthRecords[dayNum] = {
+          status: 'delivered',
+          liters: newVal,
+          morning_qty: mQty,
+          evening_qty: eQty,
+          quality_note: (item && item.quality_note) || ''
+        };
+      }
       showToast(`రేపు (${dayNum}న) +0.5L షెడ్యూల్ చేశాం! మొత్తం: ${newVal}L`);
       promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి మొత్తం ${newVal}L పాలు కావాలి (+0.5L ఎక్స్‌ట్రా). - ${currentUser.name || 'Customer'}`);
       renderApp();
@@ -1731,7 +1753,7 @@
       document.getElementById('billSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 8. WHATSAPP SHARE
+    // 8. WHATSAPP SHARE (FIX 2: Dual-Shift Accurate Calculation)
     function shareOnWhatsApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -1744,6 +1766,8 @@
       let deliveredDays = 0;
       let skippedDays = 0;
       let totalLiters = 0;
+      let totalMorningLiters = 0;
+      let totalEveningLiters = 0;
 
       for (let d = 1; d <= daysInMonth; d++) {
         const currentDate = new Date(year, month, d);
@@ -1755,41 +1779,34 @@
           if (item.status === 'delivered' && item.liters > 0 && isPastOrToday) {
             deliveredDays++;
             totalLiters += item.liters;
+            totalMorningLiters += (item.morning_qty !== undefined && item.morning_qty !== null ? item.morning_qty : item.liters);
+            totalEveningLiters += (item.evening_qty !== undefined && item.evening_qty !== null ? item.evening_qty : 0);
           } else if (item.status === 'skipped') {
             skippedDays++;
           }
         } else if (isPastOrToday && isAfterOrOnJoin && isAutoMode) {
           deliveredDays++;
           totalLiters += defaultDailyQuota;
+          totalMorningLiters += morningQuota;
+          totalEveningLiters += eveningQuota;
         }
       }
 
-      const totalAmount = Math.round(totalLiters * ratePerLiter);
+      const morningBill = Math.round(totalMorningLiters * morningRate);
+      const eveningBill = Math.round(totalEveningLiters * eveningRate);
+      const totalAmount = morningBill + eveningBill;
       const monthNameTel = TELUGU_MONTHS[month];
       const monthNameEng = ENGLISH_MONTHS[month];
 
-      const textMessage = 
-`🥛 *పాల లెక్క వివరాలు (Milk Delivery Bill)* 🥛
--------------------------------------
-👤 *కస్టమర్:* ${currentUser.name || 'User'} (${currentUser.phone})
-📅 *నెల:* ${monthNameTel} (${monthNameEng}) ${year}
-✅ *పాలు తీసుకున్న రోజులు:* ${deliveredDays} రోజులు
-❌ *సెలవులు (ఆపిన రోజులు):* ${skippedDays} రోజులు
-🍶 *మొత్తం పాల పరిమాణం:* ${totalLiters.toFixed(1)} లీటర్లు (${custMilkType})
-💰 *లీటరు ధర:* ₹${ratePerLiter}
--------------------------------------
-💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*
--------------------------------------
-_MilkCount యాప్ ద్వారా రూపొందించబడింది._`;
+      const shiftBreakdownLines = (morningQuota > 0 && eveningQuota > 0)
+        ? `🌅 *ఉదయం (${morningMilkType}):* ${totalMorningLiters.toFixed(1)}L × ₹${morningRate} = ₹${morningBill}\n🌇 *సాయంత్రం (${eveningMilkType}):* ${totalEveningLiters.toFixed(1)}L × ₹${eveningRate} = ₹${eveningBill}`
+        : `💰 *లీటరు ధర:* ₹${morningQuota > 0 ? morningRate : eveningRate}`;
 
       const ledger = getEffectiveLedger(year, month);
       let extraBillLines = '';
       if (ledger.prevDue > 0 || ledger.paid > 0) {
         const netDue = Math.max(0, (totalAmount + ledger.prevDue) - ledger.paid);
-        extraBillLines = `
-📌 *పాత బాకీ:* ₹${ledger.prevDue}
-✅ *చెల్లించినది:* ₹${ledger.paid}
-💳 *నికర బాకీ (Balance):* ₹${netDue}`;
+        extraBillLines = `\n📌 *పాత బాకీ:* ₹${ledger.prevDue}\n✅ *చెల్లించినది:* ₹${ledger.paid}\n💳 *నికర బాకీ (Balance):* ₹${netDue}`;
       }
 
       const qNotes = getMonthQualityNotes(year, month);
@@ -1800,15 +1817,19 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
         qualityWaLines = `\n⚠️ *నాణ్యత / సమస్యల వివరాలు:*\n${listStr}\n-------------------------------------`;
       }
 
-      const finalWaMessage = textMessage
-        .replace(
-          `💵 *మొత్తం చెల్లించవలసిన బిల్లు: ₹${totalAmount}*`,
-          `💵 *ఈ నెల బిల్లు: ₹${totalAmount}*${extraBillLines}`
-        )
-        .replace(
-          `_MilkCount యాప్ ద్వారా రూపొందించబడింది._`,
-          `${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`
-        );
+      const finalWaMessage =
+`🥛 *పాల లెక్క వివరాలు (Milk Delivery Bill)* 🥛
+-------------------------------------
+👤 *కస్టమర్:* ${currentUser.name || 'User'} (${currentUser.phone})
+📅 *నెల:* ${monthNameTel} (${monthNameEng}) ${year}
+✅ *పాలు తీసుకున్న రోజులు:* ${deliveredDays} రోజులు
+❌ *సెలవులు (ఆపిన రోజులు):* ${skippedDays} రోజులు
+🍶 *మొత్తం పాల పరిమాణం:* ${totalLiters.toFixed(1)} లీటర్లు
+${shiftBreakdownLines}
+-------------------------------------
+💵 *ఈ నెల బిల్లు: ₹${totalAmount}*${extraBillLines}
+-------------------------------------
+${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వారా రూపొందించబడింది._`;
 
       const encoded = encodeURIComponent(finalWaMessage);
       const milkman = getMilkmanProfile();
@@ -2032,6 +2053,8 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
           user_id: getHouseUserId(),
           log_date: `${y}-${m}-${d}`,
           quantity: 0,
+          morning_qty: 0,
+          evening_qty: 0,
           status: 'skipped'
         });
         cur.setDate(cur.getDate() + 1);
@@ -2358,64 +2381,64 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
     }
 
     // FIX: PDF / Print టేబుల్‌లో కూడా ఉదయం & సాయంత్రం షిఫ్ట్ వారీగా ఖచ్చితమైన రేటు లెక్కింపు
-function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
-  const tbody = document.getElementById('printStatementBody');
-  if (!tbody) return;
-  let rowsHtml = '';
-  const splits = typeof getMonthSplits === 'function' ? getMonthSplits(year, month) : {};
+    function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
+      const tbody = document.getElementById('printStatementBody');
+      if (!tbody) return;
+      let rowsHtml = '';
+      const splits = typeof getMonthSplits === 'function' ? getMonthSplits(year, month) : {};
 
-  for (let d = 1; d <= daysInMonth; d++) {
-    const cDate = new Date(year, month, d);
-    const isPast = cDate <= now;
-    const isJoined = cDate >= userRegDate;
-    const rec = monthRecords[d];
-    let statusText = '-';
-    let litersVal = 0;
-    let dayAmt = 0;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cDate = new Date(year, month, d);
+        const isPast = cDate <= now;
+        const isJoined = cDate >= userRegDate;
+        const rec = monthRecords[d];
+        let statusText = '-';
+        let litersVal = 0;
+        let dayAmt = 0;
 
-    if (rec) {
-      if (rec.status === 'delivered') {
-        statusText = isPast ? 'డెలివరీ (Delivered)' : 'షెడ్యూల్ (Scheduled)';
-        litersVal = isPast ? rec.liters : 0;
-        if (isPast && litersVal > 0) {
-          let mL = rec.morning_qty !== undefined && rec.morning_qty !== null ? parseFloat(rec.morning_qty) : null;
-          let eL = rec.evening_qty !== undefined && rec.evening_qty !== null ? parseFloat(rec.evening_qty) : null;
+        if (rec) {
+          if (rec.status === 'delivered') {
+            statusText = isPast ? 'డెలివరీ (Delivered)' : 'షెడ్యూల్ (Scheduled)';
+            litersVal = isPast ? rec.liters : 0;
+            if (isPast && litersVal > 0) {
+              let mL = rec.morning_qty !== undefined && rec.morning_qty !== null ? parseFloat(rec.morning_qty) : null;
+              let eL = rec.evening_qty !== undefined && rec.evening_qty !== null ? parseFloat(rec.evening_qty) : null;
 
-          if ((mL === null || eL === null || isNaN(mL) || isNaN(eL)) && splits[d]) {
-            mL = parseFloat(splits[d].m || 0);
-            eL = parseFloat(splits[d].e || 0);
-          }
-          if (mL === null || eL === null || isNaN(mL) || isNaN(eL)) {
-            if (defaultDailyQuota > 0) {
-              mL = (morningQuota / defaultDailyQuota) * litersVal;
-              eL = (eveningQuota / defaultDailyQuota) * litersVal;
-            } else {
-              mL = litersVal;
-              eL = 0;
+              if ((mL === null || eL === null || isNaN(mL) || isNaN(eL)) && splits[d]) {
+                mL = parseFloat(splits[d].m || 0);
+                eL = parseFloat(splits[d].e || 0);
+              }
+              if (mL === null || eL === null || isNaN(mL) || isNaN(eL)) {
+                if (defaultDailyQuota > 0) {
+                  mL = (morningQuota / defaultDailyQuota) * litersVal;
+                  eL = (eveningQuota / defaultDailyQuota) * litersVal;
+                } else {
+                  mL = litersVal;
+                  eL = 0;
+                }
+              }
+              dayAmt = Math.round((mL * morningRate) + (eL * eveningRate));
             }
+          } else {
+            statusText = 'వద్దు (Skipped)';
           }
-          dayAmt = Math.round((mL * morningRate) + (eL * eveningRate));
+        } else if (isPast && isJoined && isAutoMode) {
+          statusText = 'ఆటో డెలివరీ';
+          litersVal = defaultDailyQuota;
+          dayAmt = Math.round((morningQuota * morningRate) + (eveningQuota * eveningRate));
         }
-      } else {
-        statusText = 'వద్దు (Skipped)';
-      }
-    } else if (isPast && isJoined && isAutoMode) {
-      statusText = 'ఆటో డెలివరీ';
-      litersVal = defaultDailyQuota;
-      dayAmt = Math.round((morningQuota * morningRate) + (eveningQuota * eveningRate));
-    }
 
-    rowsHtml += `
-      <tr class="border-b border-slate-200">
-        <td class="p-1">${d} ${TELUGU_MONTHS[month]}</td>
-        <td class="p-1">${statusText}</td>
-        <td class="p-1 text-right">${litersVal > 0 ? litersVal + ' L' : '-'}</td>
-        <td class="p-1 text-right">${dayAmt > 0 ? '₹' + dayAmt : '-'}</td>
-      </tr>
-    `;
-  }
-  tbody.innerHTML = rowsHtml;
-}
+        rowsHtml += `
+          <tr class="border-b border-slate-200">
+            <td class="p-1">${d} ${TELUGU_MONTHS[month]}</td>
+            <td class="p-1">${statusText}</td>
+            <td class="p-1 text-right">${litersVal > 0 ? litersVal + ' L' : '-'}</td>
+            <td class="p-1 text-right">${dayAmt > 0 ? '₹' + dayAmt : '-'}</td>
+          </tr>
+        `;
+      }
+      tbody.innerHTML = rowsHtml;
+    }
 
     function printBillReceipt() {
       window.print();
@@ -2435,6 +2458,7 @@ function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
       }
     }
 
+    // FIX 3: setDayQualityNote - Syncs morning_qty and evening_qty alongside quality_note
     async function setDayQualityNote(noteText) {
       if (!selectedDayForModal) return;
       const year = currentViewingDate.getFullYear();
@@ -2445,22 +2469,32 @@ function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
       localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(notes));
       document.getElementById('customQualityInput').value = noteText;
 
-      // Sync quality_note to Supabase customer_milk_logs so Vendor gets instant Quality Alert!
+      // Sync quality_note + shift quantities to Supabase customer_milk_logs so Vendor gets instant Quality Alert!
       const logDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const existing = monthRecords[day];
       const qty = existing ? existing.liters : defaultDailyQuota;
+      const mQty = existing && existing.morning_qty !== undefined ? existing.morning_qty : morningQuota;
+      const eQty = existing && existing.evening_qty !== undefined ? existing.evening_qty : eveningQuota;
       const dbStatus = (existing && existing.status === 'skipped') ? 'skipped' : 'taken';
 
       await db.from('customer_milk_logs').upsert({
         user_id: getHouseUserId(),
         log_date: logDate,
         quantity: qty,
+        morning_qty: dbStatus === 'skipped' ? 0 : mQty,
+        evening_qty: dbStatus === 'skipped' ? 0 : eQty,
         status: dbStatus,
         quality_note: noteText
       }, { onConflict: 'user_id,log_date' });
 
       if (!monthRecords[day]) {
-        monthRecords[day] = { status: dbStatus === 'taken' ? 'delivered' : 'skipped', liters: qty, quality_note: noteText };
+        monthRecords[day] = {
+          status: dbStatus === 'taken' ? 'delivered' : 'skipped',
+          liters: qty,
+          morning_qty: dbStatus === 'skipped' ? 0 : mQty,
+          evening_qty: dbStatus === 'skipped' ? 0 : eQty,
+          quality_note: noteText
+        };
       } else {
         monthRecords[day].quality_note = noteText;
       }
@@ -2660,6 +2694,7 @@ function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
         : (currentUser.vendor_phone ? `వెండర్ లింక్: ${currentUser.vendor_phone}` : 'వెండర్ నంబర్ లింక్ చేయండి');
     }
 
+    // FIX 4: renderSixMonthSpendingChart - Uses Dual-Shift rates accurately
     async function renderSixMonthSpendingChart() {
       const chartEl = document.getElementById('sixMonthSpendingChart');
       if (!chartEl || !currentUser) return;
@@ -2670,14 +2705,19 @@ function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
       const startIso = `${sixStart.getFullYear()}-${String(sixStart.getMonth() + 1).padStart(2, '0')}-01`;
 
       const { data: logs } = await db.from('customer_milk_logs')
-        .select('log_date, quantity, status')
+        .select('log_date, quantity, morning_qty, evening_qty, status')
         .eq('user_id', houseId)
         .gte('log_date', startIso);
 
       const logsMap = {};
       if (logs) {
         logs.forEach(l => {
-          logsMap[l.log_date] = { status: l.status, qty: parseFloat(l.quantity) || 0 };
+          logsMap[l.log_date] = {
+            status: l.status,
+            qty: parseFloat(l.quantity) || 0,
+            mQty: l.morning_qty !== null && l.morning_qty !== undefined ? parseFloat(l.morning_qty) : null,
+            eQty: l.evening_qty !== null && l.evening_qty !== undefined ? parseFloat(l.evening_qty) : null
+          };
         });
       }
 
@@ -2693,18 +2733,37 @@ function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
         const m = dObj.getMonth();
         const dCount = new Date(y, m + 1, 0).getDate();
         let liters = 0;
+        let mLiters = 0;
+        let eLiters = 0;
 
         for (let d = 1; d <= dCount; d++) {
           const cur = new Date(y, m, d);
           const iso = `${y}-${String(m + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
           const rec = logsMap[iso];
           if (rec) {
-            if (rec.status === 'taken' && cur <= now) liters += rec.qty;
+            if (rec.status === 'taken' && cur <= now && rec.qty > 0) {
+              liters += rec.qty;
+              let dM = rec.mQty;
+              let dE = rec.eQty;
+              if (dM === null || dE === null || isNaN(dM) || isNaN(dE)) {
+                if (defaultDailyQuota > 0) {
+                  dM = (morningQuota / defaultDailyQuota) * rec.qty;
+                  dE = rec.qty - dM;
+                } else {
+                  dM = rec.qty;
+                  dE = 0;
+                }
+              }
+              mLiters += dM;
+              eLiters += dE;
+            }
           } else if (cur <= now && cur >= regDate && isAutoMode) {
             liters += defaultDailyQuota;
+            mLiters += morningQuota;
+            eLiters += eveningQuota;
           }
         }
-        const bill = Math.round(liters * ratePerLiter);
+        const bill = Math.round(mLiters * morningRate) + Math.round(eLiters * eveningRate);
         if (bill > maxBill) maxBill = bill;
         monthsData.push({ label: TELUGU_MONTHS[m].slice(0, 3), bill, liters });
       }
@@ -2850,5 +2909,6 @@ function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
       }).join('');
     }
   </script>
+
 </body>
 </html>

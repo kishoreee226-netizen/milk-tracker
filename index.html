@@ -2960,6 +2960,22 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         `;
       }).join('');
     }
+    // Share Vendor App Link via WhatsApp (Uses existing share logic)
+    function shareVendorApp() {
+      const vendorAppUrl = 'https://kishoreee226-netizen.github.io/milk-tracker/vendor.html'; 
+      const shareText = `🚚 *MilkCount Vendor App - పాల వ్యాపారి యాప్*\nడెలివరీ రూట్, ఆటో కలెక్షన్ మరియు కస్టమర్ల బిల్లింగ్ నిర్వహించడానికి ఈ వెండర్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి:\n${vendorAppUrl}`;
+
+      if (navigator.share) {
+        navigator.share({
+          title: 'MilkCount Vendor App',
+          text: shareText,
+          url: vendorAppUrl
+        }).catch(() => {});
+      } else {
+        window.location.href = `whatsapp://send?text=${encodeURIComponent(shareText)}`;
+      }
+    }
+
   </script>
 
 </body>

@@ -2357,35 +2357,65 @@ _MilkCount యాప్ ద్వారా రూపొందించబడి�
       }
     }
 
-    function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
-      const tbody = document.getElementById('printStatementBody');
-      if (!tbody) return;
-      let rowsHtml = '';
-      for (let d = 1; d <= daysInMonth; d++) {
-        const cDate = new Date(year, month, d);
-        const isPast = cDate <= now;
-        const isJoined = cDate >= userRegDate;
-        const rec = monthRecords[d];
-        let statusText = '-';
-        let litersVal = 0;
+    // FIX: PDF / Print టేబుల్‌లో కూడా ఉదయం & సాయంత్రం షిఫ్ట్ వారీగా ఖచ్చితమైన రేటు లెక్కింపు
+function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
+  const tbody = document.getElementById('printStatementBody');
+  if (!tbody) return;
+  let rowsHtml = '';
+  const splits = typeof getMonthSplits === 'function' ? getMonthSplits(year, month) : {};
 
-        if (rec) {
-          if (rec.status === 'delivered') {
-            statusText = isPast ? 'డెలివరీ (Delivered)' : 'షెడ్యూల్ (Scheduled)';
-            litersVal = isPast ? rec.liters : 0;
-          } else {
-            statusText = 'వద్దు (Skipped)';
+  for (let d = 1; d <= daysInMonth; d++) {
+    const cDate = new Date(year, month, d);
+    const isPast = cDate <= now;
+    const isJoined = cDate >= userRegDate;
+    const rec = monthRecords[d];
+    let statusText = '-';
+    let litersVal = 0;
+    let dayAmt = 0;
+
+    if (rec) {
+      if (rec.status === 'delivered') {
+        statusText = isPast ? 'డెలివరీ (Delivered)' : 'షెడ్యూల్ (Scheduled)';
+        litersVal = isPast ? rec.liters : 0;
+        if (isPast && litersVal > 0) {
+          let mL = rec.morning_qty !== undefined && rec.morning_qty !== null ? parseFloat(rec.morning_qty) : null;
+          let eL = rec.evening_qty !== undefined && rec.evening_qty !== null ? parseFloat(rec.evening_qty) : null;
+
+          if ((mL === null || eL === null || isNaN(mL) || isNaN(eL)) && splits[d]) {
+            mL = parseFloat(splits[d].m || 0);
+            eL = parseFloat(splits[d].e || 0);
           }
-        } else if (isPast && isJoined && isAutoMode) {
-          statusText = 'ఆటో డెలివరీ';
-          litersVal = defaultDailyQuota;
+          if (mL === null || eL === null || isNaN(mL) || isNaN(eL)) {
+            if (defaultDailyQuota > 0) {
+              mL = (morningQuota / defaultDailyQuota) * litersVal;
+              eL = (eveningQuota / defaultDailyQuota) * litersVal;
+            } else {
+              mL = litersVal;
+              eL = 0;
+            }
+          }
+          dayAmt = Math.round((mL * morningRate) + (eL * eveningRate));
         }
-
-        const amt = Math.round(litersVal * ratePerLiter);
-        rowsHtml += `<tr class="border-b border-slate-200"><td class="p-1">${d} ${TELUGU_MONTHS[month]}</td><td class="p-1">${statusText}</td><td class="p-1 text-right">${litersVal > 0 ? litersVal + ' L' : '-'}</td><td class="p-1 text-right">${amt > 0 ? '₹' + amt : '-'}</td></tr>`;
+      } else {
+        statusText = 'వద్దు (Skipped)';
       }
-      tbody.innerHTML = rowsHtml;
+    } else if (isPast && isJoined && isAutoMode) {
+      statusText = 'ఆటో డెలివరీ';
+      litersVal = defaultDailyQuota;
+      dayAmt = Math.round((morningQuota * morningRate) + (eveningQuota * eveningRate));
     }
+
+    rowsHtml += `
+      <tr class="border-b border-slate-200">
+        <td class="p-1">${d} ${TELUGU_MONTHS[month]}</td>
+        <td class="p-1">${statusText}</td>
+        <td class="p-1 text-right">${litersVal > 0 ? litersVal + ' L' : '-'}</td>
+        <td class="p-1 text-right">${dayAmt > 0 ? '₹' + dayAmt : '-'}</td>
+      </tr>
+    `;
+  }
+  tbody.innerHTML = rowsHtml;
+}
 
     function printBillReceipt() {
       window.print();

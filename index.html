@@ -1204,16 +1204,41 @@
         : 'వద్దు (0L)';
     }
 
+    // Helper: ఫ్యామిలీ మెంబర్ అయితే మెయిన్ హెడ్ యొక్క కోటా & రేట్లను లోడ్ చేస్తుంది, మరియు ఫ్యామిలీ మెంబర్ కి vendor_phone లేకుండా చూస్తుంది
+    async function loadEffectiveUserProfile(userId) {
+      const { data: latestUser } = await db.from('customer_users').select('*').eq('id', userId).maybeSingle();
+      if (!latestUser) return null;
+
+      if (latestUser.family_head_id) {
+        // ఫ్యామిలీ మెంబర్ అకౌంట్‌లో పొరపాటున vendor_phone ఉంటే వెంటనే DB లో null చేయడం (వెండర్ యాప్‌లో డూప్లికేట్ రాకుండా!)
+        if (latestUser.vendor_phone) {
+          await db.from('customer_users').update({ vendor_phone: null }).eq('id', latestUser.id);
+          latestUser.vendor_phone = null;
+        }
+        const { data: headUser } = await db.from('customer_users').select('*').eq('id', latestUser.family_head_id).maybeSingle();
+        if (headUser) {
+          return Object.assign({}, headUser, {
+            id: latestUser.id,
+            name: latestUser.name,
+            phone: latestUser.phone,
+            pin: latestUser.pin,
+            family_head_id: latestUser.family_head_id,
+            vendor_phone: headUser.vendor_phone // కేవలం కస్టమర్ UI లో పాలబ్బాయి వివరాలు కనిపించడానికి మాత్రమే
+          });
+        }
+      }
+      return latestUser;
+    }
+
     async function setupUserSession(user, isNewUser = false) {
       applyUserProfileToState(user);
 
       document.getElementById('authSection').classList.add('hidden-force');
       document.getElementById('mainAppSection').classList.remove('hidden-force');
 
-      // Refresh latest user record from DB (in case vendor updated milk_type, shift, rate, quota, etc.)
-      const { data: freshUser } = await db.from('customer_users').select('*').eq('id', user.id).maybeSingle();
-      if (freshUser) {
-        applyUserProfileToState(freshUser);
+      const effectiveUser = await loadEffectiveUserProfile(user.id);
+      if (effectiveUser) {
+        applyUserProfileToState(effectiveUser);
       }
 
       await syncVendorPhoneOnSessionStart(currentUser);
@@ -1241,6 +1266,11 @@
     }
 
     async function syncVendorPhoneOnSessionStart(user) {
+      // ఫ్యామిలీ మెంబర్ అకౌంట్‌ని ఎప్పుడూ వెండర్‌కి సింక్ చేయకూడదు!
+      if (user.family_head_id) {
+        return;
+      }
+
       const localM = getMilkmanProfile();
       if (localM.phone && localM.phone.length === 10 && user.vendor_phone !== localM.phone) {
         const { error } = await db.from('customer_users').update({ vendor_phone: localM.phone }).eq('id', user.id);
@@ -1251,7 +1281,7 @@
       } else if (!localM.phone && user.vendor_phone && user.vendor_phone.length === 10) {
         const { data: vData } = await db.from('vendors').select('name').eq('phone', user.vendor_phone).maybeSingle();
         const vName = vData && vData.name ? vData.name : localM.name;
-        localStorage.setItem(`milkman_profile_${user.id}`, JSON.stringify({ name: vName || '', phone: user.vendor_phone, upi: localM.upi || '' }));
+        localStorage.setItem(`milkman_profile_${ getHouseUserId() }`, JSON.stringify({ name: vName || '', phone: user.vendor_phone, upi: localM.upi || '' }));
       }
     }
 
@@ -1336,7 +1366,7 @@
       updateAutoModeUI();
       renderApp();
 
-      await db.from('customer_users').update({ auto_mode: isAutoMode }).eq('id', currentUser.id);
+      await db.from('customer_users').update({ auto_mode: isAutoMode }).eq('id', getHouseUserId());
       showToast(isAutoMode ? "ఆటో మోడ్ ఆన్ చేయబడింది (Auto-fill ON)" : "మాన్యువల్ మోడ్ ఆన్ చేయబడింది (Auto-fill OFF)");
     }
 
@@ -1358,7 +1388,7 @@
       }
     }
 
-    // 4. MONTH NAVIGATION & DATA FETCHING (Synced with Vendor Updates!)
+    // 4. MONTH NAVIGATION & DATA FETCHING (Synced with Vendor & Family Head Updates!)
     function changeMonth(delta) {
       currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
       fetchMonthData(false);
@@ -1368,10 +1398,10 @@
       const syncIcon = document.getElementById('custSyncIcon');
       if (syncIcon) syncIcon.classList.add('animate-spin');
 
-      // Also refresh customer profile settings from DB so vendor edits reflect immediately
-      const { data: latestUser } = await db.from('customer_users').select('*').eq('id', currentUser.id).maybeSingle();
-      if (latestUser) {
-        applyUserProfileToState(latestUser);
+      // Refresh customer profile settings (or Family Head's settings if linked)
+      const effectiveUser = await loadEffectiveUserProfile(currentUser.id);
+      if (effectiveUser) {
+        applyUserProfileToState(effectiveUser);
         updateAutoModeUI();
         updateMilkmanCardUI();
       }
@@ -1475,7 +1505,7 @@
         ratePerLiter = val;
         currentUser.price_per_ltr = val;
         localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
-        await db.from('customer_users').update({ price_per_ltr: val }).eq('id', currentUser.id);
+        await db.from('customer_users').update({ price_per_ltr: val }).eq('id', getHouseUserId());
         closePriceModal();
         showToast(`పాల రేటు ₹${ratePerLiter}/L గా మారింది!`);
         renderApp();
@@ -1532,7 +1562,7 @@
         evening_rate: eRate
       };
 
-      const { error } = await db.from('customer_users').update(updatePayload).eq('id', currentUser.id);
+      const { error } = await db.from('customer_users').update(updatePayload).eq('id', getHouseUserId());
       if (error) return alert('Error: ' + error.message);
 
       Object.assign(currentUser, updatePayload);
@@ -2075,11 +2105,14 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       fetchMonthData(false);
     }
 
-    // B. Milkman Contact, Vendor Auto-Lookup & DB Sync
+    // B. Milkman Contact, Vendor Auto-Lookup & DB Sync (Uses House User ID so Family shares same Milkman)
     function getMilkmanProfile() {
       if (!currentUser) return { name: '', phone: '', upi: '' };
+      const houseId = getHouseUserId();
       try {
-        const saved = JSON.parse(localStorage.getItem(`milkman_profile_${currentUser.id}`)) || { name: '', phone: '', upi: '' };
+        const saved = JSON.parse(localStorage.getItem(`milkman_profile_${houseId}`))
+          || JSON.parse(localStorage.getItem(`milkman_profile_${currentUser.id}`))
+          || { name: '', phone: '', upi: '' };
         if (!saved.phone && currentUser.vendor_phone) {
           saved.phone = currentUser.vendor_phone;
         }
@@ -2163,10 +2196,18 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       btn.innerText = 'సేవ్ అవుతోంది...';
 
       const vendorPhoneToSave = phone.length === 10 ? phone : null;
+      const houseId = getHouseUserId();
+
+      // FIX: ఎప్పుడూ మెయిన్ హెడ్ అకౌంట్ (houseId) కి మాత్రమే vendor_phone అప్‌డేట్ అవుతుంది!
       const { error } = await db
         .from('customer_users')
         .update({ vendor_phone: vendorPhoneToSave })
-        .eq('id', currentUser.id);
+        .eq('id', houseId);
+
+      // ఒకవేళ ఫ్యామిలీ మెంబర్ సేవ్ చేస్తుంటే, ఫ్యామిలీ మెంబర్ సొంత అకౌంట్‌లో vendor_phone: null గానే ఉంచాలి
+      if (currentUser.family_head_id) {
+        await db.from('customer_users').update({ vendor_phone: null }).eq('id', currentUser.id);
+      }
 
       btn.disabled = false;
       btn.innerText = 'సేవ్ చేయండి';
@@ -2177,7 +2218,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
       currentUser.vendor_phone = vendorPhoneToSave;
       localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
-      localStorage.setItem(`milkman_profile_${currentUser.id}`, JSON.stringify({ name, phone, upi }));
+      localStorage.setItem(`milkman_profile_${houseId}`, JSON.stringify({ name, phone, upi }));
 
       updateMilkmanCardUI();
       closeMilkmanModal();
@@ -2219,7 +2260,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
     // C. Payment & Due Ledger + UPI Pay (Synced with Vendor Billing Ledger!)
     function getLedgerKey(year, month) {
-      return `milk_ledger_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
+      return `milk_ledger_${getHouseUserId()}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
 
     function getEffectiveLedger(year, month) {
@@ -2446,7 +2487,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
     // E. Quality & SNF / Issue Log (Synced directly to Supabase for Vendor Alerts!)
     function getQualityStorageKey(year, month) {
-      return `milk_quality_${currentUser.id}_${year}_${String(month + 1).padStart(2, '0')}`;
+      return `milk_quality_${getHouseUserId()}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
 
     function getMonthQualityNotes(year, month) {
@@ -2469,7 +2510,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(notes));
       document.getElementById('customQualityInput').value = noteText;
 
-      // Sync quality_note + shift quantities to Supabase customer_milk_logs so Vendor gets instant Quality Alert!
       const logDate = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const existing = monthRecords[day];
       const qty = existing ? existing.liters : defaultDailyQuota;
@@ -2559,7 +2599,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       return currentUser.family_head_id || currentUser.id;
     }
 
-    // E3. FAMILY MEMBER LINKING LOGIC
+    // E3. FAMILY MEMBER LINKING LOGIC (Updated: Prevents Vendor Duplicate Customer!)
     function openFamilyModal() {
       document.getElementById('familyMemberPhoneInput').value = '';
       const statusBox = document.getElementById('familyLinkedStatusBox');
@@ -2599,9 +2639,14 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
 
       const houseId = getHouseUserId();
+
+      // FIX: vendor_phone: null చేయడం వల్ల వెండర్ యాప్‌లో ఈ ఫ్యామిలీ నంబర్ కొత్త కస్టమర్‌గా యాడ్ అవ్వదు!
       const { error: updErr } = await db
         .from('customer_users')
-        .update({ family_head_id: houseId, vendor_phone: currentUser.vendor_phone || memberUser.vendor_phone })
+        .update({ 
+          family_head_id: houseId, 
+          vendor_phone: null 
+        })
         .eq('id', memberUser.id);
 
       btn.disabled = false;
@@ -2615,8 +2660,9 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
     async function unlinkFamilyAccount() {
       if (!confirm('ఫ్యామిలీ అకౌంట్ లింక్ తొలగించాలా?')) return;
-      await db.from('customer_users').update({ family_head_id: null }).eq('id', currentUser.id);
+      await db.from('customer_users').update({ family_head_id: null, vendor_phone: null }).eq('id', currentUser.id);
       currentUser.family_head_id = null;
+      currentUser.vendor_phone = null;
       localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
       closeFamilyModal();
       showToast('ఫ్యామిలీ లింక్ తొలగించబడింది!');

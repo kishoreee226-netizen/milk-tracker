@@ -211,13 +211,13 @@
   </button>
 
   <!-- 6. Download / Share Monthly Bill -->
-  <button onclick="if(typeof downloadMonthlyBill === 'function') printBillReceipt(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <button onclick="if(typeof downloadMonthlyBill === 'function') shareOnWhatsApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-file-pdf text-indigo-600 text-base shrink-0"></i>
     <span>నెలవారీ బిల్లు PDF</span>
   </button>
 
   <!-- 7. Call / WhatsApp Vendor -->
-  <button onclick="if(typeof contactVendor === 'function') callMilkmanLink(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <button onclick="if(typeof contactVendor === 'function') chatMilkmanWhatsApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
     <span>వెండర్‌ను సంప్రదించండి</span>
   </button>

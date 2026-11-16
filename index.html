@@ -125,10 +125,9 @@
       </div>
     </section>
 
-      <!-- 2. MAIN APP CONTAINER -->
+       <!-- 2. MAIN APP CONTAINER -->
     <div id="mainAppSection" class="hidden-force flex-1 flex flex-col">
-           
-<!-- TOP HEADER (100% Fixed & Properly Closed Tags) -->
+            <!-- TOP HEADER (100% Fixed & Properly Closed Tags) -->
       <header class="bg-gradient-to-r from-sky-600 via-brand-600 to-blue-700 text-white px-3 pt-2.5 pb-2 sticky top-0 z-30 shadow-md relative">
         
         <!-- Top 3-Row Exact Parallel Grid Layout -->
@@ -148,14 +147,14 @@
             </button>
           </div>
 
-<!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
+          <!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
           <div class="flex justify-end">
             <button onclick="logoutCustomer()" class="text-[9px] bg-rose-500/35 hover:bg-rose-500/50 border border-rose-300/50 px-1.5 py-0.5 rounded-md text-rose-100 font-bold flex items-center gap-1 shadow-sm transition-colors shrink-0">
               <i class="ph-bold ph-sign-out text-[10px] text-rose-200"></i> లాగౌట్
             </button>
           </div>
 
- <!-- ROW 2 LEFT: Customer Name ONLY -->
+          <!-- ROW 2 LEFT: Customer Name ONLY -->
           <div class="min-w-0">
             <span id="userPhoneBadge" class="hidden">User</span>
             <button onclick="openProfileModal()" title="ప్రొఫైల్ మార్చండి" class="text-[15px] leading-tight text-amber-200 hover:text-white font-extrabold flex items-center gap-1 underline decoration-sky-200/60 underline-offset-2 truncate max-w-full">
@@ -174,7 +173,7 @@
               <i class="ph-bold ph-dots-three-vertical text-sm"></i>
             </button>
 
-    <!-- 11-Option Dropdown Menu -->
+            <!-- 11-Option Dropdown Menu -->
             <div id="custHeaderMenu" class="hidden absolute right-0 top-8 w-56 max-h-[75vh] overflow-y-auto bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
               
               <!-- 1. Profile / PIN -->
@@ -183,7 +182,7 @@
                 <span>ప్రొఫైల్ / PIN మార్పు</span>
               </button>
 
-   <!-- 2. Milk Quota & Shift Rates -->
+              <!-- 2. Milk Quota & Shift Rates -->
               <button onclick="openQuotaModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
                 <i class="ph-bold ph-sliders text-amber-600 text-base shrink-0"></i>
                 <span>పాలు & ధరల సెట్టింగ్స్</span>
@@ -195,13 +194,13 @@
                 <span class="text-emerald-700 font-bold">Pay UPI (బిల్లు చెల్లింపు)</span>
               </button>
 
-      <!-- 4. Vacation / Pause Milk -->
+              <!-- 4. Vacation / Pause Milk -->
               <button onclick="if(typeof openVacationModal === 'function') openVacationModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
                 <i class="ph-bold ph-calendar-slash text-orange-500 text-base shrink-0"></i>
                 <span>సెలవు / పాలు ఆపండి</span>
               </button>
 
-  <!-- 5. Quality Alert / Complaint -->
+              <!-- 5. Quality Alert / Complaint -->
               <button onclick="if(typeof openQualityModal === 'function') openQualityModal(); else openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
                 <i class="ph-bold ph-warning-circle text-rose-500 text-base shrink-0"></i>
                 <span>పాల నాణ్యత ఫిర్యాదు</span>
@@ -213,7 +212,7 @@
                 <span>నెలవారీ బిల్లు PDF</span>
               </button>
 
-    <!-- 7. Call / WhatsApp Vendor -->
+              <!-- 7. Call / WhatsApp Vendor -->
               <button onclick="if(typeof contactVendor === 'function') contactVendor(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
                 <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
                 <span>వెండర్‌ను సంప్రదించండి</span>
@@ -221,13 +220,13 @@
 
               <div class="border-t border-slate-100 my-1"></div>
 
-    <!-- 8. Share Customer App -->
+              <!-- 8. Share Customer App -->
               <button onclick="if(typeof shareCustomerApp === 'function') shareCustomerApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
                 <i class="ph-bold ph-share-network text-sky-600 text-base shrink-0"></i>
                 <span>Share Customer App</span>
               </button>
 
-          <!-- 9. Share Vendor App -->
+              <!-- 9. Share Vendor App -->
               <button onclick="if(typeof shareVendorApp === 'function') shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
                 <i class="ph-bold ph-truck text-teal-600 text-base shrink-0"></i>
                 <span>Share Vendor App</span>
@@ -258,7 +257,7 @@
             </span>
           </div>
 
-  <!-- ROW 3 RIGHT: Compact Raise Ticket -->
+          <!-- ROW 3 RIGHT: Compact Raise Ticket -->
           <div class="flex justify-end">
             <button onclick="openSupportModal()" class="text-[9px] bg-amber-400/30 hover:bg-amber-400/40 border border-amber-300/60 px-1.5 py-0.5 rounded-md text-amber-100 font-extrabold flex items-center gap-0.5 shadow-sm transition-colors shrink-0">
               <i class="ph-bold ph-ticket text-[10px] text-amber-200"></i> Raise Ticket
@@ -267,9 +266,9 @@
 
         </div>
 
- <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR -->
+   <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR (నెల పేరు కట్ అవ్వకుండా సెట్ చేశాము) -->
         <div class="mt-2 grid grid-cols-[auto_1fr] gap-1.5 items-center">
-                 
+          
           <!-- Left: Compact Highlighted Shift Rates Button -->
           <button onclick="openQuotaModal()" title="పాలు & ధరలు మార్చండి" class="h-9 px-2 rounded-xl bg-slate-950/45 hover:bg-slate-950/60 active:scale-95 transition-all border border-amber-300/60 shadow-md flex items-center gap-1 shrink-0">
             <div class="flex items-center gap-1 text-[11px] leading-none">

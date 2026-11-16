@@ -173,7 +173,7 @@
               <i class="ph-bold ph-dots-three-vertical text-sm"></i>
             </button>
 
-           <!-- Dropdown Menu Start (15 Options + Zero Background Scroll) -->
+           <!-- Dropdown Menu Start (15 Options with Exact App Functions & Zero Background Scroll) -->
 <div id="custHeaderMenu" 
      ontouchstart="this._startY = event.touches[0].clientY;"
      ontouchmove="const dy = event.touches[0].clientY - this._startY; const atTop = this.scrollTop <= 0 && dy > 0; const atBottom = this.scrollTop + this.clientHeight >= this.scrollHeight && dy < 0; if (this.scrollHeight <= this.clientHeight || atTop || atBottom) event.preventDefault(); event.stopPropagation();"
@@ -193,45 +193,45 @@
   </button>
 
   <!-- 3. Pay UPI -->
-  <button onclick="if(typeof payViaUPI === 'function') payViaUPI(); else if(typeof openUpiModal === 'function') openUpiModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-emerald-50 flex items-center gap-2.5 transition-colors">
+  <button onclick="payViaUPI(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-emerald-50 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-currency-inr text-emerald-600 text-base shrink-0"></i>
     <span class="text-emerald-700 font-bold">Pay UPI (బిల్లు చెల్లింపు)</span>
   </button>
 
   <!-- 4. Vacation / Pause Milk -->
-  <button onclick="if(typeof openVacationModal === 'function') openVacationModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <button onclick="openVacationModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-calendar-slash text-orange-500 text-base shrink-0"></i>
     <span>సెలవు / పాలు ఆపండి</span>
   </button>
 
-  <!-- 5. Quality Alert / Complaint -->
-  <button onclick="if(typeof openQualityModal === 'function') openQualityModal(); else openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 5. Quality Alert / Complaint (Opens Today's Day Modal for Quality Note) -->
+  <button onclick="openDayModal(new Date().getDate()); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-warning-circle text-rose-500 text-base shrink-0"></i>
     <span>పాల నాణ్యత ఫిర్యాదు</span>
   </button>
 
-  <!-- 6. Download / Share Monthly Bill -->
-  <button onclick="if(typeof downloadMonthlyBill === 'function') shareOnWhatsApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 6. Download Monthly Bill PDF (Exact Function: printBillReceipt) -->
+  <button onclick="printBillReceipt(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-file-pdf text-indigo-600 text-base shrink-0"></i>
     <span>నెలవారీ బిల్లు PDF</span>
   </button>
 
-  <!-- 7. Call / WhatsApp Vendor -->
-  <button onclick="if(typeof contactVendor === 'function') chatMilkmanWhatsApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 7. Contact Vendor (Exact Function: openMilkmanModal) -->
+  <button onclick="openMilkmanModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
     <span>వెండర్‌ను సంప్రదించండి</span>
   </button>
 
   <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 8. Share Customer App -->
-  <button onclick="if(typeof shareCustomerApp === 'function') shareAppLink(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
+  <!-- 8. Share Customer App (Exact Function: shareAppLink) -->
+  <button onclick="shareAppLink(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-share-network text-sky-600 text-base shrink-0"></i>
     <span>Share Customer App</span>
   </button>
 
-  <!-- 9. Share Vendor App -->
-  <button onclick="if(typeof shareVendorApp === 'function') shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
+  <!-- 9. Share Vendor App (Exact Function: shareVendorApp) -->
+  <button onclick="shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-truck text-teal-600 text-base shrink-0"></i>
     <span>Share Vendor App</span>
   </button>
@@ -246,26 +246,26 @@
 
   <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 11. About Us (NEW) -->
-  <button onclick="if(typeof openAboutModal === 'function') openAboutModal(); else if(typeof openInfoModal === 'function') openInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 11. About Us -->
+  <button onclick="openCustInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-info text-blue-600 text-base shrink-0"></i>
     <span>About Us (మా గురించి)</span>
   </button>
 
-  <!-- 12. Why Choose Us (NEW) -->
-  <button onclick="if(typeof openWhyChooseUsModal === 'function') openWhyChooseUsModal(); else if(typeof openInfoModal === 'function') openInfoModal('why'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 12. Why Choose Us -->
+  <button onclick="openCustInfoModal('why'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-star text-amber-500 text-base shrink-0"></i>
     <span>Why Choose Us</span>
   </button>
 
-  <!-- 13. Privacy Policy (NEW) -->
-  <button onclick="if(typeof openPrivacyModal === 'function') openPrivacyModal(); else if(typeof openInfoModal === 'function') openInfoModal('privacy'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 13. Privacy Policy -->
+  <button onclick="openCustInfoModal('privacy'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
     <span>Privacy Policy</span>
   </button>
 
-  <!-- 14. Terms & Conditions (NEW) -->
-  <button onclick="if(typeof openTermsModal === 'function') openTermsModal(); else if(typeof openInfoModal === 'function') openInfoModal('terms'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+  <!-- 14. Terms & Conditions -->
+  <button onclick="openCustInfoModal('terms'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-file-text text-slate-600 text-base shrink-0"></i>
     <span>Terms & Conditions</span>
   </button>

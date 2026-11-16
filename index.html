@@ -127,7 +127,8 @@
 
       <!-- 2. MAIN APP CONTAINER -->
     <div id="mainAppSection" class="hidden-force flex-1 flex flex-col">
-      <!-- TOP HEADER (ఒరిజినల్ బ్లూ కలర్ థీమ్‌తో) -->
+           
+<!-- TOP HEADER (100% Fixed & Properly Closed Tags) -->
       <header class="bg-gradient-to-r from-sky-600 via-brand-600 to-blue-700 text-white px-3 pt-2.5 pb-2 sticky top-0 z-30 shadow-md relative">
         
         <!-- Top 3-Row Exact Parallel Grid Layout -->
@@ -138,7 +139,7 @@
             <i class="ph-bold ph-drop text-2xl text-amber-200"></i>
           </div>
 
-   <!-- ROW 1 LEFT: Only MilkCount Larger + Old Size Customer & PROFILE -->
+          <!-- ROW 1 LEFT: Larger MilkCount + Customer + PROFILE -->
           <div class="flex items-center gap-1 min-w-0 pr-1">
             <h1 class="text-[16px] font-extrabold tracking-tight leading-none shrink-0">MilkCount</h1>
             <span class="text-[8px] bg-white/20 px-1.5 py-0.5 rounded-full font-semibold shrink-0">Customer</span>
@@ -147,16 +148,15 @@
             </button>
           </div>
 
-  <!-- ROW 1 RIGHT: Old Size Light-Red లాగౌట్ -->
+<!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
           <div class="flex justify-end">
             <button onclick="logoutCustomer()" class="text-[9px] bg-rose-500/35 hover:bg-rose-500/50 border border-rose-300/50 px-1.5 py-0.5 rounded-md text-rose-100 font-bold flex items-center gap-1 shadow-sm transition-colors shrink-0">
               <i class="ph-bold ph-sign-out text-[10px] text-rose-200"></i> లాగౌట్
             </button>
           </div>
 
-          <!-- ROW 2 LEFT: Customer Name ONLY (పెద్దగా, కట్ అవ్వకుండా వస్తుంది) -->
+ <!-- ROW 2 LEFT: Customer Name ONLY -->
           <div class="min-w-0">
-            <!-- JS కోసం ఒరిజినల్ userPhoneBadge ని దాచి ఉంచాము -->
             <span id="userPhoneBadge" class="hidden">User</span>
             <button onclick="openProfileModal()" title="ప్రొఫైల్ మార్చండి" class="text-[15px] leading-tight text-amber-200 hover:text-white font-extrabold flex items-center gap-1 underline decoration-sky-200/60 underline-offset-2 truncate max-w-full">
               <span id="custNameOnly" class="truncate">User</span>
@@ -164,36 +164,93 @@
             </button>
           </div>
 
-          <!-- ROW 2 RIGHT: Sync + 3-Dot Menu Button -->
+          <!-- ROW 2 RIGHT: Sync + Emerald 3-Dot Menu Button + 11-Item Dropdown -->
           <div class="flex items-center justify-end gap-1.5 shrink-0 relative">
             <button onclick="fetchMonthData(true)" title="వెండర్ అప్‌డేట్స్ సింక్ చేయండి" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center text-white border border-white/25 transition-all">
               <i id="custSyncIcon" class="ph-bold ph-arrows-clockwise text-sm"></i>
             </button>
 
-   <!-- 3-Dot Menu Button (Light Emerald Green) -->
-<button onclick="document.getElementById('custHeaderMenu').classList.toggle('hidden')" title="మెనూ" class="w-7 h-7 rounded-lg bg-emerald-400/30 hover:bg-emerald-400/45 active:scale-95 flex items-center justify-center text-emerald-100 border border-emerald-300/50 shadow-sm transition-all">
-  <i class="ph-bold ph-dots-three-vertical text-sm"></i>
-</button>
+            <button onclick="document.getElementById('custHeaderMenu').classList.toggle('hidden')" title="మెనూ" class="w-7 h-7 rounded-lg bg-emerald-400/30 hover:bg-emerald-400/45 active:scale-95 flex items-center justify-center text-emerald-100 border border-emerald-300/50 shadow-sm transition-all">
+              <i class="ph-bold ph-dots-three-vertical text-sm"></i>
+            </button>
 
-            <!-- 3-Dot Dropdown Menu -->
-            <div id="custHeaderMenu" class="hidden absolute right-0 top-8 w-44 bg-white text-slate-800 rounded-xl shadow-xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
-              <button onclick="openProfileModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2">
-                <i class="ph-bold ph-user-circle text-sky-600 text-sm"></i> ప్రొఫైల్ మార్చండి
+    <!-- 11-Option Dropdown Menu -->
+            <div id="custHeaderMenu" class="hidden absolute right-0 top-8 w-56 max-h-[75vh] overflow-y-auto bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+              
+              <!-- 1. Profile / PIN -->
+              <button onclick="openProfileModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-user-circle text-sky-600 text-base shrink-0"></i>
+                <span>ప్రొఫైల్ / PIN మార్పు</span>
               </button>
-              <button onclick="openQuotaModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2">
-                <i class="ph-bold ph-sliders text-amber-600 text-sm"></i> పాలు & ధరల సెట్టింగ్స్
+
+   <!-- 2. Milk Quota & Shift Rates -->
+              <button onclick="openQuotaModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-sliders text-amber-600 text-base shrink-0"></i>
+                <span>పాలు & ధరల సెట్టింగ్స్</span>
               </button>
-              <button onclick="openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2">
-                <i class="ph-bold ph-ticket text-emerald-600 text-sm"></i> Raise Ticket / సపోర్ట్
+
+              <!-- 3. Pay UPI -->
+              <button onclick="if(typeof payViaUPI === 'function') payViaUPI(); else if(typeof openUpiModal === 'function') openUpiModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-emerald-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-currency-inr text-emerald-600 text-base shrink-0"></i>
+                <span class="text-emerald-700 font-bold">Pay UPI (బిల్లు చెల్లింపు)</span>
               </button>
+
+      <!-- 4. Vacation / Pause Milk -->
+              <button onclick="if(typeof openVacationModal === 'function') openVacationModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-calendar-slash text-orange-500 text-base shrink-0"></i>
+                <span>సెలవు / పాలు ఆపండి</span>
+              </button>
+
+  <!-- 5. Quality Alert / Complaint -->
+              <button onclick="if(typeof openQualityModal === 'function') openQualityModal(); else openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-warning-circle text-rose-500 text-base shrink-0"></i>
+                <span>పాల నాణ్యత ఫిర్యాదు</span>
+              </button>
+
+              <!-- 6. Download / Share Monthly Bill -->
+              <button onclick="if(typeof downloadMonthlyBill === 'function') downloadMonthlyBill(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-file-pdf text-indigo-600 text-base shrink-0"></i>
+                <span>నెలవారీ బిల్లు PDF</span>
+              </button>
+
+    <!-- 7. Call / WhatsApp Vendor -->
+              <button onclick="if(typeof contactVendor === 'function') contactVendor(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
+                <span>వెండర్‌ను సంప్రదించండి</span>
+              </button>
+
               <div class="border-t border-slate-100 my-1"></div>
-              <button onclick="logoutCustomer()" class="w-full px-3 py-2 text-left hover:bg-rose-50 text-rose-600 flex items-center gap-2">
-                <i class="ph-bold ph-sign-out text-sm"></i> లాగౌట్
+
+    <!-- 8. Share Customer App -->
+              <button onclick="if(typeof shareCustomerApp === 'function') shareCustomerApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-share-network text-sky-600 text-base shrink-0"></i>
+                <span>Share Customer App</span>
               </button>
+
+          <!-- 9. Share Vendor App -->
+              <button onclick="if(typeof shareVendorApp === 'function') shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-truck text-teal-600 text-base shrink-0"></i>
+                <span>Share Vendor App</span>
+              </button>
+
+              <div class="border-t border-slate-100 my-1"></div>
+
+              <!-- 10. Raise Ticket / App Support -->
+              <button onclick="openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-ticket text-purple-600 text-base shrink-0"></i>
+                <span>Raise Ticket / సపోర్ట్</span>
+              </button>
+
+              <!-- 11. Logout -->
+              <button onclick="logoutCustomer()" class="w-full px-3 py-2 text-left hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-sign-out text-base shrink-0"></i>
+                <span>లాగౌట్</span>
+              </button>
+
             </div>
           </div>
 
-          <!-- ROW 3 LEFT: Phone Number ONLY (పేరు కింద నేరుగా వస్తుంది) -->
+          <!-- ROW 3 LEFT: Phone Number ONLY (నేరుగా పేరు కింద ఉంటుంది) -->
           <div class="min-w-0 flex items-center text-[11px] text-sky-100 font-bold">
             <span id="custPhoneWrap" class="flex items-center gap-1 truncate">
               <i class="ph-fill ph-phone text-[10px] text-amber-300 shrink-0"></i>
@@ -201,7 +258,7 @@
             </span>
           </div>
 
-          <!-- ROW 3 RIGHT: Compact Raise Ticket (వెడల్పు తగ్గించాము) -->
+  <!-- ROW 3 RIGHT: Compact Raise Ticket -->
           <div class="flex justify-end">
             <button onclick="openSupportModal()" class="text-[9px] bg-amber-400/30 hover:bg-amber-400/40 border border-amber-300/60 px-1.5 py-0.5 rounded-md text-amber-100 font-extrabold flex items-center gap-0.5 shadow-sm transition-colors shrink-0">
               <i class="ph-bold ph-ticket text-[10px] text-amber-200"></i> Raise Ticket
@@ -210,9 +267,9 @@
 
         </div>
 
-              <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR (నెల పేరు కట్ అవ్వకుండా సెట్ చేశాము) -->
+ <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR -->
         <div class="mt-2 grid grid-cols-[auto_1fr] gap-1.5 items-center">
-          
+                 
           <!-- Left: Compact Highlighted Shift Rates Button -->
           <button onclick="openQuotaModal()" title="పాలు & ధరలు మార్చండి" class="h-9 px-2 rounded-xl bg-slate-950/45 hover:bg-slate-950/60 active:scale-95 transition-all border border-amber-300/60 shadow-md flex items-center gap-1 shrink-0">
             <div class="flex items-center gap-1 text-[11px] leading-none">

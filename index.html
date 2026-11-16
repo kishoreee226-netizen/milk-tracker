@@ -278,17 +278,23 @@
     <span>Why Choose Us</span>
   </button>
 
-  <!-- 16. Privacy Policy -->
-  <button onclick="openCustInfoModal('privacy'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
-    <span>Privacy Policy</span>
-  </button>
+   <!-- 16. Privacy Policy (Opens separate privacy.html page) -->
+  <a href="./privacy.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
+    <span class="flex items-center gap-2.5">
+      <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
+      <span>Privacy Policy</span>
+    </span>
+    <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
+  </a>
 
-  <!-- 17. Terms & Conditions -->
-  <button onclick="openCustInfoModal('terms'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-file-text text-slate-600 text-base shrink-0"></i>
-    <span>Terms & Conditions</span>
-  </button>
+  <!-- 17. Terms & Conditions (Opens separate terms.html page) -->
+  <a href="./terms.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
+    <span class="flex items-center gap-2.5">
+      <i class="ph-bold ph-file-text text-slate-600 text-base shrink-0"></i>
+      <span>Terms & Conditions</span>
+    </span>
+    <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
+  </a>
 
   <div class="border-t border-slate-100 my-1"></div>
 

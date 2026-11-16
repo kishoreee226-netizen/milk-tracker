@@ -3186,6 +3186,91 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
   </script>
+<!-- CUSTOMER INFO MODAL (About Us & Why Choose Us Only) -->
+<div id="custInfoModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
+    
+    <!-- Modal Header -->
+    <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3.5 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2">
+        <i id="custInfoModalIcon" class="ph-bold ph-info text-xl text-amber-200"></i>
+        <h3 id="custInfoModalTitle" class="text-sm font-extrabold tracking-wide">సమాచారం</h3>
+      </div>
+      <button onclick="closeCustInfoModal()" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
+        <i class="ph-bold ph-x text-sm"></i>
+      </button>
+    </div>
+
+    <!-- Modal Scrollable Body -->
+    <div id="custInfoModalBody" class="p-4 overflow-y-auto overscroll-contain text-xs text-slate-700 space-y-3 leading-relaxed">
+    </div>
+
+    <!-- Modal Footer -->
+    <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+      <button onclick="closeCustInfoModal()" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition">
+        మూసివేయి (Close)
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+  const CUST_INFO_CONTENT = {
+    about: {
+      title: 'About Us (మా గురించి)',
+      icon: 'ph-bold ph-info text-amber-200',
+      html: `
+        <div class="bg-sky-50 border border-sky-100 rounded-xl p-3 text-sky-900 font-semibold">
+          <strong>MilkCount Customer App</strong> అనేది ప్రతి కుటుంబానికి రోజువారీ పాల లెక్కలను మరియు నెలవారీ బిల్లులను పారదర్శకంగా చూపించే స్మార్ట్ డిజిటల్ డైరీ యాప్.
+        </div>
+        <p>పాత పద్ధతిలో పాల కార్డులు లేదా పేపర్ డైరీలు పోగొట్టుకోవడం, నెలాఖరులో లెక్కల్లో తప్పులు రావడం వంటి సమస్యలకు చెక్ పెట్టేందుకే <strong>MilkCount</strong> రూపొందించబడింది.</p>
+        <ul class="list-disc pl-4 space-y-1.5 text-slate-700">
+          <li><strong>లైవ్ వెండర్ సింక్:</strong> మీ పాల వ్యాపారి (Vendor) వేసే ప్రతి రోజు డెలివరీ ఎంట్రీ మీ యాప్‌లో వెంటనే కనిపిస్తుంది.</li>
+          <li><strong>ఉదయం & సాయంత్రం లెక్కలు:</strong> గేదె పాలు, ఆవు పాలు మరియు షిఫ్ట్ వారీగా ధరలను స్పష్టంగా ట్రాక్ చేసుకోవచ్చు.</li>
+          <li><strong>సులభమైన కమ్యూనికేషన్:</strong> ఒక్క క్లిక్‌తో రేపటి పాలు ఆపడం (Skip Tomorrow) లేదా అదనపు పాలు అడగడం చేయవచ్చు.</li>
+        </ul>
+      `
+    },
+    why: {
+      title: 'Why Choose Us (మమ్మల్ని ఎందుకు ఎంచుకోవాలి?)',
+      icon: 'ph-bold ph-star text-amber-300',
+      html: `
+        <div class="space-y-2.5">
+          <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
+            <div class="font-bold text-emerald-800">✅ 100% పారదర్శకమైన బిల్లింగ్</div>
+            <div class="text-slate-600 mt-0.5">ఏ రోజు ఎన్ని లీటర్లు వచ్చాయో క్యాలెండర్‌లో రంగులతో సహా స్పష్టంగా కనిపిస్తుంది. లెక్కల్లో ఒక్క రూపాయి కూడా తేడా రాదు.</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-100">
+            <div class="font-bold text-amber-800">⚡ త్వరిత అప్‌డేట్స్ (Quick Actions)</div>
+            <div class="text-slate-600 mt-0.5">ఊరికి వెళ్తున్నప్పుడు వెండర్‌కు ఫోన్ చేయాల్సిన పని లేకుండా యాప్ నుండే సెలవు (Pause Milk) పెట్టవచ్చు.</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100">
+            <div class="font-bold text-sky-800">💳 సులభమైన UPI & బిల్లు PDF</div>
+            <div class="text-slate-600 mt-0.5">నెల పూర్తయిన వెంటనే మొత్తం బిల్లును చూసుకుని నేరుగా UPI ద్వారా చెల్లించవచ్చు మరియు రసీదు పొందవచ్చు.</div>
+          </div>
+          <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-100">
+            <div class="font-bold text-purple-800">🛡️ నాణ్యత ఫిర్యాదు & సపోర్ట్</div>
+            <div class="text-slate-600 mt-0.5">పాల నాణ్యతలో ఏదైనా సమస్య ఉంటే నేరుగా యాప్ నుండే ఫిర్యాదు (Quality Alert) పంపే సౌకర్యం.</div>
+          </div>
+        </div>
+      `
+    }
+  };
+
+  function openCustInfoModal(type) {
+    const data = CUST_INFO_CONTENT[type];
+    if (!data) return;
+    document.getElementById('custInfoModalTitle').textContent = data.title;
+    document.getElementById('custInfoModalIcon').className = data.icon + ' text-xl';
+    document.getElementById('custInfoModalBody').innerHTML = data.html;
+    document.getElementById('custInfoModal').classList.remove('hidden-force');
+  }
+
+  function closeCustInfoModal() {
+    document.getElementById('custInfoModal').classList.add('hidden-force');
+  }
+</script>
 
 </body>
 </html>

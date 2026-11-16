@@ -48,7 +48,10 @@
         </section>
 
         <div class="mt-10 pt-6 border-t border-gray-100">
-            <a href="./index.html" class="text-indigo-600 hover:text-indigo-800 font-medium">&larr; Back to App</a>
+            <button onclick="window.close(); setTimeout(() => { if(!window.closed) history.back(); }, 100);" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-xs active:scale-95 transition">
+  ← వెనక్కి (Back to App)
+</button>
+
         </div>
     </div>
 </body>

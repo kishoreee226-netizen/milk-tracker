@@ -65,7 +65,9 @@
   <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-2xl relative border-x border-slate-200">
 
     <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
-    <section id="authSection" class="p-6 flex-1 flex flex-col justify-center items-center">
+        <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
+    <section id="authSection" class="hidden-force p-6 flex-1 flex flex-col justify-center items-center">
+
       <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 mb-4 shadow-sm">
         <i class="ph-bold ph-drop text-3xl"></i>
       </div>
@@ -129,10 +131,10 @@
     <div id="mainAppSection" class="hidden-force flex-1 flex flex-col">
             <!-- TOP HEADER (100% Fixed & Properly Closed Tags) -->
       <header class="bg-gradient-to-r from-sky-600 via-brand-600 to-blue-700 text-white px-3 pt-2.5 pb-2 sticky top-0 z-30 shadow-md relative">
-        
+
         <!-- Top 3-Row Exact Parallel Grid Layout -->
         <div class="grid grid-cols-[auto_1fr_auto] gap-x-2 gap-y-1 items-center">
-          
+
           <!-- Logo: మొత్తం 3 వరుసలకు సమానంగా (Row 1, 2, 3) -->
           <div class="row-span-3 w-11 h-14 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0">
             <i class="ph-bold ph-drop text-2xl text-amber-200"></i>
@@ -179,7 +181,7 @@
      ontouchmove="const dy = event.touches.clientY - this._startY; const atTop = this.scrollTop <= 0 && dy > 0; const atBottom = this.scrollTop + this.clientHeight >= this.scrollHeight && dy < 0; if (this.scrollHeight <= this.clientHeight || atTop || atBottom) event.preventDefault(); event.stopPropagation();"
      onwheel="event.stopPropagation();"
      class="hidden absolute right-0 top-8 w-56 max-h-[75vh] overflow-y-auto overscroll-contain bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
-  
+
   <!-- 1. Profile / PIN -->
   <button onclick="openProfileModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-user-circle text-sky-600 text-base shrink-0"></i>
@@ -328,7 +330,7 @@
 
    <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR (నెల పేరు కట్ అవ్వకుండా సెట్ చేశాము) -->
         <div class="mt-2 grid grid-cols-[auto_1fr] gap-1.5 items-center">
-          
+
           <!-- Left: Compact Highlighted Shift Rates Button -->
           <button onclick="openQuotaModal()" title="పాలు & ధరలు మార్చండి" class="h-9 px-2 rounded-xl bg-slate-950/45 hover:bg-slate-950/60 active:scale-95 transition-all border border-amber-300/60 shadow-md flex items-center gap-1 shrink-0">
             <div class="flex items-center gap-1 text-[11px] leading-none">
@@ -354,7 +356,7 @@
           </div>
 
         </div>
-        
+
         <!-- 100% Bug-Free Split Script (పేరు 2వ వరుసలోకి, ఫోన్ నంబర్ 3వ వరుసలోకి విడదీస్తుంది) -->
         <script>
           (function() {
@@ -398,7 +400,7 @@
 
       <!-- MAIN SCROLLABLE CONTENT -->
       <main class="flex-1 overflow-y-auto px-2 pt-1.5 space-y-1.5 pb-28">
-         
+
         <!-- LIVE VENDOR DELIVERY STATUS & FAMILY SYNC BAR -->
         <div id="liveDeliveryStatusBanner" class="bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2">
           <div class="flex items-center gap-2 min-w-0">
@@ -633,7 +635,17 @@
             </h3>
             <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium" id="billMonthBadge">నవంబర్ 2026</span>
           </div>
-
+          <!-- SHIFT BILL FILTER TABS (Both / Morning / Evening) -->
+          <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl text-[11px] font-extrabold">
+            <button id="billTabBoth" onclick="setBillFilter('both')" class="py-1.5 rounded-lg bg-white text-sky-700 shadow-xs transition-all">మొత్తం (Both)</button>
+            <button id="billTabMorning" onclick="setBillFilter('morning')" class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all">🌅 ఉదయం బిల్లు</button>
+            <button id="billTabEvening" onclick="setBillFilter('evening')" class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all">🌇 సాయంత్రం బిల్లు</button>
+          </div>
+          <p id="activeBillVendorBanner" class="text-[10px] font-bold text-indigo-700 bg-indigo-50 border border-indigo-100 px-2.5 py-1 rounded-lg flex items-center justify-between">
+            <span>👤 పాలబ్బాయి: --</span>
+            <span id="activeBillShiftTag">Both Shifts</span>
+          </p>
+          
           <div class="space-y-2 text-xs">
             <div class="flex justify-between text-slate-600">
               <span>మొత్తం రోజులు (Total Month Days):</span>
@@ -647,11 +659,11 @@
               <span>సెలవులు / వద్దన్న రోజులు (Skipped):</span>
               <span id="billSkippedDays" class="font-medium text-rose-600">0 రోజులు</span>
             </div>
-            <div class="flex justify-between text-slate-600">
+            <div id="billMorningRow" class="flex justify-between text-slate-600">
               <span>🌅 ఉదయం పాలు (<span id="billMorningTypeLabel">Buffalo</span>):</span>
               <span id="billMorningSummary" class="font-bold text-slate-800">0.0 L (₹0)</span>
             </div>
-            <div class="flex justify-between text-slate-600">
+            <div id="billEveningRow" class="flex justify-between text-slate-600">
               <span>🌇 సాయంత్రం పాలు (<span id="billEveningTypeLabel">Cow</span>):</span>
               <span id="billEveningSummary" class="font-bold text-slate-800">0.0 L (₹0)</span>
             </div>
@@ -1013,36 +1025,57 @@
       </div>
     </div>
 
-    <!-- MODAL 5: MILKMAN CONTACT, VENDOR SYNC & UPI SETTINGS -->
+    <!-- MODAL 5: DUAL-SHIFT MILKMAN CONTACT & VENDOR SYNC -->
     <div id="milkmanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
           <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-              <i class="ph-fill ph-user-circle text-sky-600"></i> పాలబ్బాయి వివరాలు (Milkman)
-            </h4>
-            <p class="text-[10px] text-slate-500">నంబర్ సేవ్ చేస్తే వెండర్ యాప్‌కు ఆటోమేటిక్‌గా లింక్ అవుతుంది</p>
+            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5"><i class="ph-fill ph-user-circle text-sky-600"></i> పాలబ్బాయి వివరాలు</h4>
+            <p class="text-[10px] text-slate-500">ఒకే పాలబ్బాయా లేదా వేర్వేరు పాలబ్బాయిలా ఎంచుకోండి</p>
           </div>
-          <button onclick="closeMilkmanModal()" class="text-slate-400 hover:text-slate-600">
-            <i class="ph-bold ph-x text-sm"></i>
-          </button>
+          <button onclick="closeMilkmanModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-sm"></i></button>
         </div>
 
-        <div class="space-y-2.5">
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">వాట్సాప్ / ఫోన్ నంబర్ (10 అంకెలు):</label>
-            <input type="tel" id="milkmanPhoneInput" maxlength="10" oninput="lookupVendorByPhone(this.value)" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-            <p id="vendorLookupHint" class="hidden-force text-[10px] text-emerald-700 font-bold mt-1"></p>
+        <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl text-[11px] font-bold">
+          <button type="button" id="milkmanModeSingleBtn" onclick="setMilkmanMode('single')" class="py-1.5 rounded-lg bg-white text-sky-700 shadow-xs">ఒకే పాలబ్బాయి</button>
+          <button type="button" id="milkmanModeDualBtn" onclick="setMilkmanMode('dual')" class="py-1.5 rounded-lg text-slate-600">వేర్వేరు (🌅 / 🌇)</button>
+        </div>
+
+        <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 space-y-2">
+          <span id="primaryMilkmanBoxTitle" class="text-[11px] font-extrabold text-amber-900 block">🌅 ఉదయం పాలబ్బాయి</span>
+          <input type="tel" id="milkmanPhoneInput" maxlength="10" oninput="lookupVendorByPhone(this.value, 'morning')" placeholder="ఫోన్ నంబర్ (10 అంకెలు)" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+          <p id="vendorLookupHint" class="hidden-force text-[10px] text-emerald-700 font-bold"></p>
+          <div class="grid grid-cols-2 gap-1.5">
+            <input type="text" id="milkmanNameInput" placeholder="పేరు (ఉదా: రాజు)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            <input type="text" id="milkmanUpiInput" placeholder="UPI ID" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
           </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">పాలబ్బాయి / డెయిరీ పేరు (Name):</label>
-            <input type="text" id="milkmanNameInput" placeholder="ఉదా: రాజు గారు" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">UPI ID (GPay / PhonePe కోసం - ఐచ్ఛికం):</label>
-            <input type="text" id="milkmanUpiInput" placeholder="ఉదా: 9876543210@ybl" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-sky-500">
+          <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-1.5">
+            <a id="callMilkmanLink" href="#" class="py-1.5 rounded-lg bg-white border border-sky-200 text-sky-800 font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-bold ph-phone"></i> కాల్</a>
+            <button type="button" onclick="chatMilkmanWhatsApp('morning')" class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-fill ph-whatsapp-logo"></i> వాట్సాప్</button>
           </div>
         </div>
+
+        <div id="eveningMilkmanBox" class="hidden-force bg-sky-50/70 border border-sky-200 rounded-xl p-3 space-y-2">
+          <span class="text-[11px] font-extrabold text-sky-900 block">🌇 సాయంత్రం పాలబ్బాయి</span>
+          <input type="tel" id="eveningMilkmanPhoneInput" maxlength="10" oninput="lookupVendorByPhone(this.value, 'evening')" placeholder="సాయంత్రం పాలబ్బాయి నంబర్" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+          <p id="eveningVendorLookupHint" class="hidden-force text-[10px] text-emerald-700 font-bold"></p>
+          <div class="grid grid-cols-2 gap-1.5">
+            <input type="text" id="eveningMilkmanNameInput" placeholder="పేరు (ఉదా: శీను)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            <input type="text" id="eveningMilkmanUpiInput" placeholder="Evening UPI ID" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+          </div>
+          <div id="eveningMilkmanDirectActions" class="hidden-force grid grid-cols-2 gap-1.5">
+            <a id="callEveningMilkmanLink" href="#" class="py-1.5 rounded-lg bg-white border border-sky-200 text-sky-800 font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-bold ph-phone"></i> కాల్</a>
+            <button type="button" onclick="chatMilkmanWhatsApp('evening')" class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-fill ph-whatsapp-logo"></i> వాట్సాప్</button>
+          </div>
+        </div>
+
+        <div class="flex gap-2 pt-1">
+          <button onclick="closeMilkmanModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button id="saveMilkmanBtn" onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
+        </div>
+      </div>
+    
+    
 
         <!-- Quick Call & WhatsApp buttons if phone saved -->
         <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-2 pt-1">
@@ -3195,7 +3228,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 <!-- CUSTOMER INFO MODAL (About Us & Why Choose Us Only) -->
 <div id="custInfoModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
-    
+
     <!-- Modal Header -->
     <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3.5 flex items-center justify-between shrink-0">
       <div class="flex items-center gap-2">
@@ -3276,6 +3309,297 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
   function closeCustInfoModal() {
     document.getElementById('custInfoModal').classList.add('hidden-force');
   }
+</script>
+
+<script>
+  let activeBillFilter = 'both';
+  let milkmanEditMode = 'single';
+
+  function setBillFilter(mode) {
+    activeBillFilter = mode;
+    ['both', 'morning', 'evening'].forEach(function(m) {
+      const btn = document.getElementById('billTab' + m.charAt(0).toUpperCase() + m.slice(1));
+      if (!btn) return;
+      btn.className = (m === mode)
+        ? 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs transition-all font-extrabold'
+        : 'py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all font-bold';
+    });
+    renderApp();
+  }
+
+  function setMilkmanMode(mode) {
+    milkmanEditMode = mode;
+    const sBtn = document.getElementById('milkmanModeSingleBtn');
+    const dBtn = document.getElementById('milkmanModeDualBtn');
+    const evBox = document.getElementById('eveningMilkmanBox');
+    const titleEl = document.getElementById('primaryMilkmanBoxTitle');
+    if (!sBtn || !dBtn || !evBox || !titleEl) return;
+    if (mode === 'dual') {
+      sBtn.className = 'py-1.5 rounded-lg text-slate-600';
+      dBtn.className = 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs';
+      evBox.classList.remove('hidden-force');
+      titleEl.innerText = '🌅 ఉదయం పాలబ్బాయి (Morning)';
+    } else {
+      sBtn.className = 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs';
+      dBtn.className = 'py-1.5 rounded-lg text-slate-600';
+      evBox.classList.add('hidden-force');
+      titleEl.innerText = '🌅🌇 పాలబ్బాయి (Both Shifts)';
+    }
+  }
+
+  window.getMilkmanProfile = function(shift) {
+    shift = shift || 'morning';
+    if (!currentUser) return { mode: 'single', name: '', phone: '', upi: '', evName: '', evPhone: '', evUpi: '' };
+    const houseId = getHouseUserId();
+    let saved = {};
+    try {
+      saved = JSON.parse(localStorage.getItem('milkman_profile_' + houseId)) || JSON.parse(localStorage.getItem('milkman_profile_' + currentUser.id)) || {};
+    } catch (e) {}
+    const base = {
+      mode: saved.mode || (saved.evPhone ? 'dual' : 'single'),
+      name: saved.name || '', phone: saved.phone || currentUser.vendor_phone || '', upi: saved.upi || '',
+      evName: saved.evName || '', evPhone: saved.evPhone || '', evUpi: saved.evUpi || ''
+    };
+    if (shift === 'evening' && base.mode === 'dual') return { name: base.evName, phone: base.evPhone, upi: base.evUpi, mode: 'dual', full: base };
+    return { name: base.name, phone: base.phone, upi: base.upi, mode: base.mode, full: base };
+  };
+
+  window.updateMilkmanCardUI = function() {
+    const m = getMilkmanProfile('morning').full;
+    const nameEl = document.getElementById('milkmanCardName');
+    const subEl = document.getElementById('milkmanCardSub');
+    if (!nameEl || !subEl) return;
+    if (m.mode === 'dual' && (m.evName || m.evPhone)) {
+      nameEl.innerText = (m.name || 'ఉదయం') + ' / ' + (m.evName || 'సాయంత్రం');
+      subEl.innerText = '🌅' + (m.phone ? m.phone.slice(-4) : '--') + ' • 🌇' + (m.evPhone ? m.evPhone.slice(-4) : '--');
+    } else if (m.name || m.phone) {
+      nameEl.innerText = m.name || m.phone;
+      subEl.innerText = m.phone ? '📞 ' + m.phone : 'UPI Saved';
+    } else {
+      nameEl.innerText = 'నంబర్ సేవ్';
+      subEl.innerText = 'Add Milkman';
+    }
+  };
+
+  window.lookupVendorByPhone = async function(phoneVal, which) {
+    which = which || 'morning';
+    const hintEl = document.getElementById(which === 'evening' ? 'eveningVendorLookupHint' : 'vendorLookupHint');
+    const nameInput = document.getElementById(which === 'evening' ? 'eveningMilkmanNameInput' : 'milkmanNameInput');
+    const clean = (phoneVal || '').trim();
+    if (clean.length !== 10 || isNaN(clean)) { if (hintEl) hintEl.classList.add('hidden-force'); return; }
+    const { data: vData } = await db.from('vendors').select('name').eq('phone', clean).maybeSingle();
+    if (vData && vData.name && hintEl) {
+      hintEl.innerText = '✓ MilkCount వెండర్: ' + vData.name;
+      hintEl.classList.remove('hidden-force');
+      if (nameInput && !nameInput.value.trim()) nameInput.value = vData.name;
+    } else if (hintEl) hintEl.classList.add('hidden-force');
+  };
+
+  window.openMilkmanModal = function() {
+    const m = getMilkmanProfile('morning').full;
+    setMilkmanMode(m.mode || 'single');
+    document.getElementById('milkmanNameInput').value = m.name || '';
+    document.getElementById('milkmanPhoneInput').value = m.phone || '';
+    document.getElementById('milkmanUpiInput').value = m.upi || '';
+    document.getElementById('eveningMilkmanNameInput').value = m.evName || '';
+    document.getElementById('eveningMilkmanPhoneInput').value = m.evPhone || '';
+    document.getElementById('eveningMilkmanUpiInput').value = m.evUpi || '';
+    const act1 = document.getElementById('milkmanDirectActions');
+    if (m.phone && m.phone.length === 10) { act1.classList.remove('hidden-force'); document.getElementById('callMilkmanLink').href = 'tel:' + m.phone; }
+    else act1.classList.add('hidden-force');
+    const act2 = document.getElementById('eveningMilkmanDirectActions');
+    if (m.evPhone && m.evPhone.length === 10) { act2.classList.remove('hidden-force'); document.getElementById('callEveningMilkmanLink').href = 'tel:' + m.evPhone; }
+    else act2.classList.add('hidden-force');
+    document.getElementById('milkmanModal').classList.remove('hidden-force');
+  };
+
+  window.saveMilkmanProfile = async function() {
+    const name = document.getElementById('milkmanNameInput').value.trim();
+    const phone = document.getElementById('milkmanPhoneInput').value.trim();
+    const upi = document.getElementById('milkmanUpiInput').value.trim();
+    const evName = document.getElementById('eveningMilkmanNameInput').value.trim();
+    const evPhone = document.getElementById('eveningMilkmanPhoneInput').value.trim();
+    const evUpi = document.getElementById('eveningMilkmanUpiInput').value.trim();
+    if (phone && (phone.length !== 10 || isNaN(phone))) return alert('ఉదయం పాలబ్బాయి 10 అంకెల నంబర్ నమోదు చేయండి.');
+    if (milkmanEditMode === 'dual' && evPhone && (evPhone.length !== 10 || isNaN(evPhone))) return alert('సాయంత్రం పాలబ్బాయి 10 అంకెల నంబర్ నమోదు చేయండి.');
+    const btn = document.getElementById('saveMilkmanBtn');
+    btn.disabled = true; btn.innerText = 'సేవ్ అవుతోంది...';
+    const vendorPhoneToSave = phone.length === 10 ? phone : null;
+    const houseId = getHouseUserId();
+    await db.from('customer_users').update({ vendor_phone: vendorPhoneToSave }).eq('id', houseId);
+    if (currentUser.family_head_id) await db.from('customer_users').update({ vendor_phone: null }).eq('id', currentUser.id);
+    btn.disabled = false; btn.innerText = 'సేవ్ చేయండి';
+    currentUser.vendor_phone = vendorPhoneToSave;
+    localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+    localStorage.setItem('milkman_profile_' + houseId, JSON.stringify({ mode: milkmanEditMode, name, phone, upi, evName, evPhone, evUpi }));
+    updateMilkmanCardUI();
+    closeMilkmanModal();
+    renderApp();
+    showToast('పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
+  };
+
+  window.chatMilkmanWhatsApp = function(which) {
+    const m = getMilkmanProfile(which || 'morning');
+    if (!m.phone) return;
+    const msg = encodeURIComponent('నమస్కారం ' + (m.name || 'గారు') + ', నేను ' + (currentUser.name || 'Customer') + ' మాట్లాడుతున్నాను.');
+    window.location.href = 'whatsapp://send?phone=91' + m.phone + '&text=' + msg;
+  };
+</script>
+
+<script>
+  const _origRenderAppV15 = renderApp;
+  window.renderApp = function() {
+    _origRenderAppV15();
+
+    const year = currentViewingDate.getFullYear();
+    const month = currentViewingDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate();
+    const now = new Date();
+    const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
+    userRegDate.setHours(0, 0, 0, 0);
+
+         // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) cleanly inside the box
+    const grid = document.getElementById('calendarDaysGrid');
+    if (grid) {
+      grid.querySelectorAll('button').forEach(function(btn, idx) {
+        const day = idx + 1;
+        const item = monthRecords[day];
+        const cDate = new Date(year, month, day);
+        let mQ = 0, eQ = 0, isDel = false;
+        if (item && item.status === 'delivered' && item.liters > 0) {
+          isDel = true;
+          mQ = item.morning_qty !== undefined ? parseFloat(item.morning_qty) : item.liters;
+          eQ = item.evening_qty !== undefined ? parseFloat(item.evening_qty) : 0;
+        } else if (!item && cDate <= now && cDate >= userRegDate && isAutoMode) {
+          isDel = true; mQ = morningQuota; eQ = eveningQuota;
+        }
+        if (isDel && (mQ > 0 || eQ > 0)) {
+          btn.classList.remove('h-14');
+          btn.classList.add('h-16');
+          const box = btn.querySelector('div.my-auto');
+          if (box) {
+            if (mQ > 0 && eQ > 0) {
+              box.innerHTML =
+                '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap">🌅 ' + mQ + 'L</div>' +
+                '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap">🌇 ' + eQ + 'L</div>';
+            } else if (mQ > 0) {
+              box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap">🌅 ' + mQ + 'L</span>';
+            } else {
+              box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap">🌇 ' + eQ + 'L</span>';
+            }
+          }
+        }
+      });
+    }
+
+
+    // 2. Shift-wise bill calculation
+    let mDays = 0, eDays = 0, bothDays = 0, skipDays = 0, totM = 0, totE = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cDate = new Date(year, month, d);
+      const rec = monthRecords[d];
+      if (rec) {
+        if (rec.status === 'delivered' && rec.liters > 0 && cDate <= now) {
+          const m = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
+          const e = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
+          bothDays++; if (m > 0) { mDays++; totM += m; } if (e > 0) { eDays++; totE += e; }
+        } else if (rec.status === 'skipped') skipDays++;
+      } else if (cDate <= now && cDate >= userRegDate && isAutoMode) {
+        bothDays++;
+        if (morningQuota > 0) { mDays++; totM += morningQuota; }
+        if (eveningQuota > 0) { eDays++; totE += eveningQuota; }
+      }
+    }
+
+    const mBill = Math.round(totM * morningRate), eBill = Math.round(totE * eveningRate);
+    const mInfo = getMilkmanProfile('morning'), eInfo = getMilkmanProfile('evening');
+    const bannerEl = document.getElementById('activeBillVendorBanner');
+    const mRow = document.getElementById('billMorningRow'), eRow = document.getElementById('billEveningRow');
+
+    if (activeBillFilter === 'morning') {
+      currentCalculatedBill = mBill;
+      if (bannerEl) bannerEl.innerHTML = '<span>🌅 ఉదయం పాలబ్బాయి: <strong>' + (mInfo.name || mInfo.phone || 'Not Set') + '</strong></span><span>Morning Only</span>';
+      if (mRow) mRow.style.display = 'flex'; if (eRow) eRow.style.display = 'none';
+      document.getElementById('billDeliveredDays').innerText = mDays + ' రోజులు';
+      document.getElementById('billTotalLiters').innerText = totM.toFixed(1) + ' L';
+      document.getElementById('billFinalAmount').innerText = mBill.toLocaleString('en-IN');
+    } else if (activeBillFilter === 'evening') {
+      currentCalculatedBill = eBill;
+      if (bannerEl) bannerEl.innerHTML = '<span>🌇 సాయంత్రం పాలబ్బాయి: <strong>' + (eInfo.name || eInfo.phone || 'Not Set') + '</strong></span><span>Evening Only</span>';
+      if (mRow) mRow.style.display = 'none'; if (eRow) eRow.style.display = 'flex';
+      document.getElementById('billDeliveredDays').innerText = eDays + ' రోజులు';
+      document.getElementById('billTotalLiters').innerText = totE.toFixed(1) + ' L';
+      document.getElementById('billFinalAmount').innerText = eBill.toLocaleString('en-IN');
+    } else {
+      currentCalculatedBill = mBill + eBill;
+      const vLbl = (mInfo.mode === 'dual' && eInfo.name) ? ((mInfo.name || 'ఉదయం') + ' & ' + eInfo.name) : (mInfo.name || mInfo.phone || 'Not Set');
+      if (bannerEl) bannerEl.innerHTML = '<span>👤 పాలబ్బాయి: <strong>' + vLbl + '</strong></span><span>Both Shifts</span>';
+      if (mRow) mRow.style.display = 'flex'; if (eRow) eRow.style.display = 'flex';
+      document.getElementById('billDeliveredDays').innerText = bothDays + ' రోజులు';
+      document.getElementById('billTotalLiters').innerText = (totM + totE).toFixed(1) + ' L';
+      document.getElementById('billFinalAmount').innerText = (mBill + eBill).toLocaleString('en-IN');
+    }
+    refreshLedgerUI(year, month, currentCalculatedBill);
+
+    // 3. Shift-aware Print / PDF Table
+    const tbody = document.getElementById('printStatementBody');
+    if (tbody) {
+      let rows = '';
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cDate = new Date(year, month, d);
+        const rec = monthRecords[d];
+        let mL = 0, eL = 0, st = '-';
+        if (rec) {
+          if (rec.status === 'delivered' && cDate <= now && rec.liters > 0) {
+            st = 'డెలివరీ';
+            mL = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
+            eL = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
+          } else if (rec.status === 'skipped') st = 'వద్దు';
+        } else if (cDate <= now && cDate >= userRegDate && isAutoMode) {
+          st = 'ఆటో'; mL = morningQuota; eL = eveningQuota;
+        }
+        if (activeBillFilter === 'morning') {
+          const a = Math.round(mL * morningRate);
+          rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + (mL > 0 ? '🌅 డెలివరీ' : st) + '</td><td class="p-1 text-right">' + (mL > 0 ? mL + ' L' : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+        } else if (activeBillFilter === 'evening') {
+          const a = Math.round(eL * eveningRate);
+          rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + (eL > 0 ? '🌇 డెలివరీ' : st) + '</td><td class="p-1 text-right">' + (eL > 0 ? eL + ' L' : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+        } else {
+          const a = Math.round(mL * morningRate) + Math.round(eL * eveningRate);
+          rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + st + '</td><td class="p-1 text-right">' + ((mL > 0 || eL > 0) ? ('🌅' + mL + ' + 🌇' + eL) : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+        }
+      }
+      tbody.innerHTML = rows;
+    }
+  };
+
+  window.shareOnWhatsApp = function() {
+    const year = currentViewingDate.getFullYear(), month = currentViewingDate.getMonth();
+    const daysInMonth = new Date(year, month + 1, 0).getDate(), now = new Date();
+    const reg = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0); reg.setHours(0, 0, 0, 0);
+    let mD = 0, eD = 0, bD = 0, sD = 0, tM = 0, tE = 0;
+    for (let d = 1; d <= daysInMonth; d++) {
+      const cDate = new Date(year, month, d), rec = monthRecords[d];
+      if (rec) {
+        if (rec.status === 'delivered' && rec.liters > 0 && cDate <= now) {
+          const m = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
+          const e = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
+          bD++; if (m > 0) { mD++; tM += m; } if (e > 0) { eD++; tE += e; }
+        } else if (rec.status === 'skipped') sD++;
+      } else if (cDate <= now && cDate >= reg && isAutoMode) {
+        bD++; if (morningQuota > 0) { mD++; tM += morningQuota; } if (eveningQuota > 0) { eD++; tE += eveningQuota; }
+      }
+    }
+    const mB = Math.round(tM * morningRate), eB = Math.round(tE * eveningRate);
+    let title = '🥛 *పాల లెక్క వివరాలు (Full Bill)* 🥛', details = '✅ *రోజులు:* ' + bD + '\n🌅 *ఉదయం:* ' + tM.toFixed(1) + 'L = ₹' + mB + '\n🌇 *సాయంత్రం:* ' + tE.toFixed(1) + 'L = ₹' + eB + '\n💵 *మొత్తం: ₹' + (mB + eB) + '*', target = getMilkmanProfile('morning');
+    if (activeBillFilter === 'morning') {
+      title = '🌅 *ఉదయం పాల బిల్లు* 🌅'; details = '✅ *రోజులు:* ' + mD + '\n🥛 *రకం:* ' + morningMilkType + ' (₹' + morningRate + '/L)\n🍶 *లీటర్లు:* ' + tM.toFixed(1) + ' L\n💵 *ఉదయం బిల్లు: ₹' + mB + '*'; target = getMilkmanProfile('morning');
+    } else if (activeBillFilter === 'evening') {
+      title = '🌇 *సాయంత్రం పాల బిల్లు* 🌇'; details = '✅ *రోజులు:* ' + eD + '\n🥛 *రకం:* ' + eveningMilkType + ' (₹' + eveningRate + '/L)\n🍶 *లీటర్లు:* ' + tE.toFixed(1) + ' L\n💵 *సాయంత్రం బిల్లు: ₹' + eB + '*'; target = getMilkmanProfile('evening');
+    }
+    const msg = encodeURIComponent(title + '\n-------------------------------------\n👤 *కస్టమర్:* ' + (currentUser.name || 'User') + ' (' + currentUser.phone + ')\n📅 *నెల:* ' + TELUGU_MONTHS[month] + ' ' + year + '\n' + details + '\n-------------------------------------\n_MilkCount యాప్ ద్వారా_');
+    window.location.href = (target.phone && target.phone.length === 10) ? ('whatsapp://send?phone=91' + target.phone + '&text=' + msg) : ('whatsapp://send?text=' + msg);
+  };
 </script>
 
 </body>

@@ -461,6 +461,25 @@
             </button>
           </div>
 
+          <!-- NEW: Shift-Wise Skip Selector Bar (Appears when clicking 'రేపు వద్దు' if both shifts active) -->
+          <div id="shiftSkipSelectorBar" class="hidden-force mt-2.5 pt-2.5 border-t border-rose-200/80 space-y-1.5">
+            <div class="flex items-center justify-between">
+              <span class="text-[11px] font-extrabold text-rose-800">రేపు ఏ షిఫ్ట్ పాలు వద్దు?</span>
+              <button onclick="document.getElementById('shiftSkipSelectorBar').classList.add('hidden-force')" class="text-slate-400 hover:text-slate-600 text-xs px-1">✕</button>
+            </div>
+            <div class="grid grid-cols-3 gap-1.5 text-[10px] font-extrabold">
+              <button onclick="applyTomorrowShiftSkip('morning')" class="py-1.5 px-1 rounded-lg bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 text-center">
+                🌅 ఉదయం వద్దు
+              </button>
+              <button onclick="applyTomorrowShiftSkip('evening')" class="py-1.5 px-1 rounded-lg bg-sky-100 hover:bg-sky-200 text-sky-900 border border-sky-300 text-center">
+                🌇 సాయంత్రం వద్దు
+              </button>
+              <button onclick="applyTomorrowShiftSkip('both')" class="py-1.5 px-1 rounded-lg bg-rose-600 hover:bg-rose-700 text-white text-center">
+                🚫 రెండూ వద్దు
+              </button>
+            </div>
+          </div>
+
           <!-- Instant Milkman WhatsApp Alert Banner -->
           <div id="milkmanNotifyBar" class="hidden-force mt-2.5 pt-2.5 border-t border-sky-200/70 flex items-center justify-between gap-2">
             <span id="milkmanNotifyText" class="text-[11px] font-semibold text-slate-700 leading-tight">పాలబ్బాయికి వాట్సాప్‌లో చెప్పాలా?</span>
@@ -1703,7 +1722,7 @@
           const totQ = parseFloat(item.quantity);
           const mQ = item.morning_qty !== undefined && item.morning_qty !== null
             ? parseFloat(item.morning_qty)
-            : (defaultDailyQuota > 0 ? parseFloat((totQ * (morningQuota / defaultDailyQuota)).toFixed(2)) : totQ);
+            : totQ;
           const eQ = item.evening_qty !== undefined && item.evening_qty !== null
             ? parseFloat(item.evening_qty)
             : Math.max(0, parseFloat((totQ - mQ).toFixed(2)));
@@ -1822,6 +1841,15 @@
 
       Object.assign(currentUser, updatePayload);
       applyUserProfileToState(currentUser);
+      
+      // కొత్త షిఫ్ట్ సెట్టింగ్స్ సేవ్ చేసిన తేదీని గుర్తుపెట్టుకుంటుంది (పాత రోజులు మారకుండా!)
+      const todayIso = new Date().toISOString().split('T');
+      localStorage.setItem('shift_effective_from_' + getHouseUserId(), JSON.stringify({
+        date: todayIso,
+        prevM: morningQuota,
+        prevE: eveningQuota
+      }));
+
       closeQuotaModal();
       showToast('ఉదయం & సాయంత్రం పాల వివరాలు వెండర్‌కు సింక్ అయ్యాయి!');
       renderApp();
@@ -3446,7 +3474,18 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
   };
 </script>
 
+  <!------// script B ----!>
 <script>
+  // పాత రోజులలో morning_qty సేవ్ కాకపోతే, దాన్ని కొత్త రేషియోతో విడగొట్టకుండా పూర్తిగా ఉదయం పాలగానే ఉంచుతుంది
+  function getEffectiveStartDate() {
+    if (!currentUser) return '2000-01-01';
+    try {
+      const saved = JSON.parse(localStorage.getItem('shift_effective_from_' + getHouseUserId()));
+      if (saved && saved.date) return saved.date;
+    } catch (e) {}
+    return '2000-01-01';
+  }
+
   const _origRenderAppV15 = renderApp;
   window.renderApp = function() {
     _origRenderAppV15();
@@ -3599,6 +3638,122 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
     }
     const msg = encodeURIComponent(title + '\n-------------------------------------\n👤 *కస్టమర్:* ' + (currentUser.name || 'User') + ' (' + currentUser.phone + ')\n📅 *నెల:* ' + TELUGU_MONTHS[month] + ' ' + year + '\n' + details + '\n-------------------------------------\n_MilkCount యాప్ ద్వారా_');
     window.location.href = (target.phone && target.phone.length === 10) ? ('whatsapp://send?phone=91' + target.phone + '&text=' + msg) : ('whatsapp://send?text=' + msg);
+  };
+</script>
+
+<script>
+  let pendingAlertShift = 'morning';
+
+  window.toggleSkipTomorrow = async function() {
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const y = tomorrow.getFullYear();
+    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const d = String(tomorrow.getDate()).padStart(2, '0');
+    const logDate = `${y}-${m}-${d}`;
+    const dayNum = tomorrow.getDate();
+
+    const isViewingTargetMonth = (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth());
+    const item = isViewingTargetMonth ? monthRecords[dayNum] : null;
+    const isPartiallyOrFullySkipped = item && (item.status === 'skipped' || (morningQuota > 0 && item.morning_qty === 0) || (eveningQuota > 0 && item.evening_qty === 0));
+
+    // ఇప్పటికే ఆపి ఉంటే, తిరిగి నార్మల్ స్థితికి మారుస్తుంది
+    if (isPartiallyOrFullySkipped) {
+      await db.from('customer_milk_logs').delete().eq('user_id', getHouseUserId()).eq('log_date', logDate);
+      if (isViewingTargetMonth) delete monthRecords[dayNum];
+      document.getElementById('shiftSkipSelectorBar').classList.add('hidden-force');
+      showToast(`రేపు (${dayNum}న) తిరిగి ఉదయం & సాయంత్రం సాధారణ స్థితికి మారింది!`);
+      renderApp();
+      return;
+    }
+
+    // రెండు షిఫ్ట్‌లు ఆన్‌లో ఉంటే 3 ఆప్షన్లు (ఉదయం వద్దు / సాయంత్రం వద్దు / రెండూ వద్దు) చూపిస్తుంది
+    if (morningQuota > 0 && eveningQuota > 0) {
+      document.getElementById('shiftSkipSelectorBar').classList.toggle('hidden-force');
+    } else {
+      applyTomorrowShiftSkip('both');
+    }
+  };
+
+  async function applyTomorrowShiftSkip(which) {
+    document.getElementById('shiftSkipSelectorBar').classList.add('hidden-force');
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    const y = tomorrow.getFullYear();
+    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+    const d = String(tomorrow.getDate()).padStart(2, '0');
+    const logDate = `${y}-${m}-${d}`;
+    const dayNum = tomorrow.getDate();
+    const isViewingTargetMonth = (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth());
+
+    let mQty = morningQuota;
+    let eQty = eveningQuota;
+    let status = 'taken';
+    let toastMsg = '';
+    let waMsg = '';
+
+    if (which === 'morning') {
+      mQty = 0;
+      eQty = eveningQuota;
+      status = eQty > 0 ? 'taken' : 'skipped';
+      pendingAlertShift = 'morning';
+      toastMsg = `రేపు (${dayNum}న) 🌅 ఉదయం పాలు వద్దు, 🌇 సాయంత్రం (${eQty}L) వస్తాయి!`;
+      waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) 🌅 ఉదయం పాలు వద్దు (Skip Morning). - ${currentUser.name || 'Customer'}`;
+    } else if (which === 'evening') {
+      mQty = morningQuota;
+      eQty = 0;
+      status = mQty > 0 ? 'taken' : 'skipped';
+      pendingAlertShift = 'evening';
+      toastMsg = `రేపు (${dayNum}న) 🌇 సాయంత్రం పాలు వద్దు, 🌅 ఉదయం (${mQty}L) వస్తాయి!`;
+      waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) 🌇 సాయంత్రం పాలు వద్దు (Skip Evening). - ${currentUser.name || 'Customer'}`;
+    } else {
+      mQty = 0;
+      eQty = 0;
+      status = 'skipped';
+      pendingAlertShift = 'morning';
+      toastMsg = `రేపు (${dayNum}న) ఉదయం & సాయంత్రం రెండూ వద్దని సెట్ చేశాం!`;
+      waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip All). - ${currentUser.name || 'Customer'}`;
+    }
+
+    const totalQ = parseFloat((mQty + eQty).toFixed(2));
+    await db.from('customer_milk_logs').upsert({
+      user_id: getHouseUserId(),
+      log_date: logDate,
+      quantity: totalQ,
+      morning_qty: mQty,
+      evening_qty: eQty,
+      status: status
+    }, { onConflict: 'user_id,log_date' });
+
+    if (isViewingTargetMonth) {
+      monthRecords[dayNum] = {
+        status: status === 'taken' ? 'delivered' : 'skipped',
+        liters: totalQ,
+        morning_qty: mQty,
+        evening_qty: eQty,
+        quality_note: ''
+      };
+    }
+
+    showToast(toastMsg);
+    pendingMilkmanAlertMsg = waMsg;
+    const bar = document.getElementById('milkmanNotifyBar');
+    const txt = document.getElementById('milkmanNotifyText');
+    const targetM = getMilkmanProfile(pendingAlertShift);
+    txt.innerText = targetM.name ? `${targetM.name} గారికి వాట్సాప్‌లో చెప్పాలా?` : 'పాలబ్బాయికి వాట్సాప్‌లో చెప్పాలా?';
+    bar.classList.remove('hidden-force');
+    renderApp();
+  }
+
+  window.sendMilkmanQuickAlert = function() {
+    const m = getMilkmanProfile(pendingAlertShift || 'morning');
+    const encoded = encodeURIComponent(pendingMilkmanAlertMsg);
+    dismissMilkmanAlert();
+    if (m.phone && m.phone.length === 10) {
+      window.location.href = `whatsapp://send?phone=91${m.phone}&text=${encoded}`;
+    } else {
+      window.location.href = `whatsapp://send?text=${encoded}`;
+    }
   };
 </script>
 

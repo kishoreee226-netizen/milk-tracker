@@ -78,9 +78,11 @@
 
         <!-- Quick PIN Lock Container -->
         <div id="quickPinContainer" class="hidden-force text-center space-y-3">
-          <div class="w-12 h-12 bg-sky-100 text-sky-700 rounded-full flex items-center justify-center mx-auto text-lg font-bold">
-            <i class="ph-bold ph-user"></i>
+                    <div class="w-14 h-14 bg-sky-100 text-sky-700 rounded-full overflow-hidden border-2 border-sky-400 flex items-center justify-center mx-auto text-lg font-bold shadow-xs">
+            <img id="quickCustPhotoImg" src="" class="hidden-force w-full h-full object-cover">
+            <i id="quickCustPhotoIcon" class="ph-bold ph-user text-2xl"></i>
           </div>
+
           <div>
             <h3 id="savedUserNameText" class="font-bold text-slate-800 text-base">User</h3>
             <p id="savedUserPhoneText" class="text-xs text-slate-500 font-medium">9876543210</p>
@@ -136,9 +138,12 @@
         <div class="grid grid-cols-[auto_1fr_auto] gap-x-2 gap-y-1 items-center">
 
           <!-- Logo: మొత్తం 3 వరుసలకు సమానంగా (Row 1, 2, 3) -->
-          <div class="row-span-3 w-11 h-14 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0">
-            <i class="ph-bold ph-drop text-2xl text-amber-200"></i>
+                   <!-- Logo / Customer Profile Photo: పాత drop సైజులోనే -->
+          <div onclick="openProfileModal()" title="ప్రొఫైల్ ఫోటో మార్చండి" class="row-span-3 w-11 h-14 rounded-xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0 cursor-pointer">
+            <img id="headerCustBigLogoImg" src="" class="hidden-force w-full h-full object-cover">
+            <i id="headerCustDefaultIcon" class="ph-bold ph-drop text-2xl text-amber-200"></i>
           </div>
+
 
           <!-- ROW 1 LEFT: Larger MilkCount + Customer + PROFILE -->
           <div class="flex items-center gap-1 min-w-0 pr-1">
@@ -268,6 +273,12 @@
 
   <div class="border-t border-slate-100 my-1"></div>
 
+  <!-- Feedback & Rating -->
+  <button onclick="openCustomerFeedbackModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
+    <i class="ph-fill ph-star text-amber-500 text-base shrink-0"></i>
+    <span class="text-amber-800 font-bold">ఫీడ్‌బ్యాక్ & రేటింగ్ (Feedback)</span>
+  </button>
+  
   <!-- 14. About Us -->
   <button onclick="openCustInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-info text-blue-600 text-base shrink-0"></i>
@@ -664,7 +675,7 @@
             <span>👤 పాలబ్బాయి: --</span>
             <span id="activeBillShiftTag">Both Shifts</span>
           </p>
-          
+
           <div class="space-y-2 text-xs">
             <div class="flex justify-between text-slate-600">
               <span>మొత్తం రోజులు (Total Month Days):</span>
@@ -1093,8 +1104,8 @@
           <button id="saveMilkmanBtn" onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
         </div>
       </div>
-    
-    
+
+
 
         <!-- Quick Call & WhatsApp buttons if phone saved -->
         <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-2 pt-1">
@@ -1128,6 +1139,18 @@
           </button>
         </div>
 
+        <!-- Customer Profile Photo Uploader -->
+        <div class="flex flex-col items-center gap-1.5">
+          <div class="w-16 h-16 rounded-full overflow-hidden bg-sky-100 border-2 border-sky-500 flex items-center justify-center shadow-xs">
+            <img id="editCustPhotoPreview" src="" class="hidden-force w-full h-full object-cover">
+            <i id="editCustPhotoIcon" class="ph-bold ph-user text-2xl text-sky-700"></i>
+          </div>
+          <label class="text-[11px] font-extrabold text-sky-700 bg-sky-50 border border-sky-200 px-2.5 py-1 rounded-full cursor-pointer active:scale-95">
+            📷 ప్రొఫైల్ ఫోటో మార్చు / అప్‌లోడ్
+            <input type="file" accept="image/*" class="hidden" onchange="handleCustProfilePhotoUpload(event)">
+          </label>
+        </div>
+        
         <div class="space-y-2.5">
           <div>
             <label class="text-[11px] font-bold text-slate-600 mb-1 block">మొబైల్ నంబర్ (మార్చలేరు):</label>
@@ -1841,7 +1864,7 @@
 
       Object.assign(currentUser, updatePayload);
       applyUserProfileToState(currentUser);
-      
+
       // కొత్త షిఫ్ట్ సెట్టింగ్స్ సేవ్ చేసిన తేదీని గుర్తుపెట్టుకుంటుంది (పాత రోజులు మారకుండా!)
       const todayIso = new Date().toISOString().split('T');
       localStorage.setItem('shift_effective_from_' + getHouseUserId(), JSON.stringify({
@@ -3791,5 +3814,202 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
   };
 </script>
 
+  <!-- CUSTOMER FEEDBACK & RATING MODAL -->
+  <div id="customerFeedbackModal" class="hidden-force fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-xs rounded-3xl shadow-2xl overflow-hidden">
+      <div class="bg-gradient-to-r from-amber-500 to-orange-500 p-4 text-white flex items-center justify-between">
+        <div class="flex items-center gap-2">
+          <i class="ph-fill ph-star text-xl"></i>
+          <h3 class="font-extrabold text-sm">యాప్ ఫీడ్‌బ్యాక్ (Feedback)</h3>
+        </div>
+        <button onclick="document.getElementById('customerFeedbackModal').classList.add('hidden-force')" class="p-1 rounded-lg bg-white/20 hover:bg-white/30">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
+
+      <div class="p-4 space-y-3.5">
+        <div class="text-center">
+          <p class="text-xs font-bold text-slate-600 mb-2">MilkCount యాప్ మీకు ఎలా ఉపయోగపడుతోంది?</p>
+          <div class="flex items-center justify-center gap-2">
+            <button type="button" onclick="setCustFeedbackRating(1)" class="cfb-star text-2xl text-amber-400 active:scale-90">★</button>
+            <button type="button" onclick="setCustFeedbackRating(2)" class="cfb-star text-2xl text-amber-400 active:scale-90">★</button>
+            <button type="button" onclick="setCustFeedbackRating(3)" class="cfb-star text-2xl text-amber-400 active:scale-90">★</button>
+            <button type="button" onclick="setCustFeedbackRating(4)" class="cfb-star text-2xl text-amber-400 active:scale-90">★</button>
+            <button type="button" onclick="setCustFeedbackRating(5)" class="cfb-star text-2xl text-amber-400 active:scale-90">★</button>
+          </div>
+          <span id="cfbRatingLabel" class="text-[11px] font-extrabold text-amber-700 mt-1 block">5 / 5 - చాలా బాగుంది!</span>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-600 mb-1 block">మీ అభిప్రాయం లేదా సలహా రాయండి:</label>
+          <textarea id="cfbMessageInput" rows="3" placeholder="ఉదా: పాల లెక్కలు చూడటం చాలా సులభంగా ఉంది..." class="w-full p-2.5 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-amber-500"></textarea>
+        </div>
+
+        <button id="submitCfbBtn" onclick="submitCustomerFeedback()" class="w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-95 text-white text-xs font-extrabold shadow-sm flex items-center justify-center gap-1.5">
+          <i class="ph-bold ph-paper-plane-tilt text-sm"></i> ఫీడ్‌బ్యాక్ పంపండి
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // CUSTOMER PROFILE PHOTO & FEEDBACK SYSTEM
+    // ==========================================
+    let currentCfbRating = 5;
+
+    function openCustomerFeedbackModal() {
+      currentCfbRating = 5;
+      setCustFeedbackRating(5);
+      document.getElementById('cfbMessageInput').value = '';
+      document.getElementById('customerFeedbackModal').classList.remove('hidden-force');
+    }
+
+    function setCustFeedbackRating(stars) {
+      currentCfbRating = stars;
+      const labels = {
+        1: '1 / 5 - మార్పులు అవసరం',
+        2: '2 / 5 - పర్వాలేదు',
+        3: '3 / 5 - బాగుంది',
+        4: '4 / 5 - చాలా బాగుంది',
+        5: '5 / 5 - అద్భుతంగా ఉంది!'
+      };
+      document.getElementById('cfbRatingLabel').innerText = labels[stars] || '';
+      document.querySelectorAll('.cfb-star').forEach((btn, idx) => {
+        btn.style.color = (idx < stars) ? '#f59e0b' : '#cbd5e1';
+      });
+    }
+
+    async function submitCustomerFeedback() {
+      if (!currentUser) return;
+      const msg = (document.getElementById('cfbMessageInput').value || '').trim();
+      if (!msg) return alert('దయచేసి మీ అభిప్రాయం లేదా సలహా రాయండి.');
+
+      const btn = document.getElementById('submitCfbBtn');
+      btn.disabled = true;
+      btn.innerText = 'పంపుతోంది...';
+
+      const ticketCode = 'CF-' + Math.floor(1000 + Math.random() * 9000);
+
+      try {
+        const { error } = await db.from('support_tickets').insert({
+          ticket_code: ticketCode,
+          user_role: 'customer',
+          user_name: currentUser.name || 'Customer',
+          user_phone: currentUser.phone,
+          category: 'Feedback',
+          description: `⭐ Rating: ${currentCfbRating}/5 Stars\n💬 Customer Feedback: ${msg}`,
+          status: 'Open'
+        });
+
+        if (error) {
+          alert('Error: ' + error.message);
+        } else {
+          document.getElementById('customerFeedbackModal').classList.add('hidden-force');
+          showToast('మీ విలువైన ఫీడ్‌బ్యాక్‌కు ధన్యవాదాలు! 🙏');
+        }
+      } catch (e) {
+        alert('Error: ' + e.message);
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="ph-bold ph-paper-plane-tilt text-sm"></i> ఫీడ్‌బ్యాక్ పంపండి';
+      }
+    }
+
+    // Compress & Save Customer Profile Photo
+    function handleCustProfilePhotoUpload(event) {
+      const file = event.target.files.item(0);
+      if (!file || !currentUser) return;
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const img = new Image();
+        img.onload = function() {
+          const canvas = document.createElement('canvas');
+          canvas.width = 160;
+          canvas.height = 160;
+          const ctx = canvas.getContext('2d');
+          const minSide = Math.min(img.width, img.height);
+          const sx = (img.width - minSide) / 2;
+          const sy = (img.height - minSide) / 2;
+          ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, 160, 160);
+
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          localStorage.setItem('mc_cust_photo_' + currentUser.phone, compressedDataUrl);
+          applyCustProfilePhotoUI(currentUser.phone);
+          showToast('ప్రొఫైల్ ఫోటో సేవ్ అయ్యింది! ✓');
+        };
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    // Apply Saved Customer Photo to Header Big Box, Profile Modal & Quick PIN Circle
+    function applyCustProfilePhotoUI(phone) {
+      if (!phone) return;
+      const photoUrl = localStorage.getItem('mc_cust_photo_' + phone);
+
+      const bigLogoImg = document.getElementById('headerCustBigLogoImg');
+      const defaultIcon = document.getElementById('headerCustDefaultIcon');
+      if (bigLogoImg && defaultIcon) {
+        if (photoUrl) {
+          bigLogoImg.src = photoUrl;
+          bigLogoImg.classList.remove('hidden-force');
+          defaultIcon.classList.add('hidden-force');
+        } else {
+          bigLogoImg.classList.add('hidden-force');
+          defaultIcon.classList.remove('hidden-force');
+        }
+      }
+
+      const editImg = document.getElementById('editCustPhotoPreview');
+      const editIcon = document.getElementById('editCustPhotoIcon');
+      if (editImg && editIcon) {
+        if (photoUrl) {
+          editImg.src = photoUrl;
+          editImg.classList.remove('hidden-force');
+          editIcon.classList.add('hidden-force');
+        } else {
+          editImg.classList.add('hidden-force');
+          editIcon.classList.remove('hidden-force');
+        }
+      }
+
+      const quickImg = document.getElementById('quickCustPhotoImg');
+      const quickIcon = document.getElementById('quickCustPhotoIcon');
+      if (quickImg && quickIcon) {
+        if (photoUrl) {
+          quickImg.src = photoUrl;
+          quickImg.classList.remove('hidden-force');
+          quickIcon.classList.add('hidden-force');
+        } else {
+          quickImg.classList.add('hidden-force');
+          quickIcon.classList.remove('hidden-force');
+        }
+      }
+    }
+
+    // Auto-hook into checkAuth, setupUserSession & openProfileModal without editing old functions!
+    const _origCheckAuthPhoto = checkAuth;
+    window.checkAuth = function() {
+      _origCheckAuthPhoto();
+      if (savedUserCache && savedUserCache.phone) {
+        applyCustProfilePhotoUI(savedUserCache.phone);
+      }
+    };
+
+    const _origSetupSessionPhoto = setupUserSession;
+    window.setupUserSession = async function(user, isNewUser) {
+      await _origSetupSessionPhoto(user, isNewUser);
+      if (user && user.phone) applyCustProfilePhotoUI(user.phone);
+    };
+
+    const _origOpenProfilePhoto = openProfileModal;
+    window.openProfileModal = function() {
+      _origOpenProfilePhoto();
+      if (currentUser && currentUser.phone) applyCustProfilePhotoUI(currentUser.phone);
+    };
+  </script>
+  
 </body>
 </html>

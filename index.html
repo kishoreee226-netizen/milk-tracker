@@ -278,7 +278,7 @@
     <i class="ph-fill ph-star text-amber-500 text-base shrink-0"></i>
     <span class="text-amber-800 font-bold">ఫీడ్‌బ్యాక్ & రేటింగ్ (Feedback)</span>
   </button>
-  
+
   <!-- 14. About Us -->
   <button onclick="openCustInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-info text-blue-600 text-base shrink-0"></i>
@@ -1150,7 +1150,7 @@
             <input type="file" accept="image/*" class="hidden" onchange="handleCustProfilePhotoUpload(event)">
           </label>
         </div>
-        
+
         <div class="space-y-2.5">
           <div>
             <label class="text-[11px] font-bold text-slate-600 mb-1 block">మొబైల్ నంబర్ (మార్చలేరు):</label>
@@ -3916,7 +3916,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-    // Compress & Save Customer Profile Photo
+       // Compress & Save Customer Profile Photo (Local + Supabase Cloud Sync)
     function handleCustProfilePhotoUpload(event) {
       const file = event.target.files.item(0);
       if (!file || !currentUser) return;
@@ -3924,7 +3924,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       const reader = new FileReader();
       reader.onload = function(e) {
         const img = new Image();
-        img.onload = function() {
+        img.onload = async function() {
           const canvas = document.createElement('canvas');
           canvas.width = 160;
           canvas.height = 160;
@@ -3934,20 +3934,59 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
           const sy = (img.height - minSide) / 2;
           ctx.drawImage(img, sx, sy, minSide, minSide, 0, 0, 160, 160);
 
-          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.85);
+          const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
+
+          // 1. Save locally for instant UI display
           localStorage.setItem('mc_cust_photo_' + currentUser.phone, compressedDataUrl);
+          currentUser.profile_pic = compressedDataUrl;
           applyCustProfilePhotoUI(currentUser.phone);
-          showToast('ప్రొఫైల్ ఫోటో సేవ్ అయ్యింది! ✓');
+
+          // 2. Sync to Supabase `customer_users` table (Visible in Vendor App too!)
+          const sbClient = typeof db !== 'undefined' ? db : (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+          if (sbClient) {
+            const { error } = await sbClient
+              .from('customer_users')
+              .update({ profile_pic: compressedDataUrl })
+              .eq('phone', currentUser.phone);
+            if (!error) {
+              showToast('ప్రొఫైల్ ఫోటో క్లౌడ్‌లో సేవ్ అయ్యింది! ✓');
+            } else {
+              console.error('Customer photo cloud sync error:', error);
+              showToast('ప్రొఫైల్ ఫోటో సేవ్ అయ్యింది! ✓');
+            }
+          } else {
+            showToast('ప్రొఫైల్ ఫోటో సేవ్ అయ్యింది! ✓');
+          }
         };
         img.src = e.target.result;
       };
       reader.readAsDataURL(file);
     }
 
-    // Apply Saved Customer Photo to Header Big Box, Profile Modal & Quick PIN Circle
-    function applyCustProfilePhotoUI(phone) {
+    // Apply Saved Customer Photo (Checks LocalStorage first, then fetches from Supabase Cloud)
+    async function applyCustProfilePhotoUI(phone) {
       if (!phone) return;
-      const photoUrl = localStorage.getItem('mc_cust_photo_' + phone);
+      let photoUrl = localStorage.getItem('mc_cust_photo_' + phone);
+
+      if (!photoUrl) {
+        if (typeof currentUser !== 'undefined' && currentUser && currentUser.profile_pic) {
+          photoUrl = currentUser.profile_pic;
+          localStorage.setItem('mc_cust_photo_' + phone, photoUrl);
+        } else {
+          const sbClient = typeof db !== 'undefined' ? db : (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
+          if (sbClient) {
+            const { data } = await sbClient
+              .from('customer_users')
+              .select('profile_pic')
+              .eq('phone', phone)
+              .maybeSingle();
+            if (data && data.profile_pic) {
+              photoUrl = data.profile_pic;
+              localStorage.setItem('mc_cust_photo_' + phone, photoUrl);
+            }
+          }
+        }
+      }
 
       const bigLogoImg = document.getElementById('headerCustBigLogoImg');
       const defaultIcon = document.getElementById('headerCustDefaultIcon');
@@ -3989,27 +4028,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-    // Auto-hook into checkAuth, setupUserSession & openProfileModal without editing old functions!
-    const _origCheckAuthPhoto = checkAuth;
-    window.checkAuth = function() {
-      _origCheckAuthPhoto();
-      if (savedUserCache && savedUserCache.phone) {
-        applyCustProfilePhotoUI(savedUserCache.phone);
-      }
-    };
-
-    const _origSetupSessionPhoto = setupUserSession;
-    window.setupUserSession = async function(user, isNewUser) {
-      await _origSetupSessionPhoto(user, isNewUser);
-      if (user && user.phone) applyCustProfilePhotoUI(user.phone);
-    };
-
-    const _origOpenProfilePhoto = openProfileModal;
-    window.openProfileModal = function() {
-      _origOpenProfilePhoto();
-      if (currentUser && currentUser.phone) applyCustProfilePhotoUI(currentUser.phone);
-    };
   </script>
-  
+
 </body>
 </html>

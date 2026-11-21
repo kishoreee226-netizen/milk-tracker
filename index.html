@@ -63,8 +63,7 @@
 
   <!-- Mobile App Wrapper Frame -->
   <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-2xl relative border-x border-slate-200">
-
-    <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
+  
         <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
     <section id="authSection" class="hidden-force p-6 flex-1 flex flex-col justify-center items-center">
 
@@ -136,10 +135,9 @@
 
         <!-- Top 3-Row Exact Parallel Grid Layout -->
         <div class="grid grid-cols-[auto_1fr_auto] gap-x-2 gap-y-1 items-center">
-
-          <!-- Logo: మొత్తం 3 వరుసలకు సమానంగా (Row 1, 2, 3) -->
-                   <!-- Logo / Customer Profile Photo: పాత drop సైజులోనే -->
-          <div onclick="openProfileModal()" title="ప్రొఫైల్ ఫోటో మార్చండి" class="row-span-3 w-11 h-14 rounded-xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0 cursor-pointer">
+        
+                   <!-- Logo / Customer Profile Photo: పాత drop సైజులోనే మొత్తం 3 వరుసలకు సమానంగా (Row 1, 2, 3)-->
+          <div onclick="openProfileModal()" title="ప్రొఫైల్ ఫోటో మార్చండి" class="row-span-3 w-11 h-13 rounded-xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0 cursor-pointer">
             <img id="headerCustBigLogoImg" src="" class="hidden-force w-full h-full object-cover">
             <i id="headerCustDefaultIcon" class="ph-bold ph-drop text-2xl text-amber-200"></i>
           </div>
@@ -1104,8 +1102,6 @@
         </div>
       </div>
 
-
-
         <!-- Quick Call & WhatsApp buttons if phone saved -->
         <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-2 pt-1">
           <a id="callMilkmanLink" href="#" class="py-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 font-bold text-xs flex items-center justify-center gap-1">
@@ -1762,6 +1758,7 @@
           }
         });
       }
+
       // Merge DB quality notes into local cache
       if (Object.keys(dbQualityNotes).length > 0) {
         const merged = Object.assign({}, getMonthQualityNotes(year, month), dbQualityNotes);
@@ -3259,6 +3256,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         `;
       }).join('');
     }
+
     // Share Vendor App Link via WhatsApp (Uses existing share logic)
     function shareVendorApp() {
       const vendorAppUrl = 'https://kishoreee226-netizen.github.io/milk-tracker-vendor/'; 
@@ -3275,6 +3273,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
   </script>
+
 <!-- CUSTOMER INFO MODAL (About Us & Why Choose Us Only) -->
 <div id="custInfoModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
   <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
@@ -3552,7 +3551,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         }
       });
     }
-
 
     // 2. Shift-wise bill calculation
     let mDays = 0, eDays = 0, bothDays = 0, skipDays = 0, totM = 0, totE = 0;

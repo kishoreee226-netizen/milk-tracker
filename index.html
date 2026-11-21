@@ -144,7 +144,6 @@
             <i id="headerCustDefaultIcon" class="ph-bold ph-drop text-2xl text-amber-200"></i>
           </div>
 
-
           <!-- ROW 1 LEFT: Larger MilkCount + Customer + PROFILE -->
           <div class="flex items-center gap-1 min-w-0 pr-1">
             <h1 class="text-[16px] font-extrabold tracking-tight leading-none shrink-0">MilkCount</h1>
@@ -154,14 +153,14 @@
             </button>
           </div>
 
-          <!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
+   <!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
           <div class="flex justify-end">
             <button onclick="logoutCustomer()" class="text-[9px] bg-rose-500/35 hover:bg-rose-500/50 border border-rose-300/50 px-1.5 py-0.5 rounded-md text-rose-100 font-bold flex items-center gap-1 shadow-sm transition-colors shrink-0">
               <i class="ph-bold ph-sign-out text-[10px] text-rose-200"></i> లాగౌట్
             </button>
           </div>
 
-          <!-- ROW 2 LEFT: Customer Name ONLY -->
+ <!-- ROW 2 LEFT: Customer Name ONLY -->
           <div class="min-w-0">
             <span id="userPhoneBadge" class="hidden">User</span>
             <button onclick="openProfileModal()" title="ప్రొఫైల్ మార్చండి" class="text-[15px] leading-tight text-amber-200 hover:text-white font-extrabold flex items-center gap-1 underline decoration-sky-200/60 underline-offset-2 truncate max-w-full">
@@ -460,7 +459,7 @@
               <span class="text-[9px] text-slate-500 mt-0.5 leading-tight">Extra tomorrow</span>
             </button>
 
-            <!-- Vacation / Date-Range Skip -->
+   <!-- Vacation / Date-Range Skip -->
             <button onclick="openVacationModal()" class="flex flex-col items-start p-2.5 rounded-xl border border-amber-200 bg-white hover:bg-amber-50/60 active:scale-95 transition-all shadow-xs text-left group">
               <div class="flex items-center justify-between w-full">
                 <span class="text-[11px] font-bold text-amber-800 flex items-center gap-1">
@@ -612,7 +611,7 @@
               <p class="text-[10px] text-slate-500">మార్పులు చేయడానికి తేదీపై నొక్కండి</p>
             </div>
 
-            <!-- Color Legend Indicator -->
+       <!-- Color Legend Indicator -->
             <div class="flex items-center gap-2 text-[10px] font-medium text-slate-600">
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>పాలు</span>
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>షెడ్యూల్</span>
@@ -4027,6 +4026,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         }
       }
     }
+
 // Auto-hook into checkAuth, setupUserSession & openProfileModal without editing old functions!
     const _origCheckAuthPhoto = checkAuth;
     window.checkAuth = function() {

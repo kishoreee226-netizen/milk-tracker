@@ -4027,7 +4027,26 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         }
       }
     }
+// Auto-hook into checkAuth, setupUserSession & openProfileModal without editing old functions!
+    const _origCheckAuthPhoto = checkAuth;
+    window.checkAuth = function() {
+      _origCheckAuthPhoto();
+      if (savedUserCache && savedUserCache.phone) {
+        applyCustProfilePhotoUI(savedUserCache.phone);
+      }
+    };
 
+    const _origSetupSessionPhoto = setupUserSession;
+    window.setupUserSession = async function(user, isNewUser) {
+      await _origSetupSessionPhoto(user, isNewUser);
+      if (user && user.phone) applyCustProfilePhotoUI(user.phone);
+    };
+
+    const _origOpenProfilePhoto = openProfileModal;
+    window.openProfileModal = function() {
+      _origOpenProfilePhoto();
+      if (currentUser && currentUser.phone) applyCustProfilePhotoUI(currentUser.phone);
+    };
   </script>
 
 </body>

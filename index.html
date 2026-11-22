@@ -1843,54 +1843,54 @@
       else if (typeEl.value === 'Buffalo' && (rateEl.value === '55' || rateEl.value === '60')) rateEl.value = '75';
     }
     async function saveDefaultQuota() {
-      const mType = document.getElementById('morningMilkTypeSelect').value;
-      const mQty = Math.max(0, parseFloat(document.getElementById('morningQuotaInput').value) || 0);
-      const mRate = Math.max(1, parseFloat(document.getElementById('morningRateInput').value) || 75);
+  const mType = document.getElementById('morningMilkTypeSelect').value;
+  const mQty = Math.max(0, parseFloat(document.getElementById('morningQuotaInput').value) || 0);
+  const mRate = Math.max(1, parseFloat(document.getElementById('morningRateInput').value) || 75);
 
-      const eType = document.getElementById('eveningMilkTypeSelect').value;
-      const eQty = Math.max(0, parseFloat(document.getElementById('eveningQuotaInput').value) || 0);
-      const eRate = Math.max(1, parseFloat(document.getElementById('eveningRateInput').value) || 55);
+  const eType = document.getElementById('eveningMilkTypeSelect').value;
+  const eQty = Math.max(0, parseFloat(document.getElementById('eveningQuotaInput').value) || 0);
+  const eRate = Math.max(1, parseFloat(document.getElementById('eveningRateInput').value) || 55);
 
-      const newArea = document.getElementById('custAreaInputSelf').value.trim() || 'General';
-      const totalQ = parseFloat((mQty + eQty).toFixed(2));
-      if (totalQ <= 0) return alert('ఉదయం లేదా సాయంత్రం కనీసం ఒక షిఫ్ట్‌లో కోటా నమోదు చేయండి.');
+  const newArea = document.getElementById('custAreaInputSelf').value.trim() || 'General';
+  const totalQ = parseFloat((mQty + eQty).toFixed(2));
+  if (totalQ <= 0) return alert('ఉదయం లేదా సాయంత్రం కనీసం ఒక షిఫ్ట్‌లో కోటా నమోదు చేయండి.');
 
-      const combinedShift = (mQty > 0 && eQty > 0) ? 'Both' : (eQty > 0 ? 'Evening' : 'Morning');
-      const primaryType = mQty > 0 ? mType : eType;
-      const primaryRate = mQty > 0 ? mRate : eRate;
+  const combinedShift = (mQty > 0 && eQty > 0) ? 'Both' : (eQty > 0 ? 'Evening' : 'Morning');
+  const primaryType = mQty > 0 ? mType : eType;
+  const primaryRate = mQty > 0 ? mRate : eRate;
 
-      const updatePayload = {
-        daily_qty: totalQ,
-        milk_type: primaryType,
-        shift: combinedShift,
-        route_area: newArea,
-        price_per_ltr: primaryRate,
-        morning_milk_type: mType,
-        morning_qty: mQty,
-        morning_rate: mRate,
-        evening_milk_type: eType,
-        evening_qty: eQty,
-        evening_rate: eRate
-      };
+  const updatePayload = {
+    daily_qty: totalQ,
+    milk_type: primaryType,
+    shift: combinedShift,
+    route_area: newArea,
+    price_per_ltr: primaryRate,
+    morning_milk_type: mType,
+    morning_qty: mQty,
+    morning_rate: mRate,
+    evening_milk_type: eType,
+    evening_qty: eQty,
+    evening_rate: eRate
+  };
 
-      const { error } = await db.from('customer_users').update(updatePayload).eq('id', getHouseUserId());
-      if (error) return alert('Error: ' + error.message);
+  const { error } = await db.from('customer_users').update(updatePayload).eq('id', getHouseUserId());
+  if (error) return alert('Error: ' + error.message);
 
-      Object.assign(currentUser, updatePayload);
-      applyUserProfileToState(currentUser);
+  Object.assign(currentUser, updatePayload);
+  applyUserProfileToState(currentUser);
 
-      // కొత్త షిఫ్ట్ సెట్టింగ్స్ సేవ్ చేసిన తేదీని గుర్తుపెట్టుకుంటుంది (పాత రోజులు మారకుండా!)
-      const todayIso = new Date().toISOString().split('T');
-      localStorage.setItem('shift_effective_from_' + getHouseUserId(), JSON.stringify({
-        date: todayIso,
-        prevM: morningQuota,
-        prevE: eveningQuota
-      }));
+  // కొత్త షిఫ్ట్ సెట్టింగ్స్ సేవ్ చేసిన తేదీని గుర్తుపెట్టుకుంటుంది (పాత రోజులు మారకుండా!)
+  const todayIso = new Date().toISOString().split('T')[0];
+  localStorage.setItem('shift_effective_from_' + getHouseUserId(), JSON.stringify({
+    date: todayIso,
+    prevM: mQty,
+    prevE: eQty
+  }));
 
-      closeQuotaModal();
-      showToast('ఉదయం & సాయంత్రం పాల వివరాలు వెండర్‌కు సింక్ అయ్యాయి!');
-      renderApp();
-    }
+  closeQuotaModal();
+  showToast('ఉదయం & సాయంత్రం పాల వివరాలు వెండర్‌కు సింక్ అయ్యాయి!');
+  renderApp();
+}
 
     // 6. DAY MODAL & ACTIONS
     function openDayModal(day) {
@@ -4141,39 +4141,42 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       read: false
     });
     saveCustNotifications(list);
+    if (typeof triggerPhoneSystemBanner === 'function') {
+      triggerPhoneSystemBanner(title || 'MilkCount', message);
+    }
   }
 
-// 1. ఫోన్ సిస్టమ్ నోటిఫికేషన్ పర్మిషన్ తీసుకోవడానికి
-window.enableCustSystemNotifications = async function() {
-  if (!('Notification' in window)) {
-    return alert('మీ బ్రౌజర్‌లో సిస్టమ్ నోటిఫికేషన్ సపోర్ట్ లేదు.');
-  }
-  const perm = await Notification.requestPermission();
-  if (perm === 'granted') {
-    showToast('ఫోన్ నోటిఫికేషన్లు ఆన్ అయ్యాయి! 🔔');
-  } else {
-    alert('ఫోన్ సెట్టింగ్స్‌లో Notification permission అనుమతించండి.');
-  }
-};
+  // 1. ఫోన్ సిస్టమ్ నోటిఫికేషన్ పర్మిషన్ తీసుకోవడానికి
+  window.enableCustSystemNotifications = async function() {
+    if (!('Notification' in window)) {
+      return alert('మీ బ్రౌజర్‌లో సిస్టమ్ నోటిఫికేషన్ సపోర్ట్ లేదు.');
+    }
+    const perm = await Notification.requestPermission();
+    if (perm === 'granted') {
+      showToast('ఫోన్ నోటిఫికేషన్లు ఆన్ అయ్యాయి! 🔔');
+    } else {
+      alert('ఫోన్ సెట్టింగ్స్‌లో Notification permission అనుమతించండి.');
+    }
+  };
 
-// 2. కొత్త డెలివరీ/బిల్లు అప్‌డేట్ వచ్చినప్పుడు ఫోన్ నోటిఫికేషన్ బార్‌లో చూపించడానికి
-function triggerPhoneSystemBanner(title, message) {
-  if (!('Notification' in window) || Notification.permission !== 'granted') return;
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.ready.then(reg => {
-      reg.showNotification(title, {
-        body: message,
-        icon: './logo-512.png',
-        badge: './favicon.png',
-        vibrate: [200, 100, 200]
+  // 2. కొత్త డెలివరీ/బిల్లు/సెలవు అప్‌డేట్ వచ్చినప్పుడు ఫోన్ నోటిఫికేషన్ బార్‌లో చూపించడానికి
+  function triggerPhoneSystemBanner(title, message) {
+    if (!('Notification' in window) || Notification.permission !== 'granted') return;
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.ready.then(reg => {
+        reg.showNotification(title, {
+          body: message,
+          icon: './logo-512.png',
+          badge: './favicon.png',
+          vibrate: [200, 100, 200]
+        });
+      }).catch(() => {
+        new Notification(title, { body: message, icon: './logo-512.png' });
       });
-    }).catch(() => {
+    } else {
       new Notification(title, { body: message, icon: './logo-512.png' });
-    });
-  } else {
-    new Notification(title, { body: message, icon: './logo-512.png' });
+    }
   }
-}
 
   function renderCustNotificationBadge() {
     const badge = document.getElementById('custNotifBadge');
@@ -4222,16 +4225,16 @@ function triggerPhoneSystemBanner(title, message) {
     saveCustNotifications(updated);
   };
 
-window.clearCustNotifications = function() {
-  const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
-    ? getHouseUserId()
-    : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
-  localStorage.removeItem('mc_cust_notifications_' + uid);
-  const badge = document.getElementById('custNotifBadge');
-  if (badge) badge.classList.add('hidden-force');
-  const listEl = document.getElementById('custNotificationsList');
-  if (listEl) listEl.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
-};
+  window.clearCustNotifications = function() {
+    const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
+      ? getHouseUserId()
+      : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
+    localStorage.removeItem('mc_cust_notifications_' + uid);
+    const badge = document.getElementById('custNotifBadge');
+    if (badge) badge.classList.add('hidden-force');
+    const listEl = document.getElementById('custNotificationsList');
+    if (listEl) listEl.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
+  };
 
   function syncAlertsFromCurrentState() {
     if (typeof currentViewingDate === 'undefined' || !currentViewingDate) return;
@@ -4251,6 +4254,26 @@ window.clearCustNotifications = function() {
           );
         }
       });
+
+      const skippedDays = Object.keys(monthRecords)
+        .filter(dayStr => monthRecords[dayStr] && monthRecords[dayStr].status === 'skipped')
+        .map(dayStr => Number(dayStr))
+        .sort((a, b) => a - b);
+
+      if (skippedDays.length > 0) {
+        const firstDay = skippedDays[0];
+        const lastDay = skippedDays[skippedDays.length - 1];
+        const rangeLabel = (firstDay === lastDay)
+          ? `${firstDay}/${m + 1}`
+          : `${firstDay}/${m + 1} నుండి ${lastDay}/${m + 1} వరకు (${skippedDays.length} రోజులు)`;
+
+        pushCustNotification(
+          `vac_skip_${mKey}_${skippedDays.join('_')}`,
+          '✈️ సెలవులు / Vacation Skip',
+          `${rangeLabel} పాలు 'వద్దు (Skipped)' అని సెట్ చేయబడ్డాయి.`,
+          `${firstDay}/${m + 1}`
+        );
+      }
     }
 
     if (typeof syncedVendorLedger !== 'undefined' && syncedVendorLedger) {

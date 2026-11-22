@@ -240,7 +240,13 @@
     <span>నెలవారీ బిల్లు PDF</span>
   </button>
 
-  <!-- 10. Contact Vendor -->
+<!-- 10. Notifications -->
+<button onclick="openCustNotificationsModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
+  <i class="ph-fill ph-bell text-yellow-500 text-base shrink-0"></i>
+  <span>Notifications (నోటిఫికేషన్లు)</span>
+</button>
+
+  <!-- 11. Contact Vendor -->
   <button onclick="openMilkmanModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
     <span>వెండర్‌ను సంప్రదించండి</span>
@@ -248,13 +254,13 @@
 
   <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 11. Share Customer App -->
+  <!-- 12. Share Customer App -->
   <button onclick="shareAppLink(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-share-network text-sky-600 text-base shrink-0"></i>
     <span>Share Customer App</span>
   </button>
 
-  <!-- 12. Share Vendor App -->
+  <!-- 13. Share Vendor App -->
   <button onclick="shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-share-network text-teal-600 text-base shrink-0"></i>
     <span>Share Vendor App</span>
@@ -262,7 +268,7 @@
 
   <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 13. Raise Ticket / App Support -->
+  <!-- 14. Raise Ticket / App Support -->
   <button onclick="openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-ticket text-purple-600 text-base shrink-0"></i>
     <span>Raise Ticket / సపోర్ట్</span>
@@ -270,25 +276,31 @@
 
   <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- Feedback & Rating -->
+  <!-- 15. Feedback & Rating -->
   <button onclick="openCustomerFeedbackModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
     <i class="ph-fill ph-star text-amber-500 text-base shrink-0"></i>
     <span class="text-amber-800 font-bold">ఫీడ్‌బ్యాక్ & రేటింగ్ (Feedback)</span>
   </button>
 
-  <!-- 14. About Us -->
+  <!-- 16. About Us -->
   <button onclick="openCustInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-info text-blue-600 text-base shrink-0"></i>
     <span>About Us (మా గురించి)</span>
   </button>
 
-  <!-- 15. Why Choose Us -->
+  <!-- 17. Why Choose Us -->
   <button onclick="openCustInfoModal('why'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-star text-amber-500 text-base shrink-0"></i>
     <span>Why Choose Us</span>
   </button>
+  
+<!--18. Contact Us (సంప్రదించండి) -->
+<button onclick="openCustInfoModal('contact'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
+  <i class="ph-bold ph-envelope-simple text-sky-600 text-base shrink-0"></i>
+  <span>Contact Us (సంప్రదించండి)</span>
+</button>
 
-   <!-- 16. Privacy Policy (Opens separate privacy.html page) -->
+   <!-- 19. Privacy Policy (Opens separate privacy.html page) -->
   <a href="./privacy.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
     <span class="flex items-center gap-2.5">
       <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
@@ -297,7 +309,7 @@
     <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
   </a>
 
-  <!-- 17. Terms & Conditions (Opens separate terms.html page) -->
+  <!-- 20. Terms & Conditions (Opens separate terms.html page) -->
   <a href="./terms.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
     <span class="flex items-center gap-2.5">
       <i class="ph-bold ph-file-text text-slate-600 text-base shrink-0"></i>
@@ -308,7 +320,7 @@
 
   <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 18. Logout -->
+  <!-- 21. Logout -->
   <button onclick="logoutCustomer()" class="w-full px-3 py-2 text-left hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition-colors">
     <i class="ph-bold ph-sign-out text-base shrink-0"></i>
     <span>లాగౌట్</span>
@@ -319,12 +331,18 @@
 
           </div>
 
-          <!-- ROW 3 LEFT: Phone Number ONLY (నేరుగా పేరు కింద ఉంటుంది) -->
+          <!-- ROW 3 LEFT: Phone Number & Notifications Baton  (ఉంటాయ్)-->
           <div class="min-w-0 flex items-center text-[11px] text-sky-100 font-bold">
             <span id="custPhoneWrap" class="flex items-center gap-1 truncate">
               <i class="ph-fill ph-phone text-[10px] text-amber-300 shrink-0"></i>
               <span id="custPhoneOnly" class="tracking-wide">--</span>
             </span>
+            
+<button onclick="openCustNotificationsModal()" title="నోటిఫికేషన్లు" class="relative w-6 h-6 rounded-lg bg-amber-300/20 hover:bg-amber-300/30 active:scale-95 flex items-center justify-center text-yellow-300 border border-yellow-300/40 transition-all shrink-0 ml-2">
+    <i class="ph-fill ph-bell text-sm text-yellow-300"></i>
+    <span id="custNotifBadge" class="hidden-force absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-500 text-white text-[8px] font-black flex items-center justify-center">0</span>
+  </button>
+
           </div>
 
           <!-- ROW 3 RIGHT: Compact Raise Ticket -->
@@ -3320,6 +3338,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         </ul>
       `
     },
+    
     why: {
       title: 'Why Choose Us (మమ్మల్ని ఎందుకు ఎంచుకోవాలి?)',
       icon: 'ph-bold ph-star text-amber-300',
@@ -3343,7 +3362,20 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
           </div>
         </div>
       `
+    },
+        contact: {
+      title: 'Contact Us (సంప్రదించండి)',
+      icon: 'ph-bold ph-envelope-simple text-amber-200',
+      html: `
+        <div class="space-y-3 text-center">
+          <p class="text-xs text-slate-600">ఏదైనా సమాచారం లేదా సహాయం కోసం మమ్మల్ని సంప్రదించండి:</p>
+          <a href="mailto:milkcount.saport@gmail.com" class="block bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs font-extrabold text-sky-900 underline break-all select-all">
+            milkcount.saport@gmail.com
+          </a>
+        </div>
+      `
     }
+    
   };
 
   function openCustInfoModal(type) {
@@ -3778,7 +3810,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 </script>
 
 <!-- CUSTOM BRANDED ALERT MODAL (Hides github.io URL & shows 'MilkCount') -->
-<div id="customAppAlertModal" class="hidden-force fixed inset-0 z- bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-5">
+<div id="customAppAlertModal" class="hidden-force fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-5">
   <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
     <!-- App Brand Header -->
     <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3 flex items-center gap-2">
@@ -3848,6 +3880,34 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       </div>
     </div>
   </div>
+
+  <!-- CUSTOMER NOTIFICATION BATON MODAL -->
+<div id="custNotificationsModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeCustNotificationsModal()">
+  <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
+    <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between shrink-0">
+      <div class="flex items-center gap-2">
+        <i class="ph-fill ph-bell text-lg text-amber-200"></i>
+        <h3 class="text-sm font-extrabold">నోటిఫికేషన్లు (Notifications)</h3>
+      </div>
+      <div class="flex items-center gap-2">
+        <button onclick="markAllCustNotificationsRead()" class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg font-bold">
+          అన్నీ చదివినట్టు ✓
+        </button>
+        <button onclick="clearCustNotifications()" class="text-[10px] bg-rose-500/30 hover:bg-rose-500/45 px-2 py-1 rounded-lg font-bold">
+  క్లియర్
+</button>
+
+        <button onclick="closeCustNotificationsModal()" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center">
+          <i class="ph-bold ph-x text-xs"></i>
+        </button>
+      </div>
+    </div>
+
+    <div id="custNotificationsList" class="p-3.5 overflow-y-auto overscroll-contain space-y-2 text-xs">
+      <p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>
+    </div>
+  </div>
+</div>
 
   <script>
     // ==========================================
@@ -4045,6 +4105,205 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       _origOpenProfilePhoto();
       if (currentUser && currentUser.phone) applyCustProfilePhotoUI(currentUser.phone);
     };
+    
+    //<!-- JAVASCRIPT CUSTOMER NOTIFICATION  -->
+(function() {
+  function getCustNotifStorageKey() {
+    const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
+      ? getHouseUserId()
+      : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
+    return 'mc_cust_notifications_' + uid;
+  }
+
+  function getCustNotifications() {
+    try {
+      return JSON.parse(localStorage.getItem(getCustNotifStorageKey()) || '[]');
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function saveCustNotifications(items) {
+    localStorage.setItem(getCustNotifStorageKey(), JSON.stringify(items.slice(0, 30)));
+    renderCustNotificationBadge();
+    renderCustNotificationsList();
+  }
+
+  function pushCustNotification(id, title, message, timeLabel) {
+    if (!id || !message) return;
+    const list = getCustNotifications();
+    if (list.some(n => n.id === id)) return;
+    list.unshift({
+      id,
+      title: title || 'MilkCount',
+      message,
+      time: timeLabel || new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+      read: false
+    });
+    saveCustNotifications(list);
+  }
+
+// 1. ఫోన్ సిస్టమ్ నోటిఫికేషన్ పర్మిషన్ తీసుకోవడానికి
+window.enableCustSystemNotifications = async function() {
+  if (!('Notification' in window)) {
+    return alert('మీ బ్రౌజర్‌లో సిస్టమ్ నోటిఫికేషన్ సపోర్ట్ లేదు.');
+  }
+  const perm = await Notification.requestPermission();
+  if (perm === 'granted') {
+    showToast('ఫోన్ నోటిఫికేషన్లు ఆన్ అయ్యాయి! 🔔');
+  } else {
+    alert('ఫోన్ సెట్టింగ్స్‌లో Notification permission అనుమతించండి.');
+  }
+};
+
+// 2. కొత్త డెలివరీ/బిల్లు అప్‌డేట్ వచ్చినప్పుడు ఫోన్ నోటిఫికేషన్ బార్‌లో చూపించడానికి
+function triggerPhoneSystemBanner(title, message) {
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.ready.then(reg => {
+      reg.showNotification(title, {
+        body: message,
+        icon: './logo-512.png',
+        badge: './favicon.png',
+        vibrate: [200, 100, 200]
+      });
+    }).catch(() => {
+      new Notification(title, { body: message, icon: './logo-512.png' });
+    });
+  } else {
+    new Notification(title, { body: message, icon: './logo-512.png' });
+  }
+}
+
+  function renderCustNotificationBadge() {
+    const badge = document.getElementById('custNotifBadge');
+    if (!badge) return;
+    const unread = getCustNotifications().filter(n => !n.read).length;
+    if (unread > 0) {
+      badge.innerText = unread > 9 ? '9+' : String(unread);
+      badge.classList.remove('hidden-force');
+    } else {
+      badge.classList.add('hidden-force');
+    }
+  }
+
+  function renderCustNotificationsList() {
+    const container = document.getElementById('custNotificationsList');
+    if (!container) return;
+    const list = getCustNotifications();
+    if (!list.length) {
+      container.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
+      return;
+    }
+    container.innerHTML = list.map(n => `
+      <div class="border ${n.read ? 'border-slate-200 bg-slate-50/70' : 'border-sky-200 bg-sky-50/60'} rounded-xl p-2.5 space-y-1">
+        <div class="flex items-center justify-between gap-2">
+          <span class="font-extrabold text-slate-800 text-[11px]">${n.title}</span>
+          <span class="text-[9px] text-slate-400 shrink-0">${n.time}</span>
+        </div>
+        <p class="text-[11px] text-slate-700 leading-snug">${n.message}</p>
+      </div>
+    `).join('');
+  }
+
+  window.openCustNotificationsModal = function() {
+    renderCustNotificationsList();
+    const modal = document.getElementById('custNotificationsModal');
+    if (modal) modal.classList.remove('hidden-force');
+  };
+
+  window.closeCustNotificationsModal = function() {
+    const modal = document.getElementById('custNotificationsModal');
+    if (modal) modal.classList.add('hidden-force');
+  };
+
+  window.markAllCustNotificationsRead = function() {
+    const updated = getCustNotifications().map(n => Object.assign({}, n, { read: true }));
+    saveCustNotifications(updated);
+  };
+
+window.clearCustNotifications = function() {
+  const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
+    ? getHouseUserId()
+    : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
+  localStorage.removeItem('mc_cust_notifications_' + uid);
+  const badge = document.getElementById('custNotifBadge');
+  if (badge) badge.classList.add('hidden-force');
+  const listEl = document.getElementById('custNotificationsList');
+  if (listEl) listEl.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
+};
+
+  function syncAlertsFromCurrentState() {
+    if (typeof currentViewingDate === 'undefined' || !currentViewingDate) return;
+    const y = currentViewingDate.getFullYear();
+    const m = currentViewingDate.getMonth();
+    const mKey = `${y}-${String(m + 1).padStart(2, '0')}`;
+
+    if (typeof monthRecords !== 'undefined' && monthRecords) {
+      Object.keys(monthRecords).forEach(dayStr => {
+        const rec = monthRecords[dayStr];
+        if (rec && rec.vendor_delivered) {
+          pushCustNotification(
+            `deliv_${mKey}_${dayStr}_${rec.liters}`,
+            '✅ పాలు డెలివరీ అయ్యాయి',
+            `${dayStr}వ తేదీన ${rec.liters}L పాలు డెలివరీ అయినట్లు వెండర్ అప్‌డేట్ చేశారు.`,
+            `${dayStr}/${m + 1}`
+          );
+        }
+      });
+    }
+
+    if (typeof syncedVendorLedger !== 'undefined' && syncedVendorLedger) {
+      const paid = parseFloat(syncedVendorLedger.paid_amount) || 0;
+      const prevDue = parseFloat(syncedVendorLedger.prev_due) || 0;
+      if (paid > 0 || prevDue > 0) {
+        pushCustNotification(
+          `ledger_${mKey}_${paid}_${prevDue}`,
+          '💳 బిల్లు / పేమెంట్ అప్‌డేట్',
+          `${mKey} నెల లెడ్జర్: చెల్లించినది ₹${paid}, పాత బాకీ ₹${prevDue}.`,
+          mKey
+        );
+      }
+    }
+
+    const now = new Date();
+    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+    if (tomorrow.getFullYear() === y && tomorrow.getMonth() === m && typeof monthRecords !== 'undefined') {
+      const tomRec = monthRecords[tomorrow.getDate()];
+      if (tomRec && tomRec.status === 'skipped') {
+        pushCustNotification(
+          `skip_tom_${y}_${m + 1}_${tomorrow.getDate()}`,
+          '⏸️ రేపు పాలు వద్దు (Skip)',
+          `రేపు (${tomorrow.getDate()}/${m + 1}) పాలు స్కిప్ అయినట్లు సెట్ అయి ఉంది.`,
+          'రేపు'
+        );
+      }
+    }
+
+    renderCustNotificationBadge();
+  }
+
+  if (typeof fetchMonthData === 'function') {
+    const _origFetchMonthDataNotif = fetchMonthData;
+    window.fetchMonthData = async function(...args) {
+      const res = await _origFetchMonthDataNotif.apply(this, args);
+      syncAlertsFromCurrentState();
+      return res;
+    };
+  }
+
+  if (typeof renderApp === 'function') {
+    const _origRenderAppNotif = renderApp;
+    window.renderApp = function(...args) {
+      const res = _origRenderAppNotif.apply(this, args);
+      syncAlertsFromCurrentState();
+      return res;
+    };
+  }
+
+  renderCustNotificationBadge();
+})();
+
   </script>
 
 </body>

@@ -4190,7 +4190,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
     }
   }
 
-  function renderCustNotificationsList() {
+    function renderCustNotificationsList() {
     const container = document.getElementById('custNotificationsList');
     if (!container) return;
     const list = getCustNotifications();
@@ -4202,7 +4202,13 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       <div class="border ${n.read ? 'border-slate-200 bg-slate-50/70' : 'border-sky-200 bg-sky-50/60'} rounded-xl p-2.5 space-y-1">
         <div class="flex items-center justify-between gap-2">
           <span class="font-extrabold text-slate-800 text-[11px]">${n.title}</span>
-          <span class="text-[9px] text-slate-400 shrink-0">${n.time}</span>
+          <div class="flex items-center gap-1.5 shrink-0">
+            <span class="text-[9px] text-slate-400">${n.time}</span>
+            ${n.read
+              ? `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md">✓ చదివారు</span>`
+              : `<button onclick="markSingleCustNotificationRead('${String(n.id).replace(/'/g, "\\'")}')" title="చదివినట్టు మార్క్ చేయండి" class="text-[10px] font-extrabold text-sky-800 bg-sky-100 hover:bg-sky-200 active:scale-95 px-1.5 py-0.5 rounded-md transition-all">✓</button>`
+            }
+          </div>
         </div>
         <p class="text-[11px] text-slate-700 leading-snug">${n.message}</p>
       </div>
@@ -4218,6 +4224,14 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
   window.closeCustNotificationsModal = function() {
     const modal = document.getElementById('custNotificationsModal');
     if (modal) modal.classList.add('hidden-force');
+  };
+
+  window.markSingleCustNotificationRead = function(id) {
+    if (!id) return;
+    const updated = getCustNotifications().map(n =>
+      n.id === id ? Object.assign({}, n, { read: true }) : n
+    );
+    saveCustNotifications(updated);
   };
 
   window.markAllCustNotificationsRead = function() {

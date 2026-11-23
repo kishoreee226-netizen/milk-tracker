@@ -4085,26 +4085,80 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-// Auto-hook into checkAuth, setupUserSession & openProfileModal without editing old functions!
+// Auto-hook into checkAuth, setupUserSession, openProfileModal & Hold/Unblock check without editing old functions!
+(function() {
+  function blockCustomerIfHeld(u) {
+    if (!u || !u.is_blocked) return false;
+    alert('⚠️ మీ కస్టమర్ అకౌంట్ Hold లో ఉంది.' + (u.block_reason ? '\nకారణం: ' + u.block_reason : ''));
+    if (typeof logoutCustomer === 'function') logoutCustomer();
+    return true;
+  }
+
+  async function checkLatestCustomerHoldByPhone(phone) {
+    if (!phone || typeof db === 'undefined') return false;
+    try {
+      const { data: freshCust } = await db
+        .from('customer_users')
+        .select('is_blocked, block_reason')
+        .eq('phone', phone)
+        .maybeSingle();
+      return blockCustomerIfHeld(freshCust);
+    } catch (e) {
+      return false;
+    }
+  }
+
+  if (typeof checkAuth === 'function') {
     const _origCheckAuthPhoto = checkAuth;
     window.checkAuth = function() {
       _origCheckAuthPhoto();
-      if (savedUserCache && savedUserCache.phone) {
-        applyCustProfilePhotoUI(savedUserCache.phone);
+      const phone = (typeof currentUser !== 'undefined' && currentUser && currentUser.phone)
+        ? currentUser.phone
+        : ((typeof savedUserCache !== 'undefined' && savedUserCache && savedUserCache.phone) ? savedUserCache.phone : null);
+      if (phone && typeof applyCustProfilePhotoUI === 'function') {
+        applyCustProfilePhotoUI(phone);
       }
+      if (typeof currentUser !== 'undefined' && blockCustomerIfHeld(currentUser)) return;
+      if (phone) checkLatestCustomerHoldByPhone(phone);
     };
+  }
 
+  if (typeof setupUserSession === 'function') {
     const _origSetupSessionPhoto = setupUserSession;
     window.setupUserSession = async function(user, isNewUser) {
+      if (blockCustomerIfHeld(user)) return;
       await _origSetupSessionPhoto(user, isNewUser);
-      if (user && user.phone) applyCustProfilePhotoUI(user.phone);
+      const activeUser = (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) ? currentUser : user;
+      if (blockCustomerIfHeld(activeUser)) return;
+      if (activeUser && activeUser.phone && typeof applyCustProfilePhotoUI === 'function') {
+        await applyCustProfilePhotoUI(activeUser.phone);
+      }
     };
+  }
 
+  if (typeof openProfileModal === 'function') {
     const _origOpenProfilePhoto = openProfileModal;
     window.openProfileModal = function() {
       _origOpenProfilePhoto();
-      if (currentUser && currentUser.phone) applyCustProfilePhotoUI(currentUser.phone);
+      if (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) {
+        if (blockCustomerIfHeld(currentUser)) return;
+        checkLatestCustomerHoldByPhone(currentUser.phone);
+        if (typeof applyCustProfilePhotoUI === 'function') {
+          applyCustProfilePhotoUI(currentUser.phone);
+        }
+      }
     };
+  }
+
+  if (typeof fetchMonthData === 'function') {
+    const _origFetchMonthHold = fetchMonthData;
+    window.fetchMonthData = async function(...args) {
+      const res = await _origFetchMonthHold.apply(this, args);
+      if (typeof currentUser !== 'undefined' && blockCustomerIfHeld(currentUser)) return;
+      return res;
+    };
+  }
+})();
     
     //<!-- JAVASCRIPT CUSTOMER NOTIFICATION  -->
 (function() {

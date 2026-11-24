@@ -1,4 +1,4 @@
-const CACHE_NAME = 'milkcount-v13';
+const CACHE_NAME = 'milkcount-v14';
 const ASSETS = [
   './',
   './index.html',

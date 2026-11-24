@@ -1070,56 +1070,59 @@
       </div>
     </div>
 
-    <!-- MODAL 5: DUAL-SHIFT MILKMAN CONTACT & VENDOR SYNC -->
-    <div id="milkmanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
+        <!-- MODAL 5: DUAL-SHIFT MILKMAN CONTACT & VENDOR SYNC -->
+    <div id="milkmanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-3">
+      <div class="bg-white w-full max-w-xs rounded-2xl p-4 shadow-2xl space-y-3 max-h-[88vh] overflow-y-auto overflow-x-hidden">
         <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
-          <div>
+          <div class="min-w-0 pr-2">
             <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5"><i class="ph-fill ph-user-circle text-sky-600"></i> పాలబ్బాయి వివరాలు</h4>
             <p class="text-[10px] text-slate-500">ఒకే పాలబ్బాయా లేదా వేర్వేరు పాలబ్బాయిలా ఎంచుకోండి</p>
           </div>
-          <button onclick="closeMilkmanModal()" class="text-slate-400 hover:text-slate-600"><i class="ph-bold ph-x text-sm"></i></button>
+          <button type="button" onclick="closeMilkmanModal()" class="w-7 h-7 rounded-full bg-slate-100 text-slate-500 hover:bg-slate-200 flex items-center justify-center shrink-0">
+            <i class="ph-bold ph-x text-sm"></i>
+          </button>
         </div>
 
         <div class="grid grid-cols-2 gap-1.5 bg-slate-100 p-1 rounded-xl text-[11px] font-bold">
-          <button type="button" id="milkmanModeSingleBtn" onclick="setMilkmanMode('single')" class="py-1.5 rounded-lg bg-white text-sky-700 shadow-xs">ఒకే పాలబ్బాయి</button>
-          <button type="button" id="milkmanModeDualBtn" onclick="setMilkmanMode('dual')" class="py-1.5 rounded-lg text-slate-600">వేర్వేరు (🌅 / 🌇)</button>
+          <button type="button" id="milkmanModeSingleBtn" onclick="setMilkmanMode('single')" class="py-1.5 rounded-lg bg-white text-sky-700 shadow-xs truncate">ఒకే పాలబ్బాయి</button>
+          <button type="button" id="milkmanModeDualBtn" onclick="setMilkmanMode('dual')" class="py-1.5 rounded-lg text-slate-600 truncate">వేర్వేరు (🌅 / 🌇)</button>
         </div>
 
-        <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-3 space-y-2">
+        <div class="bg-amber-50/60 border border-amber-200/80 rounded-xl p-2.5 space-y-2">
           <span id="primaryMilkmanBoxTitle" class="text-[11px] font-extrabold text-amber-900 block">🌅 ఉదయం పాలబ్బాయి</span>
           <input type="tel" id="milkmanPhoneInput" maxlength="10" oninput="lookupVendorByPhone(this.value, 'morning')" placeholder="ఫోన్ నంబర్ (10 అంకెలు)" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
           <p id="vendorLookupHint" class="hidden-force text-[10px] text-emerald-700 font-bold"></p>
           <div class="grid grid-cols-2 gap-1.5">
-            <input type="text" id="milkmanNameInput" placeholder="పేరు (ఉదా: రాజు)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
-            <input type="text" id="milkmanUpiInput" placeholder="UPI ID" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+            <input type="text" id="milkmanNameInput" placeholder="పేరు (ఉదా: రాజు)" class="w-full min-w-0 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            <input type="text" id="milkmanUpiInput" placeholder="UPI ID" class="w-full min-w-0 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
           </div>
           <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-1.5">
-            <a id="callMilkmanLink" href="#" class="py-1.5 rounded-lg bg-white border border-sky-200 text-sky-800 font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-bold ph-phone"></i> కాల్</a>
-            <button type="button" onclick="chatMilkmanWhatsApp('morning')" class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-fill ph-whatsapp-logo"></i> వాట్సాప్</button>
+            <a id="callMilkmanLink" href="#" class="py-1.5 rounded-lg bg-white border border-sky-200 text-sky-800 font-bold text-[11px] flex items-center justify-center gap-1 whitespace-nowrap"><i class="ph-bold ph-phone"></i> కాల్</a>
+            <button type="button" onclick="chatMilkmanWhatsApp('morning')" class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1 whitespace-nowrap"><i class="ph-fill ph-whatsapp-logo"></i> వాట్సాప్</button>
           </div>
         </div>
 
-        <div id="eveningMilkmanBox" class="hidden-force bg-sky-50/70 border border-sky-200 rounded-xl p-3 space-y-2">
+        <div id="eveningMilkmanBox" class="hidden-force bg-sky-50/70 border border-sky-200 rounded-xl p-2.5 space-y-2">
           <span class="text-[11px] font-extrabold text-sky-900 block">🌇 సాయంత్రం పాలబ్బాయి</span>
           <input type="tel" id="eveningMilkmanPhoneInput" maxlength="10" oninput="lookupVendorByPhone(this.value, 'evening')" placeholder="సాయంత్రం పాలబ్బాయి నంబర్" class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
           <p id="eveningVendorLookupHint" class="hidden-force text-[10px] text-emerald-700 font-bold"></p>
           <div class="grid grid-cols-2 gap-1.5">
-            <input type="text" id="eveningMilkmanNameInput" placeholder="పేరు (ఉదా: శీను)" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
-            <input type="text" id="eveningMilkmanUpiInput" placeholder="Evening UPI ID" class="w-full px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
+            <input type="text" id="eveningMilkmanNameInput" placeholder="పేరు (ఉదా: శీను)" class="w-full min-w-0 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-bold">
+            <input type="text" id="eveningMilkmanUpiInput" placeholder="Evening UPI ID" class="w-full min-w-0 px-2.5 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-semibold">
           </div>
           <div id="eveningMilkmanDirectActions" class="hidden-force grid grid-cols-2 gap-1.5">
-            <a id="callEveningMilkmanLink" href="#" class="py-1.5 rounded-lg bg-white border border-sky-200 text-sky-800 font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-bold ph-phone"></i> కాల్</a>
-            <button type="button" onclick="chatMilkmanWhatsApp('evening')" class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1"><i class="ph-fill ph-whatsapp-logo"></i> వాట్సాప్</button>
+            <a id="callEveningMilkmanLink" href="#" class="py-1.5 rounded-lg bg-white border border-sky-200 text-sky-800 font-bold text-[11px] flex items-center justify-center gap-1 whitespace-nowrap"><i class="ph-bold ph-phone"></i> కాల్</a>
+            <button type="button" onclick="chatMilkmanWhatsApp('evening')" class="py-1.5 rounded-lg bg-emerald-600 text-white font-bold text-[11px] flex items-center justify-center gap-1 whitespace-nowrap"><i class="ph-fill ph-whatsapp-logo"></i> వాట్సాప్</button>
           </div>
         </div>
 
-        <div class="flex gap-2 pt-1">
-          <button onclick="closeMilkmanModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
-          <button id="saveMilkmanBtn" onclick="saveMilkmanProfile()" class="flex-1 py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+          <button type="button" onclick="closeMilkmanModal()" class="py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+          <button type="button" id="saveMilkmanBtn" onclick="saveMilkmanProfile()" class="py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold">సేవ్ చేయండి</button>
         </div>
       </div>
-
+    </div>
+    
         <!-- Quick Call & WhatsApp buttons if phone saved -->
         <div id="milkmanDirectActions" class="hidden-force grid grid-cols-2 gap-2 pt-1">
           <a id="callMilkmanLink" href="#" class="py-2 rounded-xl bg-sky-50 border border-sky-200 text-sky-800 font-bold text-xs flex items-center justify-center gap-1">

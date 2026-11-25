@@ -10,7 +10,7 @@
   <link rel="apple-touch-icon" href="./logo-512.png">
 
   <!-- PWA Web App Settings -->
-  <link rel="manifest" href="./manifest.json?v=5">
+  <link rel="manifest" href="./manifest.json?v=6">
   <meta name="theme-color" content="#0284c7">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
@@ -63,8 +63,8 @@
 
   <!-- Mobile App Wrapper Frame -->
   <div class="w-full max-w-md bg-white min-h-screen flex flex-col shadow-2xl relative border-x border-slate-200">
-  
-        <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
+
+    <!-- 1. AUTH SCREEN (Smart PIN & Name Support) -->
     <section id="authSection" class="hidden-force p-6 flex-1 flex flex-col justify-center items-center">
 
       <div class="w-16 h-16 rounded-2xl bg-brand-50 border border-brand-200 flex items-center justify-center text-brand-600 mb-4 shadow-sm">
@@ -73,11 +73,11 @@
       <h2 class="text-xl font-extrabold text-slate-800 text-center">MilkCount - పాల లెక్క</h2>
       <p class="text-xs text-slate-500 mb-6 text-center">మీ రోజువారీ పాల లెక్కలు భద్రపరుచుకోండి</p>
 
-  <div class="w-full bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-xs">
+      <div class="w-full bg-slate-50 border border-slate-200/80 p-5 rounded-2xl shadow-xs">
 
-       <!-- Quick PIN Lock Container -->
+        <!-- Quick PIN Lock Container -->
         <div id="quickPinContainer" class="hidden-force text-center space-y-3">
-                    <div class="w-14 h-14 bg-sky-100 text-sky-700 rounded-full overflow-hidden border-2 border-sky-400 flex items-center justify-center mx-auto text-lg font-bold shadow-xs">
+          <div class="w-14 h-14 bg-sky-100 text-sky-700 rounded-full overflow-hidden border-2 border-sky-400 flex items-center justify-center mx-auto text-lg font-bold shadow-xs">
             <img id="quickCustPhotoImg" src="" class="hidden-force w-full h-full object-cover">
             <i id="quickCustPhotoIcon" class="ph-bold ph-user text-2xl"></i>
           </div>
@@ -128,15 +128,15 @@
       </div>
     </section>
 
-       <!-- 2. MAIN APP CONTAINER -->
+    <!-- 2. MAIN APP CONTAINER -->
     <div id="mainAppSection" class="hidden-force flex-1 flex flex-col">
-            <!-- TOP HEADER (100% Fixed & Properly Closed Tags) -->
+      <!-- TOP HEADER (100% Fixed & Properly Closed Tags) -->
       <header class="bg-gradient-to-r from-sky-600 via-brand-600 to-blue-700 text-white px-3 pt-2.5 pb-2 sticky top-0 z-30 shadow-md relative">
 
         <!-- Top 3-Row Exact Parallel Grid Layout -->
         <div class="grid grid-cols-[auto_1fr_auto] gap-x-2 gap-y-1 items-center">
-        
-            <!-- Logo / Customer Profile Photo: పాత drop సైజులోనే మొత్తం 3 వరుసలకు సమానంగా (Row 1, 2, 3)-->
+
+          <!-- Logo / Customer Profile Photo -->
           <div onclick="openProfileModal()" title="ప్రొఫైల్ ఫోటో మార్చండి" class="row-span-3 w-11 h-14 rounded-xl overflow-hidden bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/30 shadow-inner shrink-0 cursor-pointer">
             <img id="headerCustBigLogoImg" src="" class="hidden-force w-full h-full object-cover">
             <i id="headerCustDefaultIcon" class="ph-bold ph-drop text-2xl text-amber-200"></i>
@@ -151,14 +151,14 @@
             </button>
           </div>
 
-   <!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
+          <!-- ROW 1 RIGHT: Light-Red లాగౌట్ -->
           <div class="flex justify-end">
             <button onclick="logoutCustomer()" class="text-[9px] bg-rose-500/35 hover:bg-rose-500/50 border border-rose-300/50 px-1.5 py-0.5 rounded-md text-rose-100 font-bold flex items-center gap-1 shadow-sm transition-colors shrink-0">
               <i class="ph-bold ph-sign-out text-[10px] text-rose-200"></i> లాగౌట్
             </button>
           </div>
 
- <!-- ROW 2 LEFT: Customer Name ONLY -->
+          <!-- ROW 2 LEFT: Customer Name ONLY -->
           <div class="min-w-0">
             <span id="userPhoneBadge" class="hidden">User</span>
             <button onclick="openProfileModal()" title="ప్రొఫైల్ మార్చండి" class="text-[15px] leading-tight text-amber-200 hover:text-white font-extrabold flex items-center gap-1 underline decoration-sky-200/60 underline-offset-2 truncate max-w-full">
@@ -167,7 +167,7 @@
             </button>
           </div>
 
-          <!-- ROW 2 RIGHT: Sync + Emerald 3-Dot Menu Button + 11-Item Dropdown -->
+          <!-- ROW 2 RIGHT: Sync + Emerald 3-Dot Menu Button + Dropdown -->
           <div class="flex items-center justify-end gap-1.5 shrink-0 relative">
             <button onclick="fetchMonthData(true)" title="వెండర్ అప్‌డేట్స్ సింక్ చేయండి" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 active:scale-95 flex items-center justify-center text-white border border-white/25 transition-all">
               <i id="custSyncIcon" class="ph-bold ph-arrows-clockwise text-sm"></i>
@@ -177,172 +177,171 @@
               <i class="ph-bold ph-dots-three-vertical text-sm"></i>
             </button>
 
-          <!-- Dropdown Menu Start (18 Options: Family, Quick Actions, Calendar + All Features) -->
-<div id="custHeaderMenu" 
-     ontouchstart="this._startY = event.touches.clientY;"
-     ontouchmove="const dy = event.touches.clientY - this._startY; const atTop = this.scrollTop <= 0 && dy > 0; const atBottom = this.scrollTop + this.clientHeight >= this.scrollHeight && dy < 0; if (this.scrollHeight <= this.clientHeight || atTop || atBottom) event.preventDefault(); event.stopPropagation();"
-     onwheel="event.stopPropagation();"
-     class="hidden absolute right-0 top-8 w-56 max-h-[75vh] overflow-y-auto overscroll-contain bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
+            <!-- Dropdown Menu Start -->
+            <div id="custHeaderMenu"
+                 ontouchstart="this._startY = event.touches.clientY;"
+                 ontouchmove="const dy = event.touches.clientY - this._startY; const atTop = this.scrollTop <= 0 && dy > 0; const atBottom = this.scrollTop + this.clientHeight >= this.scrollHeight && dy < 0; if (this.scrollHeight <= this.clientHeight || atTop || atBottom) event.preventDefault(); event.stopPropagation();"
+                 onwheel="event.stopPropagation();"
+                 class="hidden absolute right-0 top-8 w-56 max-h-[75vh] overflow-y-auto overscroll-contain bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-200 py-1.5 z-50 text-xs font-semibold">
 
-  <!-- 1. Profile / PIN -->
-  <button onclick="openProfileModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-user-circle text-sky-600 text-base shrink-0"></i>
-    <span>ప్రొఫైల్ / PIN మార్పు</span>
-  </button>
+              <!-- 1. Profile / PIN -->
+              <button onclick="openProfileModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-user-circle text-sky-600 text-base shrink-0"></i>
+                <span>ప్రొఫైల్ / PIN మార్పు</span>
+              </button>
 
-  <!-- 2. Family Sync (NEW) -->
-  <button onclick="openFamilyModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-indigo-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-users-three text-indigo-600 text-base shrink-0"></i>
-    <span>ఫ్యామిలీ సింక్ (Family Link)</span>
-  </button>
+              <!-- 2. Family Sync -->
+              <button onclick="openFamilyModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-indigo-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-users-three text-indigo-600 text-base shrink-0"></i>
+                <span>ఫ్యామిలీ సింక్ (Family Link)</span>
+              </button>
 
-  <!-- 3. Milk Quota & Shift Rates -->
-  <button onclick="openQuotaModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-sliders text-amber-600 text-base shrink-0"></i>
-    <span>పాలు & ధరల సెట్టింగ్స్</span>
-  </button>
+              <!-- 3. Milk Quota & Shift Rates -->
+              <button onclick="openQuotaModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-sliders text-amber-600 text-base shrink-0"></i>
+                <span>పాలు & ధరల సెట్టింగ్స్</span>
+              </button>
 
-  <div class="border-t border-slate-100 my-1"></div>
+              <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 4. Quick Actions (NEW - Scrolls smoothly to Quick Actions) -->
-  <button onclick="document.getElementById('quickActionsSection').scrollIntoView({ behavior: 'smooth' }); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-fill ph-lightning text-amber-500 text-base shrink-0"></i>
-    <span>క్విక్ యాక్షన్స్ (Quick Actions)</span>
-  </button>
+              <!-- 4. Quick Actions -->
+              <button onclick="document.getElementById('quickActionsSection').scrollIntoView({ behavior: 'smooth' }); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-fill ph-lightning text-amber-500 text-base shrink-0"></i>
+                <span>క్విక్ యాక్షన్స్ (Quick Actions)</span>
+              </button>
 
-  <!-- 5. Daily Calendar (NEW - Scrolls smoothly to Calendar) -->
-  <button onclick="document.getElementById('calendarSection').scrollIntoView({ behavior: 'smooth' }); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-fill ph-calendar text-sky-600 text-base shrink-0"></i>
-    <span>రోజువారీ క్యాలెండర్ (Calendar)</span>
-  </button>
+              <!-- 5. Daily Calendar -->
+              <button onclick="document.getElementById('calendarSection').scrollIntoView({ behavior: 'smooth' }); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-fill ph-calendar text-sky-600 text-base shrink-0"></i>
+                <span>రోజువారీ క్యాలెండర్ (Calendar)</span>
+              </button>
 
-  <!-- 6. Pay UPI -->
-  <button onclick="payViaUPI(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-emerald-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-currency-inr text-emerald-600 text-base shrink-0"></i>
-    <span class="text-emerald-700 font-bold">Pay UPI (బిల్లు చెల్లింపు)</span>
-  </button>
+              <!-- 6. Pay UPI -->
+              <button onclick="payViaUPI(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-emerald-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-currency-inr text-emerald-600 text-base shrink-0"></i>
+                <span class="text-emerald-700 font-bold">Pay UPI (బిల్లు చెల్లింపు)</span>
+              </button>
 
-  <!-- 7. Vacation / Pause Milk -->
-  <button onclick="openVacationModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-calendar-slash text-orange-500 text-base shrink-0"></i>
-    <span>సెలవు / పాలు ఆపండి</span>
-  </button>
+              <!-- 7. Vacation / Pause Milk -->
+              <button onclick="openVacationModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-calendar-slash text-orange-500 text-base shrink-0"></i>
+                <span>సెలవు / పాలు ఆపండి</span>
+              </button>
 
-  <!-- 8. Quality Alert / Complaint -->
-  <button onclick="openDayModal(new Date().getDate()); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-warning-circle text-rose-500 text-base shrink-0"></i>
-    <span>పాల నాణ్యత ఫిర్యాదు</span>
-  </button>
+              <!-- 8. Quality Alert / Complaint -->
+              <button onclick="openDayModal(new Date().getDate()); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-warning-circle text-rose-500 text-base shrink-0"></i>
+                <span>పాల నాణ్యత ఫిర్యాదు</span>
+              </button>
 
-  <!-- 9. Download Monthly Bill PDF -->
-  <button onclick="printBillReceipt(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-file-pdf text-indigo-600 text-base shrink-0"></i>
-    <span>నెలవారీ బిల్లు PDF</span>
-  </button>
+              <!-- 9. Download Monthly Bill PDF -->
+              <button onclick="printBillReceipt(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-file-pdf text-indigo-600 text-base shrink-0"></i>
+                <span>నెలవారీ బిల్లు PDF</span>
+              </button>
 
-<!-- 10. Notifications -->
-<button onclick="openCustNotificationsModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
-  <i class="ph-fill ph-bell text-yellow-500 text-base shrink-0"></i>
-  <span>Notifications (నోటిఫికేషన్లు)</span>
-</button>
+              <!-- 10. Notifications -->
+              <button onclick="openCustNotificationsModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-fill ph-bell text-yellow-500 text-base shrink-0"></i>
+                <span>Notifications (నోటిఫికేషన్లు)</span>
+              </button>
 
-  <!-- 11. Contact Vendor -->
-  <button onclick="openMilkmanModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
-    <span>వెండర్‌ను సంప్రదించండి</span>
-  </button>
+              <!-- 11. Contact Vendor -->
+              <button onclick="openMilkmanModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-whatsapp-logo text-green-600 text-base shrink-0"></i>
+                <span>వెండర్‌ను సంప్రదించండి</span>
+              </button>
 
-  <div class="border-t border-slate-100 my-1"></div>
+              <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 12. Share Customer App -->
-  <button onclick="shareAppLink(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-share-network text-sky-600 text-base shrink-0"></i>
-    <span>Share Customer App</span>
-  </button>
+              <!-- 12. Share Customer App -->
+              <button onclick="shareAppLink(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-share-network text-sky-600 text-base shrink-0"></i>
+                <span>Share Customer App</span>
+              </button>
 
-  <!-- 13. Share Vendor App -->
-  <button onclick="shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-share-network text-teal-600 text-base shrink-0"></i>
-    <span>Share Vendor App</span>
-  </button>
+              <!-- 13. Share Vendor App -->
+              <button onclick="shareVendorApp(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-teal-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-share-network text-teal-600 text-base shrink-0"></i>
+                <span>Share Vendor App</span>
+              </button>
 
-  <div class="border-t border-slate-100 my-1"></div>
+              <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 14. Raise Ticket / App Support -->
-  <button onclick="openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-ticket text-purple-600 text-base shrink-0"></i>
-    <span>Raise Ticket / సపోర్ట్</span>
-  </button>
+              <!-- 14. Raise Ticket / App Support -->
+              <button onclick="openSupportModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-ticket text-purple-600 text-base shrink-0"></i>
+                <span>Raise Ticket / సపోర్ట్</span>
+              </button>
 
-  <div class="border-t border-slate-100 my-1"></div>
+              <div class="border-t border-slate-100 my-1"></div>
 
-  <!-- 15. Feedback & Rating -->
-  <button onclick="openCustomerFeedbackModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
-    <i class="ph-fill ph-star text-amber-500 text-base shrink-0"></i>
-    <span class="text-amber-800 font-bold">ఫీడ్‌బ్యాక్ & రేటింగ్ (Feedback)</span>
-  </button>
+              <!-- 15. Feedback & Rating -->
+              <button onclick="openCustomerFeedbackModal(); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-amber-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-fill ph-star text-amber-500 text-base shrink-0"></i>
+                <span class="text-amber-800 font-bold">ఫీడ్‌బ్యాక్ & రేటింగ్ (Feedback)</span>
+              </button>
 
-  <!-- 16. About Us -->
-  <button onclick="openCustInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-info text-blue-600 text-base shrink-0"></i>
-    <span>About Us (మా గురించి)</span>
-  </button>
+              <!-- 16. About Us -->
+              <button onclick="openCustInfoModal('about'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-info text-blue-600 text-base shrink-0"></i>
+                <span>About Us (మా గురించి)</span>
+              </button>
 
-  <!-- 17. Why Choose Us -->
-  <button onclick="openCustInfoModal('why'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-star text-amber-500 text-base shrink-0"></i>
-    <span>Why Choose Us</span>
-  </button>
-  
-<!--18. Contact Us (సంప్రదించండి) -->
-<button onclick="openCustInfoModal('contact'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
-  <i class="ph-bold ph-envelope-simple text-sky-600 text-base shrink-0"></i>
-  <span>Contact Us (సంప్రదించండి)</span>
-</button>
+              <!-- 17. Why Choose Us -->
+              <button onclick="openCustInfoModal('why'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-star text-amber-500 text-base shrink-0"></i>
+                <span>Why Choose Us</span>
+              </button>
 
-   <!-- 19. Privacy Policy (Opens separate privacy.html page) -->
-  <a href="./privacy.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
-    <span class="flex items-center gap-2.5">
-      <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
-      <span>Privacy Policy</span>
-    </span>
-    <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
-  </a>
+              <!-- 18. Contact Us -->
+              <button onclick="openCustInfoModal('contact'); document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-sky-50 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-envelope-simple text-sky-600 text-base shrink-0"></i>
+                <span>Contact Us (సంప్రదించండి)</span>
+              </button>
 
-  <!-- 20. Terms & Conditions (Opens separate terms.html page) -->
-  <a href="./terms.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
-    <span class="flex items-center gap-2.5">
-      <i class="ph-bold ph-file-text text-slate-600 text-base shrink-0"></i>
-      <span>Terms & Conditions</span>
-    </span>
-    <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
-  </a>
+              <!-- 19. Privacy Policy -->
+              <a href="./privacy.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
+                <span class="flex items-center gap-2.5">
+                  <i class="ph-bold ph-shield-check text-emerald-600 text-base shrink-0"></i>
+                  <span>Privacy Policy</span>
+                </span>
+                <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
+              </a>
 
-  <div class="border-t border-slate-100 my-1"></div>
+              <!-- 20. Terms & Conditions -->
+              <a href="./terms.html" target="_blank" onclick="document.getElementById('custHeaderMenu').classList.add('hidden');" class="w-full px-3 py-2 text-left hover:bg-slate-100 flex items-center justify-between transition-colors">
+                <span class="flex items-center gap-2.5">
+                  <i class="ph-bold ph-file-text text-slate-600 text-base shrink-0"></i>
+                  <span>Terms & Conditions</span>
+                </span>
+                <i class="ph-bold ph-arrow-square-out text-slate-400 text-xs"></i>
+              </a>
 
-  <!-- 21. Logout -->
-  <button onclick="logoutCustomer()" class="w-full px-3 py-2 text-left hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition-colors">
-    <i class="ph-bold ph-sign-out text-base shrink-0"></i>
-    <span>లాగౌట్</span>
-  </button>
+              <div class="border-t border-slate-100 my-1"></div>
 
-</div>
-<!-- Dropdown Menu End -->
+              <!-- 21. Logout -->
+              <button onclick="logoutCustomer()" class="w-full px-3 py-2 text-left hover:bg-rose-50 text-rose-600 flex items-center gap-2.5 transition-colors">
+                <i class="ph-bold ph-sign-out text-base shrink-0"></i>
+                <span>లాగౌట్</span>
+              </button>
+
+            </div>
+            <!-- Dropdown Menu End -->
 
           </div>
 
-          <!-- ROW 3 LEFT: Phone Number & Notifications Baton  (ఉంటాయ్)-->
+          <!-- ROW 3 LEFT: Phone Number & Notifications Bell -->
           <div class="min-w-0 flex items-center text-[11px] text-sky-100 font-bold">
             <span id="custPhoneWrap" class="flex items-center gap-1 truncate">
               <i class="ph-fill ph-phone text-[10px] text-amber-300 shrink-0"></i>
               <span id="custPhoneOnly" class="tracking-wide">--</span>
             </span>
-            
-<button onclick="openCustNotificationsModal()" title="నోటిఫికేషన్లు" class="relative w-6 h-6 rounded-lg bg-amber-300/20 hover:bg-amber-300/30 active:scale-95 flex items-center justify-center text-yellow-300 border border-yellow-300/40 transition-all shrink-0 ml-2">
-    <i class="ph-fill ph-bell text-sm text-yellow-300"></i>
-    <span id="custNotifBadge" class="hidden-force absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-500 text-white text-[8px] font-black flex items-center justify-center">0</span>
-  </button>
 
+            <button onclick="openCustNotificationsModal()" title="నోటిఫికేషన్లు" class="relative w-6 h-6 rounded-lg bg-amber-300/20 hover:bg-amber-300/30 active:scale-95 flex items-center justify-center text-yellow-300 border border-yellow-300/40 transition-all shrink-0 ml-2">
+              <i class="ph-fill ph-bell text-sm text-yellow-300"></i>
+              <span id="custNotifBadge" class="hidden-force absolute -top-1 -right-1 min-w-[15px] h-[15px] px-1 rounded-full bg-rose-500 text-white text-[8px] font-black flex items-center justify-center">0</span>
+            </button>
           </div>
 
           <!-- ROW 3 RIGHT: Compact Raise Ticket -->
@@ -354,7 +353,7 @@
 
         </div>
 
-   <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR (నెల పేరు కట్ అవ్వకుండా సెట్ చేశాము) -->
+        <!-- HIGHLIGHTED SHIFT RATES & MONTH BAR -->
         <div class="mt-2 grid grid-cols-[auto_1fr] gap-1.5 items-center">
 
           <!-- Left: Compact Highlighted Shift Rates Button -->
@@ -367,7 +366,7 @@
             <i class="ph-bold ph-pencil-simple text-[10px] text-amber-200 ml-0.5 shrink-0"></i>
           </button>
 
-          <!-- Right: Month Navigation (నవంబర్ 2026 పూర్తిగా కనిపిస్తుంది) -->
+          <!-- Right: Month Navigation -->
           <div class="h-9 flex items-center justify-between bg-black/25 backdrop-blur-md rounded-xl px-1 border border-white/20 shadow-inner min-w-0">
             <button onclick="changeMonth(-1)" class="w-6 h-6 flex items-center justify-center bg-white/10 hover:bg-white/20 rounded-lg transition-colors text-white active:scale-90 shrink-0">
               <i class="ph-bold ph-caret-left text-xs"></i>
@@ -383,7 +382,7 @@
 
         </div>
 
-        <!-- 100% Bug-Free Split Script (పేరు 2వ వరుసలోకి, ఫోన్ నంబర్ 3వ వరుసలోకి విడదీస్తుంది) -->
+        <!-- Split Name & Phone Script -->
         <script>
           (function() {
             const badge = document.getElementById('userPhoneBadge');
@@ -428,7 +427,7 @@
       <main class="flex-1 overflow-y-auto px-2 pt-1.5 space-y-1.5 pb-28">
 
         <!-- LIVE VENDOR DELIVERY STATUS & FAMILY SYNC BAR -->
-        <div id="liveDeliveryStatusBanner" class="bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2">
+        <div id="liveDeliveryStatusBanner" class="bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors">
           <div class="flex items-center gap-2 min-w-0">
             <span id="liveDeliveryIcon" class="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0">
               <i class="ph-bold ph-clock text-base"></i>
@@ -475,7 +474,7 @@
               <span class="text-[9px] text-slate-500 mt-0.5 leading-tight">Extra tomorrow</span>
             </button>
 
-   <!-- Vacation / Date-Range Skip -->
+            <!-- Vacation / Date-Range Skip -->
             <button onclick="openVacationModal()" class="flex flex-col items-start p-2.5 rounded-xl border border-amber-200 bg-white hover:bg-amber-50/60 active:scale-95 transition-all shadow-xs text-left group">
               <div class="flex items-center justify-between w-full">
                 <span class="text-[11px] font-bold text-amber-800 flex items-center gap-1">
@@ -487,7 +486,7 @@
             </button>
           </div>
 
-          <!-- NEW: Shift-Wise Skip Selector Bar (Appears when clicking 'రేపు వద్దు' if both shifts active) -->
+          <!-- Shift-Wise Skip Selector Bar -->
           <div id="shiftSkipSelectorBar" class="hidden-force mt-2.5 pt-2.5 border-t border-rose-200/80 space-y-1.5">
             <div class="flex items-center justify-between">
               <span class="text-[11px] font-extrabold text-rose-800">రేపు ఏ షిఫ్ట్ పాలు వద్దు?</span>
@@ -592,7 +591,7 @@
           </button>
         </section>
 
-        <!-- DELIVERY PREFERENCES BAR (Morning & Evening Independent Milk Types, Quotas & Rates) -->
+        <!-- DELIVERY PREFERENCES BAR -->
         <section class="bg-white border border-slate-200 rounded-2xl p-3 shadow-2xs space-y-2">
           <div class="flex items-center justify-between gap-2">
             <div class="min-w-0">
@@ -627,7 +626,7 @@
               <p class="text-[10px] text-slate-500">మార్పులు చేయడానికి తేదీపై నొక్కండి</p>
             </div>
 
-       <!-- Color Legend Indicator -->
+            <!-- Color Legend Indicator -->
             <div class="flex items-center gap-2 text-[10px] font-medium text-slate-600">
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>పాలు</span>
               <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-sky-500"></span>షెడ్యూల్</span>
@@ -680,7 +679,7 @@
             </h3>
             <span class="text-[11px] bg-slate-100 text-slate-600 px-2 py-0.5 rounded-full font-medium" id="billMonthBadge">నవంబర్ 2026</span>
           </div>
-          <!-- SHIFT BILL FILTER TABS (Both / Morning / Evening) -->
+          <!-- SHIFT BILL FILTER TABS -->
           <div class="grid grid-cols-3 gap-1 bg-slate-100 p-1 rounded-xl text-[11px] font-extrabold">
             <button id="billTabBoth" onclick="setBillFilter('both')" class="py-1.5 rounded-lg bg-white text-sky-700 shadow-xs transition-all">మొత్తం (Both)</button>
             <button id="billTabMorning" onclick="setBillFilter('morning')" class="py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all">🌅 ఉదయం బిల్లు</button>
@@ -728,7 +727,7 @@
             </div>
           </div>
 
-          <!-- PAYMENT & BALANCE LEDGER (Synced with Vendor Billing Ledger) -->
+          <!-- PAYMENT & BALANCE LEDGER -->
           <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-3 space-y-2.5">
             <div class="flex items-center justify-between">
               <span class="text-xs font-bold text-slate-700 flex items-center gap-1">
@@ -807,29 +806,25 @@
               </button>
             </div>
 
-   <!-- 3 బటన్లు నీట్‌గా ఉండేలా గ్రిడ్ మార్పు -->
-  <div class="grid grid-cols-3 gap-2">
-                <button onclick="shareAppLink()" class="bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
-                  <i class="ph-bold ph-share-network text-sm text-sky-600"></i>
-                  కస్టమర్ యాప్
-                </button>
-                <button onclick="openSupportModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 active:scale-[0.98] transition-all text-amber-900 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
-                  <i class="ph-fill ph-ticket text-sm text-amber-600"></i>
-                  Raise Ticket
-                </button>
-                <button onclick="shareVendorApp()" class="bg-teal-50 hover:bg-teal-100 border border-teal-200 active:scale-[0.98] transition-all text-teal-800 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
-                  <i class="ph-bold ph-share-network text-sm text-teal-600"></i>
-                  వెండర్ యాప్
-                </button>
-              </div>
+            <div class="grid grid-cols-3 gap-2">
+              <button onclick="shareAppLink()" class="bg-sky-50 hover:bg-sky-100 border border-sky-200 active:scale-[0.98] transition-all text-sky-800 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
+                <i class="ph-bold ph-share-network text-sm text-sky-600"></i>
+                కస్టమర్ యాప్
+              </button>
+              <button onclick="openSupportModal()" class="bg-amber-50 hover:bg-amber-100 border border-amber-200 active:scale-[0.98] transition-all text-amber-900 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
+                <i class="ph-fill ph-ticket text-sm text-amber-600"></i>
+                Raise Ticket
+              </button>
+              <button onclick="shareVendorApp()" class="bg-teal-50 hover:bg-teal-100 border border-teal-200 active:scale-[0.98] transition-all text-teal-800 font-bold py-2.5 px-2 rounded-xl flex items-center justify-center gap-1 text-[11px]">
+                <i class="ph-bold ph-share-network text-sm text-teal-600"></i>
+                వెండర్ యాప్
+              </button>
+            </div>
 
             <p class="text-[10px] text-center text-slate-400">పాల సమస్యలకు వెండర్‌కు కాల్ చేయండి • యాప్ టెక్నికల్ సమస్యలకు Raise Ticket నొక్కండి</p>
           </div>
         </section>
 
-        <footer class="py-4 text-center text-[10px] font-semibold tracking-wide text-slate-400">
-          Powered by <span class="font-extrabold text-sky-600">AgriConect Technologies</span>
-        </footer>
       </main>
     </div>
 
@@ -874,7 +869,7 @@
           </div>
         </div>
 
-        <!-- Morning / Evening Split Inputs (Independent Milk Types & Rates) -->
+        <!-- Morning / Evening Split Inputs -->
         <div class="bg-slate-50 border border-slate-200/80 rounded-xl p-2.5 space-y-2">
           <div class="flex items-center justify-between">
             <span class="text-[11px] font-bold text-slate-700">🌅 ఉదయం & 🌇 సాయంత్రం విడివిడిగా:</span>
@@ -905,7 +900,7 @@
           </div>
         </div>
 
-        <!-- Quality & SNF / Issue Note Section (Synced directly with Vendor App!) -->
+        <!-- Quality & SNF / Issue Note Section -->
         <div class="pt-2 border-t border-slate-100 space-y-2">
           <div class="flex items-center justify-between">
             <label class="text-[11px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1">
@@ -943,7 +938,7 @@
       </div>
     </div>
 
-    <!-- MODAL 2: EDIT MILK RATE (With Smart Rate Presets) -->
+    <!-- MODAL 2: EDIT MILK RATE -->
     <div id="priceModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
       <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
         <div class="flex justify-between items-center pb-1 border-b border-slate-100">
@@ -973,7 +968,7 @@
       </div>
     </div>
 
-    <!-- MODAL 3: DUAL-SHIFT DELIVERY PREFERENCES (Morning & Evening Independent Milk Types, Quotas & Rates) -->
+    <!-- MODAL 3: DUAL-SHIFT DELIVERY PREFERENCES -->
     <div id="quotaModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
       <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3 max-h-[90vh] overflow-y-auto">
         <div class="flex justify-between items-center pb-1 border-b border-slate-100">
@@ -1073,7 +1068,7 @@
       </div>
     </div>
 
-        <!-- MODAL 5: DUAL-SHIFT MILKMAN CONTACT & VENDOR SYNC -->
+    <!-- MODAL 5: DUAL-SHIFT MILKMAN CONTACT & VENDOR SYNC (Clean Single Block, No Duplicates) -->
     <div id="milkmanModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-3">
       <div class="bg-white w-full max-w-xs rounded-2xl p-4 shadow-2xl space-y-3 max-h-[88vh] overflow-y-auto overflow-x-hidden">
         <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
@@ -1125,7 +1120,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- MODAL 6: EDIT CUSTOMER PROFILE & CHANGE PIN -->
     <div id="profileModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
       <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
@@ -1177,92 +1172,92 @@
 
   </div>
 
-    <!-- MODAL 7: FAMILY MEMBER LINK & SYNC -->
-    <div id="familyModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
-        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
-          <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-              <i class="ph-fill ph-users-three text-indigo-600 text-base"></i> ఫ్యామిలీ సింక్ (Family Link)
-            </h4>
-            <p class="text-[10px] text-slate-500">కుటుంబ సభ్యుల నంబర్‌ను లింక్ చేస్తే ఇద్దరి ఫోన్లలో ఒకే లెక్క కనిపిస్తుంది</p>
-          </div>
-          <button onclick="closeFamilyModal()" class="text-slate-400 hover:text-slate-600">
-            <i class="ph-bold ph-x text-sm"></i>
-          </button>
+  <!-- MODAL 7: FAMILY MEMBER LINK & SYNC -->
+  <div id="familyModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+    <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5">
+      <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+        <div>
+          <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+            <i class="ph-fill ph-users-three text-indigo-600 text-base"></i> ఫ్యామిలీ సింక్ (Family Link)
+          </h4>
+          <p class="text-[10px] text-slate-500">కుటుంబ సభ్యుల నంబర్‌ను లింక్ చేస్తే ఇద్దరి ఫోన్లలో ఒకే లెక్క కనిపిస్తుంది</p>
         </div>
+        <button onclick="closeFamilyModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
 
-        <div id="familyLinkedStatusBox" class="hidden-force bg-indigo-50 border border-indigo-200 rounded-xl p-2.5 text-[11px] text-indigo-900 space-y-1">
-          <p class="font-bold" id="familyLinkedStatusText">ఫ్యామిలీ అకౌంట్ లింక్ అయింది!</p>
-          <button onclick="unlinkFamilyAccount()" class="text-[10px] text-rose-600 font-bold underline">లింక్ తొలగించు (Unlink)</button>
+      <div id="familyLinkedStatusBox" class="hidden-force bg-indigo-50 border border-indigo-200 rounded-xl p-2.5 text-[11px] text-indigo-900 space-y-1">
+        <p class="font-bold" id="familyLinkedStatusText">ఫ్యామిలీ అకౌంట్ లింక్ అయింది!</p>
+        <button onclick="unlinkFamilyAccount()" class="text-[10px] text-rose-600 font-bold underline">లింక్ తొలగించు (Unlink)</button>
+      </div>
+
+      <div class="space-y-2.5">
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 mb-1 block">కుటుంబ సభ్యుడి మొబైల్ నంబర్ (10 అంకెలు):</label>
+          <input type="tel" id="familyMemberPhoneInput" maxlength="10" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-600">
+          <p class="text-[10px] text-slate-400 mt-1">గమనిక: ఆ కుటుంబ సభ్యుడు ముందుగా యాప్‌లో Sign Up అయి ఉండాలి.</p>
         </div>
+      </div>
 
-        <div class="space-y-2.5">
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">కుటుంబ సభ్యుడి మొబైల్ నంబర్ (10 అంకెలు):</label>
-            <input type="tel" id="familyMemberPhoneInput" maxlength="10" placeholder="ఉదా: 9876543210" class="w-full px-3 py-2 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-indigo-600">
-            <p class="text-[10px] text-slate-400 mt-1">గమనిక: ఆ కుటుంబ సభ్యుడు ముందుగా యాప్‌లో Sign Up అయి ఉండాలి.</p>
-          </div>
+      <div class="flex gap-2 pt-1">
+        <button onclick="closeFamilyModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
+        <button id="linkFamilyBtn" onclick="linkFamilyMemberByPhone()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">లింక్ చేయండి</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL 8: IN-APP SUPPORT TICKET -->
+  <div id="supportModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
+    <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5 max-h-[90vh] overflow-y-auto">
+      <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
+        <div>
+          <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
+            <i class="ph-fill ph-ticket text-amber-600 text-base"></i> యాప్ సపోర్ట్ (Raise a Ticket)
+          </h4>
+          <p class="text-[10px] text-slate-500">యాప్ టెక్నికల్ సమస్యలు & ఫీడ్‌బ్యాక్ (Admin Support)</p>
         </div>
+        <button onclick="closeSupportModal()" class="text-slate-400 hover:text-slate-600">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
+      </div>
 
-        <div class="flex gap-2 pt-1">
-          <button onclick="closeFamilyModal()" class="flex-1 py-2.5 rounded-xl border border-slate-200 text-slate-600 text-xs font-semibold">రద్దు</button>
-          <button id="linkFamilyBtn" onclick="linkFamilyMemberByPhone()" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold">లింక్ చేయండి</button>
+      <div class="bg-sky-50 border border-sky-200/80 rounded-xl p-2.5 text-[10px] text-sky-900 leading-relaxed">
+        💡 <strong>గమనిక:</strong> పాలు రాలేదు, పాల నాణ్యత, లేదా సెలవుల కోసం <strong>పాలబ్బాయి (Vendor)</strong> కి తెలపండి. యాప్ పనితీరు, సింక్, లేదా ఫీడ్‌బ్యాక్ కోసం కింద టికెట్ రైజ్ చేయండి.
+      </div>
+
+      <div class="space-y-2.5">
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 mb-1 block">సమస్య రకం (Category):</label>
+          <select id="ticketCategorySelect" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
+            <option value="Sync / App Issue">🔄 డేటా సింక్ / యాప్ సమస్య</option>
+            <option value="PIN / Account Issue">🔐 PIN / అకౌంట్ లాగిన్ సమస్య</option>
+            <option value="Billing Bug">🧾 బిల్లు లెక్క టెక్నికల్ తేడా</option>
+            <option value="Feedback / Feature">💡 కొత్త ఫీచర్ సలహా / ఫీడ్‌బ్యాక్</option>
+          </select>
+        </div>
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 mb-1 block">వివరాలు రాయండి (Description):</label>
+          <textarea id="ticketDescInput" rows="2" placeholder="మీ సమస్య లేదా సలహాను ఇక్కడ క్లుప్తంగా రాయండి..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-sky-500"></textarea>
+        </div>
+        <button id="submitTicketBtn" onclick="submitSupportTicket()" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold shadow-xs transition-all">
+          టికెట్ పంపండి (Submit Ticket)
+        </button>
+      </div>
+
+      <div class="pt-2.5 border-t border-slate-100 space-y-2">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-extrabold text-slate-700">నా టికెట్లు (My Tickets)</span>
+          <button onclick="loadMySupportTickets()" class="text-[10px] text-sky-600 font-bold hover:underline">రిఫ్రెష్ ↻</button>
+        </div>
+        <div id="myTicketsListContainer" class="space-y-2 max-h-44 overflow-y-auto">
+          <p class="text-[11px] text-slate-400 text-center py-2">ఇంకా టికెట్లు ఏవీ లేవు.</p>
         </div>
       </div>
     </div>
+  </div>
 
-    <!-- MODAL 8: IN-APP SUPPORT TICKET (PhonePe / GPay Style Raise a Ticket) -->
-    <div id="supportModal" class="fixed inset-0 bg-black/60 backdrop-blur-xs z-50 flex items-center justify-center hidden-force p-4">
-      <div class="bg-white w-full max-w-xs rounded-2xl p-5 shadow-2xl space-y-3.5 max-h-[90vh] overflow-y-auto">
-        <div class="flex justify-between items-center pb-1.5 border-b border-slate-100">
-          <div>
-            <h4 class="font-bold text-slate-800 text-sm flex items-center gap-1.5">
-              <i class="ph-fill ph-ticket text-amber-600 text-base"></i> యాప్ సపోర్ట్ (Raise a Ticket)
-            </h4>
-            <p class="text-[10px] text-slate-500">యాప్ టెక్నికల్ సమస్యలు & ఫీడ్‌బ్యాక్ (Admin Support)</p>
-          </div>
-          <button onclick="closeSupportModal()" class="text-slate-400 hover:text-slate-600">
-            <i class="ph-bold ph-x text-sm"></i>
-          </button>
-        </div>
-
-        <div class="bg-sky-50 border border-sky-200/80 rounded-xl p-2.5 text-[10px] text-sky-900 leading-relaxed">
-          💡 <strong>గమనిక:</strong> పాలు రాలేదు, పాల నాణ్యత, లేదా సెలవుల కోసం <strong>పాలబ్బాయి (Vendor)</strong> కి తెలపండి. యాప్ పనితీరు, సింక్, లేదా ఫీడ్‌బ్యాక్ కోసం కింద టికెట్ రైజ్ చేయండి.
-        </div>
-
-        <div class="space-y-2.5">
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">సమస్య రకం (Category):</label>
-            <select id="ticketCategorySelect" class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-bold focus:outline-none focus:border-sky-500">
-              <option value="Sync / App Issue">🔄 డేటా సింక్ / యాప్ సమస్య</option>
-              <option value="PIN / Account Issue">🔐 PIN / అకౌంట్ లాగిన్ సమస్య</option>
-              <option value="Billing Bug">🧾 బిల్లు లెక్క టెక్నికల్ తేడా</option>
-              <option value="Feedback / Feature">💡 కొత్త ఫీచర్ సలహా / ఫీడ్‌బ్యాక్</option>
-            </select>
-          </div>
-          <div>
-            <label class="text-[11px] font-bold text-slate-600 mb-1 block">వివరాలు రాయండి (Description):</label>
-            <textarea id="ticketDescInput" rows="2" placeholder="మీ సమస్య లేదా సలహాను ఇక్కడ క్లుప్తంగా రాయండి..." class="w-full p-2.5 bg-slate-50 border border-slate-300 rounded-xl text-xs font-semibold focus:outline-none focus:border-sky-500"></textarea>
-          </div>
-          <button id="submitTicketBtn" onclick="submitSupportTicket()" class="w-full py-2.5 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-bold shadow-xs transition-all">
-            టికెట్ పంపండి (Submit Ticket)
-          </button>
-        </div>
-
-        <div class="pt-2.5 border-t border-slate-100 space-y-2">
-          <div class="flex items-center justify-between">
-            <span class="text-xs font-extrabold text-slate-700">నా టికెట్లు (My Tickets)</span>
-            <button onclick="loadMySupportTickets()" class="text-[10px] text-sky-600 font-bold hover:underline">రిఫ్రెష్ ↻</button>
-          </div>
-          <div id="myTicketsListContainer" class="space-y-2 max-h-44 overflow-y-auto">
-            <p class="text-[11px] text-slate-400 text-center py-2">ఇంకా టికెట్లు ఏవీ లేవు.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    
-    <!-- JAVASCRIPT LOGIC -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     // 1. SUPABASE CLIENT
     const SUPABASE_URL = 'https://cbemchufrgcvzkbyvfrx.supabase.co';
@@ -1516,13 +1511,11 @@
         : 'వద్దు (0L)';
     }
 
-    // Helper: ఫ్యామిలీ మెంబర్ అయితే మెయిన్ హెడ్ యొక్క కోటా & రేట్లను లోడ్ చేస్తుంది, మరియు ఫ్యామిలీ మెంబర్ కి vendor_phone లేకుండా చూస్తుంది
     async function loadEffectiveUserProfile(userId) {
       const { data: latestUser } = await db.from('customer_users').select('*').eq('id', userId).maybeSingle();
       if (!latestUser) return null;
 
       if (latestUser.family_head_id) {
-        // ఫ్యామిలీ మెంబర్ అకౌంట్‌లో పొరపాటున vendor_phone ఉంటే వెంటనే DB లో null చేయడం (వెండర్ యాప్‌లో డూప్లికేట్ రాకుండా!)
         if (latestUser.vendor_phone) {
           await db.from('customer_users').update({ vendor_phone: null }).eq('id', latestUser.id);
           latestUser.vendor_phone = null;
@@ -1535,7 +1528,7 @@
             phone: latestUser.phone,
             pin: latestUser.pin,
             family_head_id: latestUser.family_head_id,
-            vendor_phone: headUser.vendor_phone // కేవలం కస్టమర్ UI లో పాలబ్బాయి వివరాలు కనిపించడానికి మాత్రమే
+            vendor_phone: headUser.vendor_phone
           });
         }
       }
@@ -1555,7 +1548,6 @@
 
       await syncVendorPhoneOnSessionStart(currentUser);
 
-      // Update last_login_at and log login analytics once per session
       try {
         await db.from('customer_users').update({ last_login_at: new Date().toISOString() }).eq('id', currentUser.id);
         if (!sessionStorage.getItem('mc_cust_login_logged')) {
@@ -1578,7 +1570,6 @@
     }
 
     async function syncVendorPhoneOnSessionStart(user) {
-      // ఫ్యామిలీ మెంబర్ అకౌంట్‌ని ఎప్పుడూ వెండర్‌కి సింక్ చేయకూడదు!
       if (user.family_head_id) {
         return;
       }
@@ -1613,7 +1604,6 @@
       if (!currentUser) return;
       const houseId = getHouseUserId();
 
-      // 1. Supabase Realtime listener for instant updates without manual refresh
       try {
         custRealtimeChannel = db
           .channel(`cust-live-${houseId}`)
@@ -1631,7 +1621,6 @@
         console.log('Realtime fallback to polling:', e);
       }
 
-      // 2. Silent background polling every 15 seconds while tab is visible
       custAutoSyncTimer = setInterval(() => {
         if (currentUser && !document.hidden) {
           fetchMonthData(false);
@@ -1669,20 +1658,21 @@
       }, 2400);
     }
 
-    // 3. AUTO FILL MODE TOGGLE LOGIC
+    // 3. AUTO FILL MODE TOGGLE LOGIC (Saves past auto days before turning OFF)
     async function toggleAutoMode() {
+      if (!currentUser) return;
       const nextAutoMode = !isAutoMode;
 
-      // ఆటో మోడ్ ఆఫ్ చేసే ముందు, ఈరోజు వరకు ఆటోగా లెక్కైన ఖాళీ రోజులను స్థిరంగా సేవ్ చేయాలి.
+      // ఆటో మోడ్ ఆఫ్ చేసే ముందు, ఈరోజు వరకు ఆటోగా లెక్కైన ఖాళీ రోజులను స్థిరంగా సేవ్ చేయాలి
       if (!nextAutoMode) {
         const today = new Date();
         today.setHours(0, 0, 0, 0);
         const start = currentUser.created_at ? new Date(currentUser.created_at) : new Date(today);
         start.setHours(0, 0, 0, 0);
-        const toIsoDate = formatLocalDate;
-        const startIso = [toIsoDate(start), getAutoModeStartDate()].sort().pop();
-        const endIso = toIsoDate(today);
+        const startIso = [formatLocalDate(start), getAutoModeStartDate()].sort().pop();
+        const endIso = formatLocalDate(today);
         start.setTime(new Date(startIso + 'T00:00:00').getTime());
+
         const existingDates = new Set();
         let offset = 0;
         const pageSize = 1000;
@@ -1695,32 +1685,30 @@
             .lte('log_date', endIso)
             .range(offset, offset + pageSize - 1);
           if (error) return alert('పాత ఆటో ఎంట్రీలను లోడ్ చేయలేకపోయాం: ' + error.message);
-          (data || []).forEach(row => existingDates.add(row.log_date));
+          (data || []).forEach(r => existingDates.add(r.log_date));
           if (!data || data.length < pageSize) break;
           offset += pageSize;
         }
 
-        const rows = [];
-        const date = new Date(start);
-        while (date <= today) {
-          const logDate = toIsoDate(date);
-          if (!existingDates.has(logDate)) {
-            rows.push({
+        const autoRowsToSave = [];
+        for (let d = new Date(start); d <= today; d.setDate(d.getDate() + 1)) {
+          const iso = formatLocalDate(d);
+          if (!existingDates.has(iso)) {
+            autoRowsToSave.push({
               user_id: getHouseUserId(),
-              log_date: logDate,
+              log_date: iso,
               quantity: defaultDailyQuota,
               morning_qty: morningQuota,
               evening_qty: eveningQuota,
               status: 'taken'
             });
           }
-          date.setDate(date.getDate() + 1);
         }
 
-        for (let i = 0; i < rows.length; i += 200) {
-          const { error } = await db.from('customer_milk_logs')
-            .upsert(rows.slice(i, i + 200), { onConflict: 'user_id,log_date', ignoreDuplicates: true });
-          if (error) return alert('పాత ఆటో ఎంట్రీలను సేవ్ చేయలేకపోయాం: ' + error.message);
+        if (autoRowsToSave.length > 0) {
+          const { error: saveErr } = await db.from('customer_milk_logs')
+            .upsert(autoRowsToSave, { onConflict: 'user_id,log_date' });
+          if (saveErr) return alert('పాత ఆటో ఎంట్రీలను సేవ్ చేయలేకపోయాం: ' + saveErr.message);
         }
       }
 
@@ -1758,17 +1746,17 @@
       }
     }
 
-    // 4. MONTH NAVIGATION & DATA FETCHING (Synced with Vendor & Family Head Updates!)
+    // 4. MONTH NAVIGATION & DATA FETCHING
     function changeMonth(delta) {
       currentViewingDate.setMonth(currentViewingDate.getMonth() + delta);
       fetchMonthData(false);
     }
 
     async function fetchMonthData(manualSync = false) {
+      if (!currentUser) return;
       const syncIcon = document.getElementById('custSyncIcon');
       if (syncIcon) syncIcon.classList.add('animate-spin');
 
-      // Refresh customer profile settings (or Family Head's settings if linked)
       const effectiveUser = await loadEffectiveUserProfile(currentUser.id);
       if (effectiveUser) {
         applyUserProfileToState(effectiveUser);
@@ -1815,10 +1803,10 @@
       if (data) {
         data.forEach(item => {
           const dayNum = parseInt(item.log_date.split('-')[2]);
-          const totQ = parseFloat(item.quantity);
+          const totQ = parseFloat(item.quantity) || 0;
           const mQ = item.morning_qty !== undefined && item.morning_qty !== null
             ? parseFloat(item.morning_qty)
-            : totQ;
+            : (defaultDailyQuota > 0 ? parseFloat((totQ * (morningQuota / defaultDailyQuota)).toFixed(2)) : totQ);
           const eQ = item.evening_qty !== undefined && item.evening_qty !== null
             ? parseFloat(item.evening_qty)
             : Math.max(0, parseFloat((totQ - mQ).toFixed(2)));
@@ -1837,7 +1825,6 @@
         });
       }
 
-      // Merge DB quality notes into local cache
       if (Object.keys(dbQualityNotes).length > 0) {
         const merged = Object.assign({}, getMonthQualityNotes(year, month), dbQualityNotes);
         localStorage.setItem(getQualityStorageKey(year, month), JSON.stringify(merged));
@@ -1850,7 +1837,7 @@
           prevMonthRecords[dayNum] = {
             id: item.id,
             status: item.status === 'taken' ? 'delivered' : 'skipped',
-            liters: parseFloat(item.quantity)
+            liters: parseFloat(item.quantity) || 0
           };
         });
       }
@@ -1862,7 +1849,7 @@
       renderApp();
     }
 
-    // 5. SETTINGS MODALS (SMART RATE & DELIVERY PREFERENCES)
+    // 5. SETTINGS MODALS
     function openPriceModal() {
       document.getElementById('rateInput').value = ratePerLiter;
       document.getElementById('priceModal').classList.remove('hidden-force');
@@ -1903,54 +1890,53 @@
       else if (typeEl.value === 'Buffalo' && (rateEl.value === '55' || rateEl.value === '60')) rateEl.value = '75';
     }
     async function saveDefaultQuota() {
-  const mType = document.getElementById('morningMilkTypeSelect').value;
-  const mQty = Math.max(0, parseFloat(document.getElementById('morningQuotaInput').value) || 0);
-  const mRate = Math.max(1, parseFloat(document.getElementById('morningRateInput').value) || 75);
+      const mType = document.getElementById('morningMilkTypeSelect').value;
+      const mQty = Math.max(0, parseFloat(document.getElementById('morningQuotaInput').value) || 0);
+      const mRate = Math.max(1, parseFloat(document.getElementById('morningRateInput').value) || 75);
 
-  const eType = document.getElementById('eveningMilkTypeSelect').value;
-  const eQty = Math.max(0, parseFloat(document.getElementById('eveningQuotaInput').value) || 0);
-  const eRate = Math.max(1, parseFloat(document.getElementById('eveningRateInput').value) || 55);
+      const eType = document.getElementById('eveningMilkTypeSelect').value;
+      const eQty = Math.max(0, parseFloat(document.getElementById('eveningQuotaInput').value) || 0);
+      const eRate = Math.max(1, parseFloat(document.getElementById('eveningRateInput').value) || 55);
 
-  const newArea = document.getElementById('custAreaInputSelf').value.trim() || 'General';
-  const totalQ = parseFloat((mQty + eQty).toFixed(2));
-  if (totalQ <= 0) return alert('ఉదయం లేదా సాయంత్రం కనీసం ఒక షిఫ్ట్‌లో కోటా నమోదు చేయండి.');
+      const newArea = document.getElementById('custAreaInputSelf').value.trim() || 'General';
+      const totalQ = parseFloat((mQty + eQty).toFixed(2));
+      if (totalQ <= 0) return alert('ఉదయం లేదా సాయంత్రం కనీసం ఒక షిఫ్ట్‌లో కోటా నమోదు చేయండి.');
 
-  const combinedShift = (mQty > 0 && eQty > 0) ? 'Both' : (eQty > 0 ? 'Evening' : 'Morning');
-  const primaryType = mQty > 0 ? mType : eType;
-  const primaryRate = mQty > 0 ? mRate : eRate;
+      const combinedShift = (mQty > 0 && eQty > 0) ? 'Both' : (eQty > 0 ? 'Evening' : 'Morning');
+      const primaryType = mQty > 0 ? mType : eType;
+      const primaryRate = mQty > 0 ? mRate : eRate;
 
-  const updatePayload = {
-    daily_qty: totalQ,
-    milk_type: primaryType,
-    shift: combinedShift,
-    route_area: newArea,
-    price_per_ltr: primaryRate,
-    morning_milk_type: mType,
-    morning_qty: mQty,
-    morning_rate: mRate,
-    evening_milk_type: eType,
-    evening_qty: eQty,
-    evening_rate: eRate
-  };
+      const updatePayload = {
+        daily_qty: totalQ,
+        milk_type: primaryType,
+        shift: combinedShift,
+        route_area: newArea,
+        price_per_ltr: primaryRate,
+        morning_milk_type: mType,
+        morning_qty: mQty,
+        morning_rate: mRate,
+        evening_milk_type: eType,
+        evening_qty: eQty,
+        evening_rate: eRate
+      };
 
-  const { error } = await db.from('customer_users').update(updatePayload).eq('id', getHouseUserId());
-  if (error) return alert('Error: ' + error.message);
+      const { error } = await db.from('customer_users').update(updatePayload).eq('id', getHouseUserId());
+      if (error) return alert('Error: ' + error.message);
 
-  Object.assign(currentUser, updatePayload);
-  applyUserProfileToState(currentUser);
+      Object.assign(currentUser, updatePayload);
+      applyUserProfileToState(currentUser);
 
-  // కొత్త షిఫ్ట్ సెట్టింగ్స్ సేవ్ చేసిన తేదీని గుర్తుపెట్టుకుంటుంది (పాత రోజులు మారకుండా!)
-  const todayIso = new Date().toISOString().split('T')[0];
-  localStorage.setItem('shift_effective_from_' + getHouseUserId(), JSON.stringify({
-    date: todayIso,
-    prevM: mQty,
-    prevE: eQty
-  }));
+      const todayIso = new Date().toISOString().split('T')[0];
+      localStorage.setItem('shift_effective_from_' + getHouseUserId(), JSON.stringify({
+        date: todayIso,
+        prevM: mQty,
+        prevE: eQty
+      }));
 
-  closeQuotaModal();
-  showToast('ఉదయం & సాయంత్రం పాల వివరాలు వెండర్‌కు సింక్ అయ్యాయి!');
-  renderApp();
-}
+      closeQuotaModal();
+      showToast('ఉదయం & సాయంత్రం పాల వివరాలు వెండర్‌కు సింక్ అయ్యాయి!');
+      renderApp();
+    }
 
     // 6. DAY MODAL & ACTIONS
     function openDayModal(day) {
@@ -2022,6 +2008,7 @@
         }
       }
       const existingNote = (monthRecords[selectedDayForModal] && monthRecords[selectedDayForModal].quality_note) || null;
+      const existingVendorDelivered = Boolean(monthRecords[selectedDayForModal] && monthRecords[selectedDayForModal].vendor_delivered);
 
       const { error } = await db.from('customer_milk_logs').upsert({
         user_id: getHouseUserId(),
@@ -2039,12 +2026,13 @@
           liters: quantity,
           morning_qty: mQty,
           evening_qty: eQty,
-          quality_note: existingNote || ''
+          quality_note: existingNote || '',
+          vendor_delivered: existingVendorDelivered
         };
         if (liters === 0) {
           showToast(`${selectedDayForModal}వ తేదీ పాలు వద్దు అని మార్క్ చేశాం!`);
         } else if (future) {
-          showToast(`${selectedDayForModal}వ తేదీకి ${liters}L షెడ్యూల్ చేయబడింది (ఆ రోజు బిల్లులో కలుస్తుంది)!`);
+          showToast(`${selectedDayForModal}వ తేదీకి ${liters}L షెడ్యూల్ చేయబడింది!`);
         } else {
           showToast(`${selectedDayForModal}వ తేదీ: ${liters}L మార్క్ అయ్యాయి!`);
         }
@@ -2102,7 +2090,7 @@
           evening_qty: 0,
           status: 'skipped'
         }, { onConflict: 'user_id,log_date' });
-        monthRecords[dayNum] = { status: 'skipped', liters: 0, morning_qty: 0, evening_qty: 0, quality_note: '' };
+        monthRecords[dayNum] = { status: 'skipped', liters: 0, morning_qty: 0, evening_qty: 0, quality_note: '', vendor_delivered: false };
         showToast(`రేపు (${dayNum}న) పాలు వద్దని సెట్ చేసాం!`);
         promptMilkmanAlert(`రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip) అని తెలియజేస్తున్నాము. - ${currentUser.name || 'Customer'}`);
       }
@@ -2110,7 +2098,6 @@
       renderApp();
     }
 
-    // FIX 1: addExtraTomorrow - Syncs morning_qty and evening_qty accurately
     async function addExtraTomorrow() {
       const now = new Date();
       const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
@@ -2151,7 +2138,8 @@
           liters: newVal,
           morning_qty: mQty,
           evening_qty: eQty,
-          quality_note: (item && item.quality_note) || ''
+          quality_note: (item && item.quality_note) || '',
+          vendor_delivered: Boolean(item && item.vendor_delivered)
         };
       }
       showToast(`రేపు (${dayNum}న) +0.5L షెడ్యూల్ చేశాం! మొత్తం: ${newVal}L`);
@@ -2163,7 +2151,7 @@
       document.getElementById('billSection').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // 8. WHATSAPP SHARE (FIX 2: Dual-Shift Accurate Calculation)
+    // 8. WHATSAPP SHARE
     function shareOnWhatsApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -2265,7 +2253,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-    // 9. CALENDAR & APP RENDER
+    // 9. CALENDAR & APP RENDER (With Vendor Delivered Green Tick ✓)
     function renderApp() {
       const year = currentViewingDate.getFullYear();
       const month = currentViewingDate.getMonth();
@@ -2336,13 +2324,20 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
               totalEveningLiters += (item.evening_qty !== undefined ? item.evening_qty : 0);
 
               const isExtra = item.liters > defaultDailyQuota;
-              statusClass = isExtra 
-                ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs" 
+              const isVendorConfirmed = Boolean(item.vendor_delivered);
+              const tickHtml = isVendorConfirmed
+                ? `<i class="ph-bold ph-check text-[10px] text-emerald-700 font-black" title="Vendor Delivered"></i>`
+                : '';
+
+              statusClass = isExtra
+                ? "bg-emerald-50 border-emerald-400 text-emerald-950 shadow-xs"
                 : "bg-emerald-50/70 border-emerald-300 text-emerald-900";
 
               statusBadge = `
-                <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none flex items-center gap-0.5">
-                  ${item.liters}L ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
+                <span class="text-[10px] font-extrabold ${isExtra ? 'text-emerald-700' : 'text-emerald-600'} leading-none inline-flex items-center gap-0.5">
+                  ${tickHtml}
+                  <span>${item.liters}L</span>
+                  ${isExtra ? '<i class="ph-bold ph-plus text-[9px] text-emerald-600"></i>' : ''}
                 </span>
               `;
             } else {
@@ -2485,7 +2480,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       fetchMonthData(false);
     }
 
-    // B. Milkman Contact, Vendor Auto-Lookup & DB Sync (Uses House User ID so Family shares same Milkman)
+    // B. Milkman Contact Helpers
     function getMilkmanProfile() {
       if (!currentUser) return { name: '', phone: '', upi: '' };
       const houseId = getHouseUserId();
@@ -2517,101 +2512,8 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-    async function lookupVendorByPhone(phoneVal) {
-      const hintEl = document.getElementById('vendorLookupHint');
-      const clean = (phoneVal || '').trim();
-      if (clean.length !== 10 || isNaN(clean)) {
-        hintEl.classList.add('hidden-force');
-        return;
-      }
-      const { data: vData } = await db.from('vendors').select('name').eq('phone', clean).maybeSingle();
-      if (vData && vData.name) {
-        hintEl.innerText = `✓ MilkCount వెండర్ గుర్తించబడ్డారు: ${vData.name}`;
-        hintEl.classList.remove('hidden-force');
-        const nameInput = document.getElementById('milkmanNameInput');
-        if (!nameInput.value.trim()) {
-          nameInput.value = vData.name;
-        }
-      } else {
-        hintEl.classList.add('hidden-force');
-      }
-    }
-
-    function openMilkmanModal() {
-      const m = getMilkmanProfile();
-      document.getElementById('milkmanNameInput').value = m.name || '';
-      document.getElementById('milkmanPhoneInput').value = m.phone || '';
-      document.getElementById('milkmanUpiInput').value = m.upi || '';
-      document.getElementById('vendorLookupHint').classList.add('hidden-force');
-
-      if (m.phone && m.phone.length === 10) {
-        lookupVendorByPhone(m.phone);
-      }
-
-      const actionsDiv = document.getElementById('milkmanDirectActions');
-      if (m.phone && m.phone.length === 10) {
-        actionsDiv.classList.remove('hidden-force');
-        document.getElementById('callMilkmanLink').href = `tel:${m.phone}`;
-      } else {
-        actionsDiv.classList.add('hidden-force');
-      }
-      document.getElementById('milkmanModal').classList.remove('hidden-force');
-    }
-
     function closeMilkmanModal() {
       document.getElementById('milkmanModal').classList.add('hidden-force');
-    }
-
-    async function saveMilkmanProfile() {
-      const name = document.getElementById('milkmanNameInput').value.trim();
-      const phone = document.getElementById('milkmanPhoneInput').value.trim();
-      const upi = document.getElementById('milkmanUpiInput').value.trim();
-
-      if (phone && (phone.length !== 10 || isNaN(phone))) {
-        return alert('దయచేసి 10 అంకెల సరైన మొబైల్ నంబర్ నమోదు చేయండి.');
-      }
-
-      const btn = document.getElementById('saveMilkmanBtn');
-      btn.disabled = true;
-      btn.innerText = 'సేవ్ అవుతోంది...';
-
-      const vendorPhoneToSave = phone.length === 10 ? phone : null;
-      const houseId = getHouseUserId();
-
-      // FIX: ఎప్పుడూ మెయిన్ హెడ్ అకౌంట్ (houseId) కి మాత్రమే vendor_phone అప్‌డేట్ అవుతుంది!
-      const { error } = await db
-        .from('customer_users')
-        .update({ vendor_phone: vendorPhoneToSave })
-        .eq('id', houseId);
-
-      // ఒకవేళ ఫ్యామిలీ మెంబర్ సేవ్ చేస్తుంటే, ఫ్యామిలీ మెంబర్ సొంత అకౌంట్‌లో vendor_phone: null గానే ఉంచాలి
-      if (currentUser.family_head_id) {
-        await db.from('customer_users').update({ vendor_phone: null }).eq('id', currentUser.id);
-      }
-
-      btn.disabled = false;
-      btn.innerText = 'సేవ్ చేయండి';
-
-      if (error) {
-        return alert('Sync Error: ' + error.message);
-      }
-
-      currentUser.vendor_phone = vendorPhoneToSave;
-      localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
-      localStorage.setItem(`milkman_profile_${houseId}`, JSON.stringify({ name, phone, upi }));
-
-      updateMilkmanCardUI();
-      closeMilkmanModal();
-      showToast(vendorPhoneToSave
-        ? 'పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి & వెండర్ యాప్‌కు లింక్ అయ్యాయి!'
-        : 'పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
-    }
-
-    function chatMilkmanWhatsApp() {
-      const m = getMilkmanProfile();
-      if (!m.phone) return;
-      const msg = encodeURIComponent(`నమస్కారం ${m.name || 'గారు'}, నేను ${currentUser.name || 'Customer'} మాట్లాడుతున్నాను.`);
-      window.location.href = `whatsapp://send?phone=91${m.phone}&text=${msg}`;
     }
 
     function promptMilkmanAlert(msg) {
@@ -2627,18 +2529,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       document.getElementById('milkmanNotifyBar').classList.add('hidden-force');
     }
 
-    function sendMilkmanQuickAlert() {
-      const m = getMilkmanProfile();
-      const encoded = encodeURIComponent(pendingMilkmanAlertMsg);
-      dismissMilkmanAlert();
-      if (m.phone && m.phone.length === 10) {
-        window.location.href = `whatsapp://send?phone=91${m.phone}&text=${encoded}`;
-      } else {
-        window.location.href = `whatsapp://send?text=${encoded}`;
-      }
-    }
-
-    // C. Payment & Due Ledger + UPI Pay (Synced with Vendor Billing Ledger!)
+    // C. Payment & Due Ledger + UPI Pay
     function getLedgerKey(year, month) {
       return `milk_ledger_${getHouseUserId()}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
@@ -2801,7 +2692,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-    // FIX: PDF / Print టేబుల్‌లో కూడా ఉదయం & సాయంత్రం షిఫ్ట్ వారీగా ఖచ్చితమైన రేటు లెక్కింపు
     function buildPrintStatementTable(year, month, daysInMonth, now, userRegDate) {
       const tbody = document.getElementById('printStatementBody');
       if (!tbody) return;
@@ -2865,7 +2755,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       window.print();
     }
 
-    // E. Quality & SNF / Issue Log (Synced directly to Supabase for Vendor Alerts!)
+    // E. Quality & SNF / Issue Log
     function getQualityStorageKey(year, month) {
       return `milk_quality_${getHouseUserId()}_${year}_${String(month + 1).padStart(2, '0')}`;
     }
@@ -2879,7 +2769,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-    // FIX 3: setDayQualityNote - Syncs morning_qty and evening_qty alongside quality_note
     async function setDayQualityNote(noteText) {
       if (!selectedDayForModal) return;
       const year = currentViewingDate.getFullYear();
@@ -2913,7 +2802,8 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
           liters: qty,
           morning_qty: dbStatus === 'skipped' ? 0 : mQty,
           evening_qty: dbStatus === 'skipped' ? 0 : eQty,
-          quality_note: noteText
+          quality_note: noteText,
+          vendor_delivered: false
         };
       } else {
         monthRecords[day].quality_note = noteText;
@@ -2979,7 +2869,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       return currentUser.family_head_id || currentUser.id;
     }
 
-    // E3. FAMILY MEMBER LINKING LOGIC (Updated: Prevents Vendor Duplicate Customer!)
+    // E3. FAMILY MEMBER LINKING LOGIC
     function openFamilyModal() {
       document.getElementById('familyMemberPhoneInput').value = '';
       const statusBox = document.getElementById('familyLinkedStatusBox');
@@ -3020,12 +2910,11 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
       const houseId = getHouseUserId();
 
-      // FIX: vendor_phone: null చేయడం వల్ల వెండర్ యాప్‌లో ఈ ఫ్యామిలీ నంబర్ కొత్త కస్టమర్‌గా యాడ్ అవ్వదు!
       const { error: updErr } = await db
         .from('customer_users')
-        .update({ 
-          family_head_id: houseId, 
-          vendor_phone: null 
+        .update({
+          family_head_id: houseId,
+          vendor_phone: null
         })
         .eq('id', memberUser.id);
 
@@ -3093,6 +2982,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       const month = now.getMonth();
       const todayDay = now.getDate();
 
+      const bannerEl = document.getElementById('liveDeliveryStatusBanner');
       const titleEl = document.getElementById('liveDeliveryTitle');
       const subEl = document.getElementById('familySyncSubLabel');
       const iconEl = document.getElementById('liveDeliveryIcon');
@@ -3103,16 +2993,22 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
       if (todayRec && todayRec.status === 'skipped') {
         titleEl.innerText = 'ఈరోజు పాలు: వద్దు (Skipped)';
+        titleEl.className = 'text-xs font-extrabold text-rose-800 truncate';
         iconEl.className = 'w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0';
         iconEl.innerHTML = '<i class="ph-bold ph-prohibit text-base"></i>';
+        if (bannerEl) bannerEl.className = 'bg-rose-50/40 border border-rose-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
       } else if (todayRec && todayRec.vendor_delivered) {
         titleEl.innerText = `✅ ఈరోజు పాలు డెలివరీ అయ్యాయి (${todayRec.liters}L)`;
-        iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center shrink-0';
+        titleEl.className = 'text-xs font-extrabold text-emerald-800 truncate';
+        iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
         iconEl.innerHTML = '<i class="ph-fill ph-check-circle text-base"></i>';
+        if (bannerEl) bannerEl.className = 'bg-emerald-50/70 border border-emerald-300 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
       } else {
         titleEl.innerText = 'ఈరోజు డెలివరీ: షెడ్యూల్ / పెండింగ్';
+        titleEl.className = 'text-xs font-extrabold text-slate-800 truncate';
         iconEl.className = 'w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0';
         iconEl.innerHTML = '<i class="ph-bold ph-clock text-base"></i>';
+        if (bannerEl) bannerEl.className = 'bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
       }
 
       subEl.innerText = currentUser.family_head_id
@@ -3120,7 +3016,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         : (currentUser.vendor_phone ? `వెండర్ లింక్: ${currentUser.vendor_phone}` : 'వెండర్ నంబర్ లింక్ చేయండి');
     }
 
-    // FIX 4: renderSixMonthSpendingChart - Uses Dual-Shift rates accurately
     async function renderSixMonthSpendingChart() {
       const chartEl = document.getElementById('sixMonthSpendingChart');
       if (!chartEl || !currentUser) return;
@@ -3254,7 +3149,7 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       showToast('మీ పేరు మరియు కొత్త PIN అప్‌డేట్ అయ్యాయి!');
     }
 
-    // G. IN-APP SUPPORT TICKETS (Raise a Ticket & View Admin Replies)
+    // G. IN-APP SUPPORT TICKETS
     function openSupportModal() {
       if (!currentUser) return;
       document.getElementById('ticketDescInput').value = '';
@@ -3335,14 +3230,13 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }).join('');
     }
 
-    // Share Vendor App Link via WhatsApp (Uses existing share logic)
     function shareVendorApp() {
-      const vendorAppUrl = 'https://kishoreee226-netizen.github.io/milk-tracker-vendor/'; 
+      const vendorAppUrl = 'https://kishoreee226-netizen.github.io/milk-tracker-vendor/';
       const shareText = `🚚 *MilkCount Vendor App - పాల వ్యాపారి యాప్*\nడెలివరీ రూట్, ఆటో కలెక్షన్ మరియు కస్టమర్ల బిల్లింగ్ నిర్వహించడానికి ఈ వెండర్ యాప్‌ను ఇన్‌స్టాల్ చేసుకోండి:\n${vendorAppUrl}`;
 
       if (navigator.share) {
         navigator.share({
-        title: 'MilkCount Vendor App',
+          title: 'MilkCount Vendor App',
           text: shareText,
           url: vendorAppUrl
         }).catch(() => {});
@@ -3352,556 +3246,557 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
     }
   </script>
 
-<!-- CUSTOMER INFO MODAL (About Us & Why Choose Us Only) -->
-<div id="custInfoModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-  <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
+  <!-- CUSTOMER INFO MODAL -->
+  <div id="custInfoModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
 
-    <!-- Modal Header -->
-    <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3.5 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <i id="custInfoModalIcon" class="ph-bold ph-info text-xl text-amber-200"></i>
-        <h3 id="custInfoModalTitle" class="text-sm font-extrabold tracking-wide">సమాచారం</h3>
+      <!-- Modal Header -->
+      <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3.5 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-2">
+          <i id="custInfoModalIcon" class="ph-bold ph-info text-xl text-amber-200"></i>
+          <h3 id="custInfoModalTitle" class="text-sm font-extrabold tracking-wide">సమాచారం</h3>
+        </div>
+        <button onclick="closeCustInfoModal()" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
+          <i class="ph-bold ph-x text-sm"></i>
+        </button>
       </div>
-      <button onclick="closeCustInfoModal()" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center text-white transition">
-        <i class="ph-bold ph-x text-sm"></i>
-      </button>
-    </div>
 
-    <!-- Modal Scrollable Body -->
-    <div id="custInfoModalBody" class="p-4 overflow-y-auto overscroll-contain text-xs text-slate-700 space-y-3 leading-relaxed">
-    </div>
+      <!-- Modal Scrollable Body -->
+      <div id="custInfoModalBody" class="p-4 overflow-y-auto overscroll-contain text-xs text-slate-700 space-y-3 leading-relaxed">
+      </div>
 
-    <!-- Modal Footer -->
-    <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
-      <button onclick="closeCustInfoModal()" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition">
-        మూసివేయి (Close)
-      </button>
-    </div>
+      <!-- Modal Footer -->
+      <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-200 flex justify-end shrink-0">
+        <button onclick="closeCustInfoModal()" class="px-4 py-1.5 rounded-lg bg-sky-600 hover:bg-sky-700 text-white text-xs font-bold shadow-sm transition">
+          మూసివేయి (Close)
+        </button>
+      </div>
 
+    </div>
   </div>
-</div>
 
-<script>
-  const CUST_INFO_CONTENT = {
-    about: {
-      title: 'About Us (మా గురించి)',
-      icon: 'ph-bold ph-info text-amber-200',
-      html: `
-        <div class="bg-sky-50 border border-sky-100 rounded-xl p-3 text-sky-900 font-semibold">
-          <strong>MilkCount Customer App</strong> అనేది ప్రతి కుటుంబానికి రోజువారీ పాల లెక్కలను మరియు నెలవారీ బిల్లులను పారదర్శకంగా చూపించే స్మార్ట్ డిజిటల్ డైరీ యాప్.
-        </div>
-        <p>పాత పద్ధతిలో పాల కార్డులు లేదా పేపర్ డైరీలు పోగొట్టుకోవడం, నెలాఖరులో లెక్కల్లో తప్పులు రావడం వంటి సమస్యలకు చెక్ పెట్టేందుకే <strong>MilkCount</strong> రూపొందించబడింది.</p>
-        <ul class="list-disc pl-4 space-y-1.5 text-slate-700">
-          <li><strong>లైవ్ వెండర్ సింక్:</strong> మీ పాల వ్యాపారి (Vendor) వేసే ప్రతి రోజు డెలివరీ ఎంట్రీ మీ యాప్‌లో వెంటనే కనిపిస్తుంది.</li>
-          <li><strong>ఉదయం & సాయంత్రం లెక్కలు:</strong> గేదె పాలు, ఆవు పాలు మరియు షిఫ్ట్ వారీగా ధరలను స్పష్టంగా ట్రాక్ చేసుకోవచ్చు.</li>
-          <li><strong>సులభమైన కమ్యూనికేషన్:</strong> ఒక్క క్లిక్‌తో రేపటి పాలు ఆపడం (Skip Tomorrow) లేదా అదనపు పాలు అడగడం చేయవచ్చు.</li>
-        </ul>
-      `
-    },
-    
-    why: {
-      title: 'Why Choose Us (మమ్మల్ని ఎందుకు ఎంచుకోవాలి?)',
-      icon: 'ph-bold ph-star text-amber-300',
-      html: `
-        <div class="space-y-2.5">
-          <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
-            <div class="font-bold text-emerald-800">✅ 100% పారదర్శకమైన బిల్లింగ్</div>
-            <div class="text-slate-600 mt-0.5">ఏ రోజు ఎన్ని లీటర్లు వచ్చాయో క్యాలెండర్‌లో రంగులతో సహా స్పష్టంగా కనిపిస్తుంది. లెక్కల్లో ఒక్క రూపాయి కూడా తేడా రాదు.</div>
+  <script>
+    const CUST_INFO_CONTENT = {
+      about: {
+        title: 'About Us (మా గురించి)',
+        icon: 'ph-bold ph-info text-amber-200',
+        html: `
+          <div class="bg-sky-50 border border-sky-100 rounded-xl p-3 text-sky-900 font-semibold">
+            <strong>MilkCount Customer App</strong> అనేది ప్రతి కుటుంబానికి రోజువారీ పాల లెక్కలను మరియు నెలవారీ బిల్లులను పారదర్శకంగా చూపించే స్మార్ట్ డిజిటల్ డైరీ యాప్.
           </div>
-          <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-100">
-            <div class="font-bold text-amber-800">⚡ త్వరిత అప్‌డేట్స్ (Quick Actions)</div>
-            <div class="text-slate-600 mt-0.5">ఊరికి వెళ్తున్నప్పుడు వెండర్‌కు ఫోన్ చేయాల్సిన పని లేకుండా యాప్ నుండే సెలవు (Pause Milk) పెట్టవచ్చు.</div>
+          <p>పాత పద్ధతిలో పాల కార్డులు లేదా పేపర్ డైరీలు పోగొట్టుకోవడం, నెలాఖరులో లెక్కల్లో తప్పులు రావడం వంటి సమస్యలకు చెక్ పెట్టేందుకే <strong>MilkCount</strong> రూపొందించబడింది.</p>
+          <ul class="list-disc pl-4 space-y-1.5 text-slate-700">
+            <li><strong>లైవ్ వెండర్ సింక్:</strong> మీ పాల వ్యాపారి (Vendor) వేసే ప్రతి రోజు డెలివరీ ఎంట్రీ మీ యాప్‌లో వెంటనే కనిపిస్తుంది.</li>
+            <li><strong>ఉదయం & సాయంత్రం లెక్కలు:</strong> గేదె పాలు, ఆవు పాలు మరియు షిఫ్ట్ వారీగా ధరలను స్పష్టంగా ట్రాక్ చేసుకోవచ్చు.</li>
+            <li><strong>సులభమైన కమ్యూనికేషన్:</strong> ఒక్క క్లిక్‌తో రేపటి పాలు ఆపడం (Skip Tomorrow) లేదా అదనపు పాలు అడగడం చేయవచ్చు.</li>
+          </ul>
+        `
+      },
+      why: {
+        title: 'Why Choose Us (మమ్మల్ని ఎందుకు ఎంచుకోవాలి?)',
+        icon: 'ph-bold ph-star text-amber-300',
+        html: `
+          <div class="space-y-2.5">
+            <div class="p-2.5 rounded-xl bg-emerald-50 border border-emerald-100">
+              <div class="font-bold text-emerald-800">✅ 100% పారదర్శకమైన బిల్లింగ్</div>
+              <div class="text-slate-600 mt-0.5">ఏ రోజు ఎన్ని లీటర్లు వచ్చాయో క్యాలెండర్‌లో రంగులతో సహా స్పష్టంగా కనిపిస్తుంది. లెక్కల్లో ఒక్క రూపాయి కూడా తేడా రాదు.</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-amber-50 border border-amber-100">
+              <div class="font-bold text-amber-800">⚡ త్వరిత అప్‌డేట్స్ (Quick Actions)</div>
+              <div class="text-slate-600 mt-0.5">ఊరికి వెళ్తున్నప్పుడు వెండర్‌కు ఫోన్ చేయాల్సిన పని లేకుండా యాప్ నుండే సెలవు (Pause Milk) పెట్టవచ్చు.</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100">
+              <div class="font-bold text-sky-800">💳 సులభమైన UPI & బిల్లు PDF</div>
+              <div class="text-slate-600 mt-0.5">నెల పూర్తయిన వెంటనే మొత్తం బిల్లును చూసుకుని నేరుగా UPI ద్వారా చెల్లించవచ్చు మరియు రసీదు పొందవచ్చు.</div>
+            </div>
+            <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-100">
+              <div class="font-bold text-purple-800">🛡️ నాణ్యత ఫిర్యాదు & సపోర్ట్</div>
+              <div class="text-slate-600 mt-0.5">పాల నాణ్యతలో ఏదైనా సమస్య ఉంటే నేరుగా యాప్ నుండే ఫిర్యాదు (Quality Alert) పంపే సౌకర్యం.</div>
+            </div>
           </div>
-          <div class="p-2.5 rounded-xl bg-sky-50 border border-sky-100">
-            <div class="font-bold text-sky-800">💳 సులభమైన UPI & బిల్లు PDF</div>
-            <div class="text-slate-600 mt-0.5">నెల పూర్తయిన వెంటనే మొత్తం బిల్లును చూసుకుని నేరుగా UPI ద్వారా చెల్లించవచ్చు మరియు రసీదు పొందవచ్చు.</div>
+        `
+      },
+      contact: {
+        title: 'Contact Us (సంప్రదించండి)',
+        icon: 'ph-bold ph-envelope-simple text-amber-200',
+        html: `
+          <div class="space-y-3 text-center">
+            <p class="text-xs text-slate-600">ఏదైనా సమాచారం లేదా సహాయం కోసం మమ్మల్ని సంప్రదించండి:</p>
+            <a href="mailto:milkcount.saport@gmail.com" class="block bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs font-extrabold text-sky-900 underline break-all select-all">
+              milkcount.saport@gmail.com
+            </a>
           </div>
-          <div class="p-2.5 rounded-xl bg-purple-50 border border-purple-100">
-            <div class="font-bold text-purple-800">🛡️ నాణ్యత ఫిర్యాదు & సపోర్ట్</div>
-            <div class="text-slate-600 mt-0.5">పాల నాణ్యతలో ఏదైనా సమస్య ఉంటే నేరుగా యాప్ నుండే ఫిర్యాదు (Quality Alert) పంపే సౌకర్యం.</div>
-          </div>
-        </div>
-      `
-    },
-        contact: {
-      title: 'Contact Us (సంప్రదించండి)',
-      icon: 'ph-bold ph-envelope-simple text-amber-200',
-      html: `
-        <div class="space-y-3 text-center">
-          <p class="text-xs text-slate-600">ఏదైనా సమాచారం లేదా సహాయం కోసం మమ్మల్ని సంప్రదించండి:</p>
-          <a href="mailto:milkcount.saport@gmail.com" class="block bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs font-extrabold text-sky-900 underline break-all select-all">
-            milkcount.saport@gmail.com
-          </a>
-        </div>
-      `
-    }
-    
-  };
-
-  function openCustInfoModal(type) {
-    const data = CUST_INFO_CONTENT[type];
-    if (!data) return;
-    document.getElementById('custInfoModalTitle').textContent = data.title;
-    document.getElementById('custInfoModalIcon').className = data.icon + ' text-xl';
-    document.getElementById('custInfoModalBody').innerHTML = data.html;
-    document.getElementById('custInfoModal').classList.remove('hidden-force');
-  }
-
-  function closeCustInfoModal() {
-    document.getElementById('custInfoModal').classList.add('hidden-force');
-  }
-</script>
-
-<script>
-  let activeBillFilter = 'both';
-  let milkmanEditMode = 'single';
-
-  function setBillFilter(mode) {
-    activeBillFilter = mode;
-    ['both', 'morning', 'evening'].forEach(function(m) {
-      const btn = document.getElementById('billTab' + m.charAt(0).toUpperCase() + m.slice(1));
-      if (!btn) return;
-      btn.className = (m === mode)
-        ? 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs transition-all font-extrabold'
-        : 'py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all font-bold';
-    });
-    renderApp();
-  }
-
-  function setMilkmanMode(mode) {
-    milkmanEditMode = mode;
-    const sBtn = document.getElementById('milkmanModeSingleBtn');
-    const dBtn = document.getElementById('milkmanModeDualBtn');
-    const evBox = document.getElementById('eveningMilkmanBox');
-    const titleEl = document.getElementById('primaryMilkmanBoxTitle');
-    if (!sBtn || !dBtn || !evBox || !titleEl) return;
-    if (mode === 'dual') {
-      sBtn.className = 'py-1.5 rounded-lg text-slate-600';
-      dBtn.className = 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs';
-      evBox.classList.remove('hidden-force');
-      titleEl.innerText = '🌅 ఉదయం పాలబ్బాయి (Morning)';
-    } else {
-      sBtn.className = 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs';
-      dBtn.className = 'py-1.5 rounded-lg text-slate-600';
-      evBox.classList.add('hidden-force');
-      titleEl.innerText = '🌅🌇 పాలబ్బాయి (Both Shifts)';
-    }
-  }
-
-  window.getMilkmanProfile = function(shift) {
-    shift = shift || 'morning';
-    if (!currentUser) return { mode: 'single', name: '', phone: '', upi: '', evName: '', evPhone: '', evUpi: '' };
-    const houseId = getHouseUserId();
-    let saved = {};
-    try {
-      saved = JSON.parse(localStorage.getItem('milkman_profile_' + houseId)) || JSON.parse(localStorage.getItem('milkman_profile_' + currentUser.id)) || {};
-    } catch (e) {}
-    const base = {
-      mode: saved.mode || (saved.evPhone ? 'dual' : 'single'),
-      name: saved.name || '', phone: saved.phone || currentUser.vendor_phone || '', upi: saved.upi || '',
-      evName: saved.evName || '', evPhone: saved.evPhone || '', evUpi: saved.evUpi || ''
+        `
+      }
     };
-    if (shift === 'evening' && base.mode === 'dual') return { name: base.evName, phone: base.evPhone, upi: base.evUpi, mode: 'dual', full: base };
-    return { name: base.name, phone: base.phone, upi: base.upi, mode: base.mode, full: base };
-  };
 
-  window.updateMilkmanCardUI = function() {
-    const m = getMilkmanProfile('morning').full;
-    const nameEl = document.getElementById('milkmanCardName');
-    const subEl = document.getElementById('milkmanCardSub');
-    if (!nameEl || !subEl) return;
-    if (m.mode === 'dual' && (m.evName || m.evPhone)) {
-      nameEl.innerText = (m.name || 'ఉదయం') + ' / ' + (m.evName || 'సాయంత్రం');
-      subEl.innerText = '🌅' + (m.phone ? m.phone.slice(-4) : '--') + ' • 🌇' + (m.evPhone ? m.evPhone.slice(-4) : '--');
-    } else if (m.name || m.phone) {
-      nameEl.innerText = m.name || m.phone;
-      subEl.innerText = m.phone ? '📞 ' + m.phone : 'UPI Saved';
-    } else {
-      nameEl.innerText = 'నంబర్ సేవ్';
-      subEl.innerText = 'Add Milkman';
+    function openCustInfoModal(type) {
+      const data = CUST_INFO_CONTENT[type];
+      if (!data) return;
+      document.getElementById('custInfoModalTitle').textContent = data.title;
+      document.getElementById('custInfoModalIcon').className = data.icon + ' text-xl';
+      document.getElementById('custInfoModalBody').innerHTML = data.html;
+      document.getElementById('custInfoModal').classList.remove('hidden-force');
     }
-  };
 
-  window.lookupVendorByPhone = async function(phoneVal, which) {
-    which = which || 'morning';
-    const hintEl = document.getElementById(which === 'evening' ? 'eveningVendorLookupHint' : 'vendorLookupHint');
-    const nameInput = document.getElementById(which === 'evening' ? 'eveningMilkmanNameInput' : 'milkmanNameInput');
-    const clean = (phoneVal || '').trim();
-    if (clean.length !== 10 || isNaN(clean)) { if (hintEl) hintEl.classList.add('hidden-force'); return; }
-    const { data: vData } = await db.from('vendors').select('name').eq('phone', clean).maybeSingle();
-    if (vData && vData.name && hintEl) {
-      hintEl.innerText = '✓ MilkCount వెండర్: ' + vData.name;
-      hintEl.classList.remove('hidden-force');
-      if (nameInput && !nameInput.value.trim()) nameInput.value = vData.name;
-    } else if (hintEl) hintEl.classList.add('hidden-force');
-  };
+    function closeCustInfoModal() {
+      document.getElementById('custInfoModal').classList.add('hidden-force');
+    }
+  </script>
 
-  window.openMilkmanModal = function() {
-    const m = getMilkmanProfile('morning').full;
-    setMilkmanMode(m.mode || 'single');
-    document.getElementById('milkmanNameInput').value = m.name || '';
-    document.getElementById('milkmanPhoneInput').value = m.phone || '';
-    document.getElementById('milkmanUpiInput').value = m.upi || '';
-    document.getElementById('eveningMilkmanNameInput').value = m.evName || '';
-    document.getElementById('eveningMilkmanPhoneInput').value = m.evPhone || '';
-    document.getElementById('eveningMilkmanUpiInput').value = m.evUpi || '';
-    const act1 = document.getElementById('milkmanDirectActions');
-    if (m.phone && m.phone.length === 10) { act1.classList.remove('hidden-force'); document.getElementById('callMilkmanLink').href = 'tel:' + m.phone; }
-    else act1.classList.add('hidden-force');
-    const act2 = document.getElementById('eveningMilkmanDirectActions');
-    if (m.evPhone && m.evPhone.length === 10) { act2.classList.remove('hidden-force'); document.getElementById('callEveningMilkmanLink').href = 'tel:' + m.evPhone; }
-    else act2.classList.add('hidden-force');
-    document.getElementById('milkmanModal').classList.remove('hidden-force');
-  };
+  <script>
+    let activeBillFilter = 'both';
+    let milkmanEditMode = 'single';
 
-  window.saveMilkmanProfile = async function() {
-    const name = document.getElementById('milkmanNameInput').value.trim();
-    const phone = document.getElementById('milkmanPhoneInput').value.trim();
-    const upi = document.getElementById('milkmanUpiInput').value.trim();
-    const evName = document.getElementById('eveningMilkmanNameInput').value.trim();
-    const evPhone = document.getElementById('eveningMilkmanPhoneInput').value.trim();
-    const evUpi = document.getElementById('eveningMilkmanUpiInput').value.trim();
-    if (phone && (phone.length !== 10 || isNaN(phone))) return alert('ఉదయం పాలబ్బాయి 10 అంకెల నంబర్ నమోదు చేయండి.');
-    if (milkmanEditMode === 'dual' && evPhone && (evPhone.length !== 10 || isNaN(evPhone))) return alert('సాయంత్రం పాలబ్బాయి 10 అంకెల నంబర్ నమోదు చేయండి.');
-    const btn = document.getElementById('saveMilkmanBtn');
-    btn.disabled = true; btn.innerText = 'సేవ్ అవుతోంది...';
-    const vendorPhoneToSave = phone.length === 10 ? phone : null;
-    const houseId = getHouseUserId();
-    await db.from('customer_users').update({ vendor_phone: vendorPhoneToSave }).eq('id', houseId);
-    if (currentUser.family_head_id) await db.from('customer_users').update({ vendor_phone: null }).eq('id', currentUser.id);
-    btn.disabled = false; btn.innerText = 'సేవ్ చేయండి';
-    currentUser.vendor_phone = vendorPhoneToSave;
-    localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
-    localStorage.setItem('milkman_profile_' + houseId, JSON.stringify({ mode: milkmanEditMode, name, phone, upi, evName, evPhone, evUpi }));
-    updateMilkmanCardUI();
-    closeMilkmanModal();
-    renderApp();
-    showToast('పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
-  };
-
-  window.chatMilkmanWhatsApp = function(which) {
-    const m = getMilkmanProfile(which || 'morning');
-    if (!m.phone) return;
-    const msg = encodeURIComponent('నమస్కారం ' + (m.name || 'గారు') + ', నేను ' + (currentUser.name || 'Customer') + ' మాట్లాడుతున్నాను.');
-    window.location.href = 'whatsapp://send?phone=91' + m.phone + '&text=' + msg;
-  };
-</script>
-
-  <!------// script B ----!>
-<script>
-  // పాత రోజులలో morning_qty సేవ్ కాకపోతే, దాన్ని కొత్త రేషియోతో విడగొట్టకుండా పూర్తిగా ఉదయం పాలగానే ఉంచుతుంది
-  function getEffectiveStartDate() {
-    if (!currentUser) return '2000-01-01';
-    try {
-      const saved = JSON.parse(localStorage.getItem('shift_effective_from_' + getHouseUserId()));
-      if (saved && saved.date) return saved.date;
-    } catch (e) {}
-    return '2000-01-01';
-  }
-
-  const _origRenderAppV15 = renderApp;
-  window.renderApp = function() {
-    _origRenderAppV15();
-
-    const year = currentViewingDate.getFullYear();
-    const month = currentViewingDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate();
-    const now = new Date();
-    const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
-    userRegDate.setHours(0, 0, 0, 0);
-
-         // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) cleanly inside the box
-    const grid = document.getElementById('calendarDaysGrid');
-    if (grid) {
-      grid.querySelectorAll('button').forEach(function(btn, idx) {
-        const day = idx + 1;
-        const item = monthRecords[day];
-        const cDate = new Date(year, month, day);
-        let mQ = 0, eQ = 0, isDel = false;
-        if (item && item.status === 'delivered' && item.liters > 0) {
-          isDel = true;
-          mQ = item.morning_qty !== undefined ? parseFloat(item.morning_qty) : item.liters;
-          eQ = item.evening_qty !== undefined ? parseFloat(item.evening_qty) : 0;
-        } else if (!item && cDate <= now && cDate >= userRegDate && isAutoModeOnDate(cDate)) {
-          isDel = true; mQ = morningQuota; eQ = eveningQuota;
-        }
-        if (isDel && (mQ > 0 || eQ > 0)) {
-          btn.classList.remove('h-14');
-          btn.classList.add('h-16');
-          const box = btn.querySelector('div.my-auto');
-          if (box) {
-            if (mQ > 0 && eQ > 0) {
-              box.innerHTML =
-                '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap">🌅 ' + mQ + 'L</div>' +
-                '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap">🌇 ' + eQ + 'L</div>';
-            } else if (mQ > 0) {
-              box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap">🌅 ' + mQ + 'L</span>';
-            } else {
-              box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap">🌇 ' + eQ + 'L</span>';
-            }
-          }
-        }
+    function setBillFilter(mode) {
+      activeBillFilter = mode;
+      ['both', 'morning', 'evening'].forEach(function(m) {
+        const btn = document.getElementById('billTab' + m.charAt(0).toUpperCase() + m.slice(1));
+        if (!btn) return;
+        btn.className = (m === mode)
+          ? 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs transition-all font-extrabold'
+          : 'py-1.5 rounded-lg text-slate-600 hover:text-slate-900 transition-all font-bold';
       });
+      renderApp();
     }
 
-    // 2. Shift-wise bill calculation
-    let mDays = 0, eDays = 0, bothDays = 0, skipDays = 0, totM = 0, totE = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const cDate = new Date(year, month, d);
-      const rec = monthRecords[d];
-      if (rec) {
-        if (rec.status === 'delivered' && rec.liters > 0 && cDate <= now) {
-          const m = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
-          const e = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
-          bothDays++; if (m > 0) { mDays++; totM += m; } if (e > 0) { eDays++; totE += e; }
-        } else if (rec.status === 'skipped') skipDays++;
-      } else if (cDate <= now && cDate >= userRegDate && isAutoModeOnDate(cDate)) {
-        bothDays++;
-        if (morningQuota > 0) { mDays++; totM += morningQuota; }
-        if (eveningQuota > 0) { eDays++; totE += eveningQuota; }
+    function setMilkmanMode(mode) {
+      milkmanEditMode = mode;
+      const sBtn = document.getElementById('milkmanModeSingleBtn');
+      const dBtn = document.getElementById('milkmanModeDualBtn');
+      const evBox = document.getElementById('eveningMilkmanBox');
+      const titleEl = document.getElementById('primaryMilkmanBoxTitle');
+      if (!sBtn || !dBtn || !evBox || !titleEl) return;
+      if (mode === 'dual') {
+        sBtn.className = 'py-1.5 rounded-lg text-slate-600';
+        dBtn.className = 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs';
+        evBox.classList.remove('hidden-force');
+        titleEl.innerText = '🌅 ఉదయం పాలబ్బాయి (Morning)';
+      } else {
+        sBtn.className = 'py-1.5 rounded-lg bg-white text-sky-700 shadow-xs';
+        dBtn.className = 'py-1.5 rounded-lg text-slate-600';
+        evBox.classList.add('hidden-force');
+        titleEl.innerText = '🌅🌇 పాలబ్బాయి (Both Shifts)';
       }
     }
 
-    const mBill = Math.round(totM * morningRate), eBill = Math.round(totE * eveningRate);
-    const mInfo = getMilkmanProfile('morning'), eInfo = getMilkmanProfile('evening');
-    const bannerEl = document.getElementById('activeBillVendorBanner');
-    const mRow = document.getElementById('billMorningRow'), eRow = document.getElementById('billEveningRow');
+    window.getMilkmanProfile = function(shift) {
+      shift = shift || 'morning';
+      if (!currentUser) return { mode: 'single', name: '', phone: '', upi: '', evName: '', evPhone: '', evUpi: '' };
+      const houseId = getHouseUserId();
+      let saved = {};
+      try {
+        saved = JSON.parse(localStorage.getItem('milkman_profile_' + houseId)) || JSON.parse(localStorage.getItem('milkman_profile_' + currentUser.id)) || {};
+      } catch (e) {}
+      const base = {
+        mode: saved.mode || (saved.evPhone ? 'dual' : 'single'),
+        name: saved.name || '', phone: saved.phone || currentUser.vendor_phone || '', upi: saved.upi || '',
+        evName: saved.evName || '', evPhone: saved.evPhone || '', evUpi: saved.evUpi || ''
+      };
+      if (shift === 'evening' && base.mode === 'dual') return { name: base.evName, phone: base.evPhone, upi: base.evUpi, mode: 'dual', full: base };
+      return { name: base.name, phone: base.phone, upi: base.upi, mode: base.mode, full: base };
+    };
 
-    if (activeBillFilter === 'morning') {
-      currentCalculatedBill = mBill;
-      if (bannerEl) bannerEl.innerHTML = '<span>🌅 ఉదయం పాలబ్బాయి: <strong>' + (mInfo.name || mInfo.phone || 'Not Set') + '</strong></span><span>Morning Only</span>';
-      if (mRow) mRow.style.display = 'flex'; if (eRow) eRow.style.display = 'none';
-      document.getElementById('billDeliveredDays').innerText = mDays + ' రోజులు';
-      document.getElementById('billTotalLiters').innerText = totM.toFixed(1) + ' L';
-      document.getElementById('billFinalAmount').innerText = mBill.toLocaleString('en-IN');
-    } else if (activeBillFilter === 'evening') {
-      currentCalculatedBill = eBill;
-      if (bannerEl) bannerEl.innerHTML = '<span>🌇 సాయంత్రం పాలబ్బాయి: <strong>' + (eInfo.name || eInfo.phone || 'Not Set') + '</strong></span><span>Evening Only</span>';
-      if (mRow) mRow.style.display = 'none'; if (eRow) eRow.style.display = 'flex';
-      document.getElementById('billDeliveredDays').innerText = eDays + ' రోజులు';
-      document.getElementById('billTotalLiters').innerText = totE.toFixed(1) + ' L';
-      document.getElementById('billFinalAmount').innerText = eBill.toLocaleString('en-IN');
-    } else {
-      currentCalculatedBill = mBill + eBill;
-      const vLbl = (mInfo.mode === 'dual' && eInfo.name) ? ((mInfo.name || 'ఉదయం') + ' & ' + eInfo.name) : (mInfo.name || mInfo.phone || 'Not Set');
-      if (bannerEl) bannerEl.innerHTML = '<span>👤 పాలబ్బాయి: <strong>' + vLbl + '</strong></span><span>Both Shifts</span>';
-      if (mRow) mRow.style.display = 'flex'; if (eRow) eRow.style.display = 'flex';
-      document.getElementById('billDeliveredDays').innerText = bothDays + ' రోజులు';
-      document.getElementById('billTotalLiters').innerText = (totM + totE).toFixed(1) + ' L';
-      document.getElementById('billFinalAmount').innerText = (mBill + eBill).toLocaleString('en-IN');
+    window.updateMilkmanCardUI = function() {
+      const m = getMilkmanProfile('morning').full;
+      const nameEl = document.getElementById('milkmanCardName');
+      const subEl = document.getElementById('milkmanCardSub');
+      if (!nameEl || !subEl) return;
+      if (m.mode === 'dual' && (m.evName || m.evPhone)) {
+        nameEl.innerText = (m.name || 'ఉదయం') + ' / ' + (m.evName || 'సాయంత్రం');
+        subEl.innerText = '🌅' + (m.phone ? m.phone.slice(-4) : '--') + ' • 🌇' + (m.evPhone ? m.evPhone.slice(-4) : '--');
+      } else if (m.name || m.phone) {
+        nameEl.innerText = m.name || m.phone;
+        subEl.innerText = m.phone ? '📞 ' + m.phone : 'UPI Saved';
+      } else {
+        nameEl.innerText = 'నంబర్ సేవ్';
+        subEl.innerText = 'Add Milkman';
+      }
+    };
+
+    window.lookupVendorByPhone = async function(phoneVal, which) {
+      which = which || 'morning';
+      const hintEl = document.getElementById(which === 'evening' ? 'eveningVendorLookupHint' : 'vendorLookupHint');
+      const nameInput = document.getElementById(which === 'evening' ? 'eveningMilkmanNameInput' : 'milkmanNameInput');
+      const clean = (phoneVal || '').trim();
+      if (clean.length !== 10 || isNaN(clean)) { if (hintEl) hintEl.classList.add('hidden-force'); return; }
+      const { data: vData } = await db.from('vendors').select('name').eq('phone', clean).maybeSingle();
+      if (vData && vData.name && hintEl) {
+        hintEl.innerText = '✓ MilkCount వెండర్: ' + vData.name;
+        hintEl.classList.remove('hidden-force');
+        if (nameInput && !nameInput.value.trim()) nameInput.value = vData.name;
+      } else if (hintEl) hintEl.classList.add('hidden-force');
+    };
+
+    window.openMilkmanModal = function() {
+      const m = getMilkmanProfile('morning').full;
+      setMilkmanMode(m.mode || 'single');
+      document.getElementById('milkmanNameInput').value = m.name || '';
+      document.getElementById('milkmanPhoneInput').value = m.phone || '';
+      document.getElementById('milkmanUpiInput').value = m.upi || '';
+      document.getElementById('eveningMilkmanNameInput').value = m.evName || '';
+      document.getElementById('eveningMilkmanPhoneInput').value = m.evPhone || '';
+      document.getElementById('eveningMilkmanUpiInput').value = m.evUpi || '';
+      const act1 = document.getElementById('milkmanDirectActions');
+      if (m.phone && m.phone.length === 10) { act1.classList.remove('hidden-force'); document.getElementById('callMilkmanLink').href = 'tel:' + m.phone; }
+      else act1.classList.add('hidden-force');
+      const act2 = document.getElementById('eveningMilkmanDirectActions');
+      if (m.evPhone && m.evPhone.length === 10) { act2.classList.remove('hidden-force'); document.getElementById('callEveningMilkmanLink').href = 'tel:' + m.evPhone; }
+      else act2.classList.add('hidden-force');
+      document.getElementById('milkmanModal').classList.remove('hidden-force');
+    };
+
+    window.saveMilkmanProfile = async function() {
+      const name = document.getElementById('milkmanNameInput').value.trim();
+      const phone = document.getElementById('milkmanPhoneInput').value.trim();
+      const upi = document.getElementById('milkmanUpiInput').value.trim();
+      const evName = document.getElementById('eveningMilkmanNameInput').value.trim();
+      const evPhone = document.getElementById('eveningMilkmanPhoneInput').value.trim();
+      const evUpi = document.getElementById('eveningMilkmanUpiInput').value.trim();
+      if (phone && (phone.length !== 10 || isNaN(phone))) return alert('ఉదయం పాలబ్బాయి 10 అంకెల నంబర్ నమోదు చేయండి.');
+      if (milkmanEditMode === 'dual' && evPhone && (evPhone.length !== 10 || isNaN(evPhone))) return alert('సాయంత్రం పాలబ్బాయి 10 అంకెల నంబర్ నమోదు చేయండి.');
+      const btn = document.getElementById('saveMilkmanBtn');
+      btn.disabled = true; btn.innerText = 'సేవ్ అవుతోంది...';
+      const vendorPhoneToSave = phone.length === 10 ? phone : null;
+      const houseId = getHouseUserId();
+      await db.from('customer_users').update({ vendor_phone: vendorPhoneToSave }).eq('id', houseId);
+      if (currentUser.family_head_id) await db.from('customer_users').update({ vendor_phone: null }).eq('id', currentUser.id);
+      btn.disabled = false; btn.innerText = 'సేవ్ చేయండి';
+      currentUser.vendor_phone = vendorPhoneToSave;
+      localStorage.setItem('milk_self_customer', JSON.stringify(currentUser));
+      localStorage.setItem('milkman_profile_' + houseId, JSON.stringify({ mode: milkmanEditMode, name, phone, upi, evName, evPhone, evUpi }));
+      updateMilkmanCardUI();
+      closeMilkmanModal();
+      renderApp();
+      showToast('పాలబ్బాయి వివరాలు సేవ్ అయ్యాయి!');
+    };
+
+    window.chatMilkmanWhatsApp = function(which) {
+      const m = getMilkmanProfile(which || 'morning');
+      if (!m.phone) return;
+      const msg = encodeURIComponent('నమస్కారం ' + (m.name || 'గారు') + ', నేను ' + (currentUser.name || 'Customer') + ' మాట్లాడుతున్నాను.');
+      window.location.href = 'whatsapp://send?phone=91' + m.phone + '&text=' + msg;
+    };
+  </script>
+
+  <!-- Script B: Shift-Aware Calendar Override (Preserves Vendor Delivered Green Tick ✓) -->
+  <script>
+    function getEffectiveStartDate() {
+      if (!currentUser) return '2000-01-01';
+      try {
+        const saved = JSON.parse(localStorage.getItem('shift_effective_from_' + getHouseUserId()));
+        if (saved && saved.date) return saved.date;
+      } catch (e) {}
+      return '2000-01-01';
     }
-    refreshLedgerUI(year, month, currentCalculatedBill);
 
-    // 3. Shift-aware Print / PDF Table
-    const tbody = document.getElementById('printStatementBody');
-    if (tbody) {
-      let rows = '';
+    const _origRenderAppV15 = renderApp;
+    window.renderApp = function() {
+      _origRenderAppV15();
+
+      const year = currentViewingDate.getFullYear();
+      const month = currentViewingDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate();
+      const now = new Date();
+      const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
+      userRegDate.setHours(0, 0, 0, 0);
+
+      // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) + Preserves Vendor Delivered Green Tick (✓)
+      const grid = document.getElementById('calendarDaysGrid');
+      if (grid) {
+        grid.querySelectorAll('button').forEach(function(btn, idx) {
+          const day = idx + 1;
+          const item = monthRecords[day];
+          const cDate = new Date(year, month, day);
+          let mQ = 0, eQ = 0, isDel = false;
+          const isVendorConfirmed = Boolean(item && item.vendor_delivered);
+
+          if (item && item.status === 'delivered' && item.liters > 0 && cDate <= now) {
+            isDel = true;
+            mQ = item.morning_qty !== undefined ? parseFloat(item.morning_qty) : item.liters;
+            eQ = item.evening_qty !== undefined ? parseFloat(item.evening_qty) : 0;
+          } else if (!item && cDate <= now && cDate >= userRegDate && isAutoModeOnDate(cDate)) {
+            isDel = true;
+            mQ = morningQuota;
+            eQ = eveningQuota;
+          }
+
+          if (isDel && (mQ > 0 || eQ > 0)) {
+            btn.classList.remove('h-14');
+            btn.classList.add('h-16');
+            const box = btn.querySelector('div.my-auto');
+            const tickBadge = isVendorConfirmed
+              ? '<i class="ph-bold ph-check text-[10px] text-emerald-700 font-black" title="Vendor Delivered"></i>'
+              : '';
+            if (box) {
+              if (mQ > 0 && eQ > 0) {
+                box.innerHTML =
+                  '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5">' + tickBadge + '<span>🌅 ' + mQ + 'L</span></div>' +
+                  '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap">🌇 ' + eQ + 'L</div>';
+              } else if (mQ > 0) {
+                box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5">' + tickBadge + '<span>🌅 ' + mQ + 'L</span></span>';
+              } else {
+                box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5">' + tickBadge + '<span>🌇 ' + eQ + 'L</span></span>';
+              }
+            }
+          }
+        });
+      }
+
+      // 2. Shift-wise bill calculation
+      let mDays = 0, eDays = 0, bothDays = 0, skipDays = 0, totM = 0, totE = 0;
       for (let d = 1; d <= daysInMonth; d++) {
         const cDate = new Date(year, month, d);
         const rec = monthRecords[d];
-        let mL = 0, eL = 0, st = '-';
         if (rec) {
-          if (rec.status === 'delivered' && cDate <= now && rec.liters > 0) {
-            st = 'డెలివరీ';
-            mL = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
-            eL = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
-          } else if (rec.status === 'skipped') st = 'వద్దు';
+          if (rec.status === 'delivered' && rec.liters > 0 && cDate <= now) {
+            const m = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
+            const e = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
+            bothDays++; if (m > 0) { mDays++; totM += m; } if (e > 0) { eDays++; totE += e; }
+          } else if (rec.status === 'skipped') skipDays++;
         } else if (cDate <= now && cDate >= userRegDate && isAutoModeOnDate(cDate)) {
-          st = 'ఆటో'; mL = morningQuota; eL = eveningQuota;
-        }
-        if (activeBillFilter === 'morning') {
-          const a = Math.round(mL * morningRate);
-          rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + (mL > 0 ? '🌅 డెలివరీ' : st) + '</td><td class="p-1 text-right">' + (mL > 0 ? mL + ' L' : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
-        } else if (activeBillFilter === 'evening') {
-          const a = Math.round(eL * eveningRate);
-          rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + (eL > 0 ? '🌇 డెలివరీ' : st) + '</td><td class="p-1 text-right">' + (eL > 0 ? eL + ' L' : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
-        } else {
-          const a = Math.round(mL * morningRate) + Math.round(eL * eveningRate);
-          rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + st + '</td><td class="p-1 text-right">' + ((mL > 0 || eL > 0) ? ('🌅' + mL + ' + 🌇' + eL) : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+          bothDays++;
+          if (morningQuota > 0) { mDays++; totM += morningQuota; }
+          if (eveningQuota > 0) { eDays++; totE += eveningQuota; }
         }
       }
-      tbody.innerHTML = rows;
-    }
-  };
 
-  window.shareOnWhatsApp = function() {
-    const year = currentViewingDate.getFullYear(), month = currentViewingDate.getMonth();
-    const daysInMonth = new Date(year, month + 1, 0).getDate(), now = new Date();
-    const reg = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0); reg.setHours(0, 0, 0, 0);
-    let mD = 0, eD = 0, bD = 0, sD = 0, tM = 0, tE = 0;
-    for (let d = 1; d <= daysInMonth; d++) {
-      const cDate = new Date(year, month, d), rec = monthRecords[d];
-      if (rec) {
-        if (rec.status === 'delivered' && rec.liters > 0 && cDate <= now) {
-          const m = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
-          const e = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
-          bD++; if (m > 0) { mD++; tM += m; } if (e > 0) { eD++; tE += e; }
-        } else if (rec.status === 'skipped') sD++;
-      } else if (cDate <= now && cDate >= reg && isAutoModeOnDate(cDate)) {
-        bD++; if (morningQuota > 0) { mD++; tM += morningQuota; } if (eveningQuota > 0) { eD++; tE += eveningQuota; }
+      const mBill = Math.round(totM * morningRate), eBill = Math.round(totE * eveningRate);
+      const mInfo = getMilkmanProfile('morning'), eInfo = getMilkmanProfile('evening');
+      const bannerEl = document.getElementById('activeBillVendorBanner');
+      const mRow = document.getElementById('billMorningRow'), eRow = document.getElementById('billEveningRow');
+
+      if (activeBillFilter === 'morning') {
+        currentCalculatedBill = mBill;
+        if (bannerEl) bannerEl.innerHTML = '<span>🌅 ఉదయం పాలబ్బాయి: <strong>' + (mInfo.name || mInfo.phone || 'Not Set') + '</strong></span><span>Morning Only</span>';
+        if (mRow) mRow.style.display = 'flex'; if (eRow) eRow.style.display = 'none';
+        document.getElementById('billDeliveredDays').innerText = mDays + ' రోజులు';
+        document.getElementById('billTotalLiters').innerText = totM.toFixed(1) + ' L';
+        document.getElementById('billFinalAmount').innerText = mBill.toLocaleString('en-IN');
+      } else if (activeBillFilter === 'evening') {
+        currentCalculatedBill = eBill;
+        if (bannerEl) bannerEl.innerHTML = '<span>🌇 సాయంత్రం పాలబ్బాయి: <strong>' + (eInfo.name || eInfo.phone || 'Not Set') + '</strong></span><span>Evening Only</span>';
+        if (mRow) mRow.style.display = 'none'; if (eRow) eRow.style.display = 'flex';
+        document.getElementById('billDeliveredDays').innerText = eDays + ' రోజులు';
+        document.getElementById('billTotalLiters').innerText = totE.toFixed(1) + ' L';
+        document.getElementById('billFinalAmount').innerText = eBill.toLocaleString('en-IN');
+      } else {
+        currentCalculatedBill = mBill + eBill;
+        const vLbl = (mInfo.mode === 'dual' && eInfo.name) ? ((mInfo.name || 'ఉదయం') + ' & ' + eInfo.name) : (mInfo.name || mInfo.phone || 'Not Set');
+        if (bannerEl) bannerEl.innerHTML = '<span>👤 పాలబ్బాయి: <strong>' + vLbl + '</strong></span><span>Both Shifts</span>';
+        if (mRow) mRow.style.display = 'flex'; if (eRow) eRow.style.display = 'flex';
+        document.getElementById('billDeliveredDays').innerText = bothDays + ' రోజులు';
+        document.getElementById('billTotalLiters').innerText = (totM + totE).toFixed(1) + ' L';
+        document.getElementById('billFinalAmount').innerText = (mBill + eBill).toLocaleString('en-IN');
       }
-    }
-    const mB = Math.round(tM * morningRate), eB = Math.round(tE * eveningRate);
-    let title = '🥛 *పాల లెక్క వివరాలు (Full Bill)* 🥛', details = '✅ *రోజులు:* ' + bD + '\n🌅 *ఉదయం:* ' + tM.toFixed(1) + 'L = ₹' + mB + '\n🌇 *సాయంత్రం:* ' + tE.toFixed(1) + 'L = ₹' + eB + '\n💵 *మొత్తం: ₹' + (mB + eB) + '*', target = getMilkmanProfile('morning');
-    if (activeBillFilter === 'morning') {
-      title = '🌅 *ఉదయం పాల బిల్లు* 🌅'; details = '✅ *రోజులు:* ' + mD + '\n🥛 *రకం:* ' + morningMilkType + ' (₹' + morningRate + '/L)\n🍶 *లీటర్లు:* ' + tM.toFixed(1) + ' L\n💵 *ఉదయం బిల్లు: ₹' + mB + '*'; target = getMilkmanProfile('morning');
-    } else if (activeBillFilter === 'evening') {
-      title = '🌇 *సాయంత్రం పాల బిల్లు* 🌇'; details = '✅ *రోజులు:* ' + eD + '\n🥛 *రకం:* ' + eveningMilkType + ' (₹' + eveningRate + '/L)\n🍶 *లీటర్లు:* ' + tE.toFixed(1) + ' L\n💵 *సాయంత్రం బిల్లు: ₹' + eB + '*'; target = getMilkmanProfile('evening');
-    }
-    const msg = encodeURIComponent(title + '\n-------------------------------------\n👤 *కస్టమర్:* ' + (currentUser.name || 'User') + ' (' + currentUser.phone + ')\n📅 *నెల:* ' + TELUGU_MONTHS[month] + ' ' + year + '\n' + details + '\n-------------------------------------\n_MilkCount యాప్ ద్వారా_');
-    window.location.href = (target.phone && target.phone.length === 10) ? ('whatsapp://send?phone=91' + target.phone + '&text=' + msg) : ('whatsapp://send?text=' + msg);
-  };
-</script>
+      refreshLedgerUI(year, month, currentCalculatedBill);
 
-<script>
-  let pendingAlertShift = 'morning';
+      // 3. Shift-aware Print / PDF Table
+      const tbody = document.getElementById('printStatementBody');
+      if (tbody) {
+        let rows = '';
+        for (let d = 1; d <= daysInMonth; d++) {
+          const cDate = new Date(year, month, d);
+          const rec = monthRecords[d];
+          let mL = 0, eL = 0, st = '-';
+          if (rec) {
+            if (rec.status === 'delivered' && cDate <= now && rec.liters > 0) {
+              st = 'డెలివరీ';
+              mL = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
+              eL = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
+            } else if (rec.status === 'skipped') st = 'వద్దు';
+          } else if (cDate <= now && cDate >= userRegDate && isAutoModeOnDate(cDate)) {
+            st = 'ఆటో'; mL = morningQuota; eL = eveningQuota;
+          }
+          if (activeBillFilter === 'morning') {
+            const a = Math.round(mL * morningRate);
+            rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + (mL > 0 ? '🌅 డెలివరీ' : st) + '</td><td class="p-1 text-right">' + (mL > 0 ? mL + ' L' : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+          } else if (activeBillFilter === 'evening') {
+            const a = Math.round(eL * eveningRate);
+            rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + (eL > 0 ? '🌇 డెలివరీ' : st) + '</td><td class="p-1 text-right">' + (eL > 0 ? eL + ' L' : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+          } else {
+            const a = Math.round(mL * morningRate) + Math.round(eL * eveningRate);
+            rows += '<tr class="border-b border-slate-200"><td class="p-1">' + d + ' ' + TELUGU_MONTHS[month] + '</td><td class="p-1">' + st + '</td><td class="p-1 text-right">' + ((mL > 0 || eL > 0) ? ('🌅' + mL + ' + 🌇' + eL) : '-') + '</td><td class="p-1 text-right">' + (a > 0 ? '₹' + a : '-') + '</td></tr>';
+          }
+        }
+        tbody.innerHTML = rows;
+      }
+    };
 
-  window.toggleSkipTomorrow = async function() {
-    const now = new Date();
-    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    const y = tomorrow.getFullYear();
-    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const d = String(tomorrow.getDate()).padStart(2, '0');
-    const logDate = `${y}-${m}-${d}`;
-    const dayNum = tomorrow.getDate();
+    window.shareOnWhatsApp = function() {
+      const year = currentViewingDate.getFullYear(), month = currentViewingDate.getMonth();
+      const daysInMonth = new Date(year, month + 1, 0).getDate(), now = new Date();
+      const reg = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0); reg.setHours(0, 0, 0, 0);
+      let mD = 0, eD = 0, bD = 0, sD = 0, tM = 0, tE = 0;
+      for (let d = 1; d <= daysInMonth; d++) {
+        const cDate = new Date(year, month, d), rec = monthRecords[d];
+        if (rec) {
+          if (rec.status === 'delivered' && rec.liters > 0 && cDate <= now) {
+            const m = rec.morning_qty !== undefined ? parseFloat(rec.morning_qty) : rec.liters;
+            const e = rec.evening_qty !== undefined ? parseFloat(rec.evening_qty) : 0;
+            bD++; if (m > 0) { mD++; tM += m; } if (e > 0) { eD++; tE += e; }
+          } else if (rec.status === 'skipped') sD++;
+        } else if (cDate <= now && cDate >= reg && isAutoModeOnDate(cDate)) {
+          bD++; if (morningQuota > 0) { mD++; tM += morningQuota; } if (eveningQuota > 0) { eD++; tE += eveningQuota; }
+        }
+      }
+      const mB = Math.round(tM * morningRate), eB = Math.round(tE * eveningRate);
+      let title = '🥛 *పాల లెక్క వివరాలు (Full Bill)* 🥛', details = '✅ *రోజులు:* ' + bD + '\n🌅 *ఉదయం:* ' + tM.toFixed(1) + 'L = ₹' + mB + '\n🌇 *సాయంత్రం:* ' + tE.toFixed(1) + 'L = ₹' + eB + '\n💵 *మొత్తం: ₹' + (mB + eB) + '*', target = getMilkmanProfile('morning');
+      if (activeBillFilter === 'morning') {
+        title = '🌅 *ఉదయం పాల బిల్లు* 🌅'; details = '✅ *రోజులు:* ' + mD + '\n🥛 *రకం:* ' + morningMilkType + ' (₹' + morningRate + '/L)\n🍶 *లీటర్లు:* ' + tM.toFixed(1) + ' L\n💵 *ఉదయం బిల్లు: ₹' + mB + '*'; target = getMilkmanProfile('morning');
+      } else if (activeBillFilter === 'evening') {
+        title = '🌇 *సాయంత్రం పాల బిల్లు* 🌇'; details = '✅ *రోజులు:* ' + eD + '\n🥛 *రకం:* ' + eveningMilkType + ' (₹' + eveningRate + '/L)\n🍶 *లీటర్లు:* ' + tE.toFixed(1) + ' L\n💵 *సాయంత్రం బిల్లు: ₹' + eB + '*'; target = getMilkmanProfile('evening');
+      }
+      const msg = encodeURIComponent(title + '\n-------------------------------------\n👤 *కస్టమర్:* ' + (currentUser.name || 'User') + ' (' + currentUser.phone + ')\n📅 *నెల:* ' + TELUGU_MONTHS[month] + ' ' + year + '\n' + details + '\n-------------------------------------\n_MilkCount యాప్ ద్వారా_');
+      window.location.href = (target.phone && target.phone.length === 10) ? ('whatsapp://send?phone=91' + target.phone + '&text=' + msg) : ('whatsapp://send?text=' + msg);
+    };
+  </script>
 
-    const isViewingTargetMonth = (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth());
-    const item = isViewingTargetMonth ? monthRecords[dayNum] : null;
-    const isPartiallyOrFullySkipped = item && (item.status === 'skipped' || (morningQuota > 0 && item.morning_qty === 0) || (eveningQuota > 0 && item.evening_qty === 0));
+  <script>
+    let pendingAlertShift = 'morning';
 
-    // ఇప్పటికే ఆపి ఉంటే, తిరిగి నార్మల్ స్థితికి మారుస్తుంది
-    if (isPartiallyOrFullySkipped) {
-      await db.from('customer_milk_logs').delete().eq('user_id', getHouseUserId()).eq('log_date', logDate);
-      if (isViewingTargetMonth) delete monthRecords[dayNum];
+    window.toggleSkipTomorrow = async function() {
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const y = tomorrow.getFullYear();
+      const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const d = String(tomorrow.getDate()).padStart(2, '0');
+      const logDate = `${y}-${m}-${d}`;
+      const dayNum = tomorrow.getDate();
+
+      const isViewingTargetMonth = (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth());
+      const item = isViewingTargetMonth ? monthRecords[dayNum] : null;
+      const isPartiallyOrFullySkipped = item && (item.status === 'skipped' || (morningQuota > 0 && item.morning_qty === 0) || (eveningQuota > 0 && item.evening_qty === 0));
+
+      if (isPartiallyOrFullySkipped) {
+        await db.from('customer_milk_logs').delete().eq('user_id', getHouseUserId()).eq('log_date', logDate);
+        if (isViewingTargetMonth) delete monthRecords[dayNum];
+        document.getElementById('shiftSkipSelectorBar').classList.add('hidden-force');
+        showToast(`రేపు (${dayNum}న) తిరిగి ఉదయం & సాయంత్రం సాధారణ స్థితికి మారింది!`);
+        renderApp();
+        return;
+      }
+
+      if (morningQuota > 0 && eveningQuota > 0) {
+        document.getElementById('shiftSkipSelectorBar').classList.toggle('hidden-force');
+      } else {
+        applyTomorrowShiftSkip('both');
+      }
+    };
+
+    async function applyTomorrowShiftSkip(which) {
       document.getElementById('shiftSkipSelectorBar').classList.add('hidden-force');
-      showToast(`రేపు (${dayNum}న) తిరిగి ఉదయం & సాయంత్రం సాధారణ స్థితికి మారింది!`);
-      renderApp();
-      return;
-    }
+      const now = new Date();
+      const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+      const y = tomorrow.getFullYear();
+      const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
+      const d = String(tomorrow.getDate()).padStart(2, '0');
+      const logDate = `${y}-${m}-${d}`;
+      const dayNum = tomorrow.getDate();
+      const isViewingTargetMonth = (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth());
 
-    // రెండు షిఫ్ట్‌లు ఆన్‌లో ఉంటే 3 ఆప్షన్లు (ఉదయం వద్దు / సాయంత్రం వద్దు / రెండూ వద్దు) చూపిస్తుంది
-    if (morningQuota > 0 && eveningQuota > 0) {
-      document.getElementById('shiftSkipSelectorBar').classList.toggle('hidden-force');
-    } else {
-      applyTomorrowShiftSkip('both');
-    }
-  };
+      let mQty = morningQuota;
+      let eQty = eveningQuota;
+      let status = 'taken';
+      let toastMsg = '';
+      let waMsg = '';
 
-  async function applyTomorrowShiftSkip(which) {
-    document.getElementById('shiftSkipSelectorBar').classList.add('hidden-force');
-    const now = new Date();
-    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    const y = tomorrow.getFullYear();
-    const m = String(tomorrow.getMonth() + 1).padStart(2, '0');
-    const d = String(tomorrow.getDate()).padStart(2, '0');
-    const logDate = `${y}-${m}-${d}`;
-    const dayNum = tomorrow.getDate();
-    const isViewingTargetMonth = (currentViewingDate.getFullYear() === y && currentViewingDate.getMonth() === tomorrow.getMonth());
+      if (which === 'morning') {
+        mQty = 0;
+        eQty = eveningQuota;
+        status = eQty > 0 ? 'taken' : 'skipped';
+        pendingAlertShift = 'morning';
+        toastMsg = `రేపు (${dayNum}న) 🌅 ఉదయం పాలు వద్దు, 🌇 సాయంత్రం (${eQty}L) వస్తాయి!`;
+        waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) 🌅 ఉదయం పాలు వద్దు (Skip Morning). - ${currentUser.name || 'Customer'}`;
+      } else if (which === 'evening') {
+        mQty = morningQuota;
+        eQty = 0;
+        status = mQty > 0 ? 'taken' : 'skipped';
+        pendingAlertShift = 'evening';
+        toastMsg = `రేపు (${dayNum}న) 🌇 సాయంత్రం పాలు వద్దు, 🌅 ఉదయం (${mQty}L) వస్తాయి!`;
+        waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) 🌇 సాయంత్రం పాలు వద్దు (Skip Evening). - ${currentUser.name || 'Customer'}`;
+      } else {
+        mQty = 0;
+        eQty = 0;
+        status = 'skipped';
+        pendingAlertShift = 'morning';
+        toastMsg = `రేపు (${dayNum}న) ఉదయం & సాయంత్రం రెండూ వద్దని సెట్ చేశాం!`;
+        waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip All). - ${currentUser.name || 'Customer'}`;
+      }
 
-    let mQty = morningQuota;
-    let eQty = eveningQuota;
-    let status = 'taken';
-    let toastMsg = '';
-    let waMsg = '';
-
-    if (which === 'morning') {
-      mQty = 0;
-      eQty = eveningQuota;
-      status = eQty > 0 ? 'taken' : 'skipped';
-      pendingAlertShift = 'morning';
-      toastMsg = `రేపు (${dayNum}న) 🌅 ఉదయం పాలు వద్దు, 🌇 సాయంత్రం (${eQty}L) వస్తాయి!`;
-      waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) 🌅 ఉదయం పాలు వద్దు (Skip Morning). - ${currentUser.name || 'Customer'}`;
-    } else if (which === 'evening') {
-      mQty = morningQuota;
-      eQty = 0;
-      status = mQty > 0 ? 'taken' : 'skipped';
-      pendingAlertShift = 'evening';
-      toastMsg = `రేపు (${dayNum}న) 🌇 సాయంత్రం పాలు వద్దు, 🌅 ఉదయం (${mQty}L) వస్తాయి!`;
-      waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) 🌇 సాయంత్రం పాలు వద్దు (Skip Evening). - ${currentUser.name || 'Customer'}`;
-    } else {
-      mQty = 0;
-      eQty = 0;
-      status = 'skipped';
-      pendingAlertShift = 'morning';
-      toastMsg = `రేపు (${dayNum}న) ఉదయం & సాయంత్రం రెండూ వద్దని సెట్ చేశాం!`;
-      waMsg = `నమస్కారం, రేపు (${dayNum}/${m}) మా ఇంటికి పాలు వద్దు (Skip All). - ${currentUser.name || 'Customer'}`;
-    }
-
-    const totalQ = parseFloat((mQty + eQty).toFixed(2));
-    await db.from('customer_milk_logs').upsert({
-      user_id: getHouseUserId(),
-      log_date: logDate,
-      quantity: totalQ,
-      morning_qty: mQty,
-      evening_qty: eQty,
-      status: status
-    }, { onConflict: 'user_id,log_date' });
-
-    if (isViewingTargetMonth) {
-      monthRecords[dayNum] = {
-        status: status === 'taken' ? 'delivered' : 'skipped',
-        liters: totalQ,
+      const totalQ = parseFloat((mQty + eQty).toFixed(2));
+      await db.from('customer_milk_logs').upsert({
+        user_id: getHouseUserId(),
+        log_date: logDate,
+        quantity: totalQ,
         morning_qty: mQty,
         evening_qty: eQty,
-        quality_note: ''
-      };
+        status: status
+      }, { onConflict: 'user_id,log_date' });
+
+      if (isViewingTargetMonth) {
+        monthRecords[dayNum] = {
+          status: status === 'taken' ? 'delivered' : 'skipped',
+          liters: totalQ,
+          morning_qty: mQty,
+          evening_qty: eQty,
+          quality_note: '',
+          vendor_delivered: false
+        };
+      }
+
+      showToast(toastMsg);
+      pendingMilkmanAlertMsg = waMsg;
+      const bar = document.getElementById('milkmanNotifyBar');
+      const txt = document.getElementById('milkmanNotifyText');
+      const targetM = getMilkmanProfile(pendingAlertShift);
+      txt.innerText = targetM.name ? `${targetM.name} గారికి వాట్సాప్‌లో చెప్పాలా?` : 'పాలబ్బాయికి వాట్సాప్‌లో చెప్పాలా?';
+      bar.classList.remove('hidden-force');
+      renderApp();
     }
 
-    showToast(toastMsg);
-    pendingMilkmanAlertMsg = waMsg;
-    const bar = document.getElementById('milkmanNotifyBar');
-    const txt = document.getElementById('milkmanNotifyText');
-    const targetM = getMilkmanProfile(pendingAlertShift);
-    txt.innerText = targetM.name ? `${targetM.name} గారికి వాట్సాప్‌లో చెప్పాలా?` : 'పాలబ్బాయికి వాట్సాప్‌లో చెప్పాలా?';
-    bar.classList.remove('hidden-force');
-    renderApp();
-  }
+    window.sendMilkmanQuickAlert = function() {
+      const m = getMilkmanProfile(pendingAlertShift || 'morning');
+      const encoded = encodeURIComponent(pendingMilkmanAlertMsg);
+      dismissMilkmanAlert();
+      if (m.phone && m.phone.length === 10) {
+        window.location.href = `whatsapp://send?phone=91${m.phone}&text=${encoded}`;
+      } else {
+        window.location.href = `whatsapp://send?text=${encoded}`;
+      }
+    };
+  </script>
 
-  window.sendMilkmanQuickAlert = function() {
-    const m = getMilkmanProfile(pendingAlertShift || 'morning');
-    const encoded = encodeURIComponent(pendingMilkmanAlertMsg);
-    dismissMilkmanAlert();
-    if (m.phone && m.phone.length === 10) {
-      window.location.href = `whatsapp://send?phone=91${m.phone}&text=${encoded}`;
-    } else {
-      window.location.href = `whatsapp://send?text=${encoded}`;
-    }
-  };
-</script>
-
-<!-- CUSTOM BRANDED ALERT MODAL (Hides github.io URL & shows 'MilkCount') -->
-<div id="customAppAlertModal" class="hidden-force fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-5">
-  <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
-    <!-- App Brand Header -->
-    <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3 flex items-center gap-2">
-      <div class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
-        <i class="ph-bold ph-drop text-sm text-amber-200"></i>
+  <!-- CUSTOM BRANDED ALERT MODAL -->
+  <div id="customAppAlertModal" class="hidden-force fixed inset-0 z-[60] bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-5">
+    <div class="bg-white w-full max-w-xs rounded-2xl shadow-2xl overflow-hidden border border-slate-200">
+      <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3 flex items-center gap-2">
+        <div class="w-6 h-6 rounded-lg bg-white/20 flex items-center justify-center">
+          <i class="ph-bold ph-drop text-sm text-amber-200"></i>
+        </div>
+        <span class="text-sm font-extrabold tracking-wide">MilkCount</span>
       </div>
-      <span class="text-sm font-extrabold tracking-wide">MilkCount</span>
-    </div>
-    <!-- Message Body -->
-    <div class="p-4">
-      <p id="customAppAlertText" class="text-xs font-bold text-slate-700 leading-relaxed"></p>
-    </div>
-    <!-- OK Button -->
-    <div class="px-4 pb-3.5 flex justify-end">
-      <button onclick="document.getElementById('customAppAlertModal').classList.add('hidden-force')" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-extrabold shadow-xs transition">
-        OK
-      </button>
+      <div class="p-4">
+        <p id="customAppAlertText" class="text-xs font-bold text-slate-700 leading-relaxed"></p>
+      </div>
+      <div class="px-4 pb-3.5 flex justify-end">
+        <button onclick="document.getElementById('customAppAlertModal').classList.add('hidden-force')" class="px-5 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 active:scale-95 text-white text-xs font-extrabold shadow-xs transition">
+          OK
+        </button>
+      </div>
     </div>
   </div>
-</div>
 
-<script>
-  window.alert = function(message) {
-    const modal = document.getElementById('customAppAlertModal');
-    const textEl = document.getElementById('customAppAlertText');
-    if (modal && textEl) {
-      textEl.innerText = message;
-      modal.classList.remove('hidden-force');
-    }
-  };
-</script>
+  <script>
+    window.alert = function(message) {
+      const modal = document.getElementById('customAppAlertModal');
+      const textEl = document.getElementById('customAppAlertText');
+      if (modal && textEl) {
+        textEl.innerText = message;
+        modal.classList.remove('hidden-force');
+      }
+    };
+  </script>
 
   <!-- CUSTOMER FEEDBACK & RATING MODAL -->
   <div id="customerFeedbackModal" class="hidden-force fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4">
@@ -3942,32 +3837,34 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
   </div>
 
   <!-- CUSTOMER NOTIFICATION BATON MODAL -->
-<div id="custNotificationsModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeCustNotificationsModal()">
-  <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
-    <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between shrink-0">
-      <div class="flex items-center gap-2">
-        <i class="ph-fill ph-bell text-lg text-amber-200"></i>
-        <h3 class="text-sm font-extrabold">నోటిఫికేషన్లు (Notifications)</h3>
+  <div id="custNotificationsModal" class="hidden-force fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4" onclick="if(event.target===this) closeCustNotificationsModal()">
+    <div class="bg-white w-full max-w-sm rounded-2xl shadow-2xl overflow-hidden flex flex-col max-h-[82vh]">
+      <div class="bg-gradient-to-r from-sky-600 to-blue-700 text-white px-4 py-3 flex items-center justify-between shrink-0">
+        <div class="flex items-center gap-1.5">
+          <i class="ph-fill ph-bell text-lg text-amber-200"></i>
+          <h3 class="text-xs font-extrabold">నోటిఫికేషన్లు</h3>
+        </div>
+        <div class="flex items-center gap-1.5">
+          <button onclick="enableCustSystemNotifications()" class="text-[10px] bg-amber-400/25 hover:bg-amber-400/35 border border-amber-200/40 px-2 py-1 rounded-lg font-bold">
+            🔔 Alert
+          </button>
+          <button onclick="markAllCustNotificationsRead()" class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg font-bold">
+            అన్నీ ✓
+          </button>
+          <button onclick="clearCustNotifications()" class="text-[10px] bg-rose-500/30 hover:bg-rose-500/45 px-2 py-1 rounded-lg font-bold">
+            క్లియర్
+          </button>
+          <button onclick="closeCustNotificationsModal()" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center">
+            <i class="ph-bold ph-x text-xs"></i>
+          </button>
+        </div>
       </div>
-      <div class="flex items-center gap-2">
-        <button onclick="markAllCustNotificationsRead()" class="text-[10px] bg-white/20 hover:bg-white/30 px-2 py-1 rounded-lg font-bold">
-          అన్నీ చదివినట్టు ✓
-        </button>
-        <button onclick="clearCustNotifications()" class="text-[10px] bg-rose-500/30 hover:bg-rose-500/45 px-2 py-1 rounded-lg font-bold">
-  క్లియర్
-</button>
 
-        <button onclick="closeCustNotificationsModal()" class="w-7 h-7 rounded-lg bg-white/20 hover:bg-white/30 flex items-center justify-center">
-          <i class="ph-bold ph-x text-xs"></i>
-        </button>
+      <div id="custNotificationsList" class="p-3.5 overflow-y-auto overscroll-contain space-y-2 text-xs">
+        <p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>
       </div>
-    </div>
-
-    <div id="custNotificationsList" class="p-3.5 overflow-y-auto overscroll-contain space-y-2 text-xs">
-      <p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>
     </div>
   </div>
-</div>
 
   <script>
     // ==========================================
@@ -4033,7 +3930,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-       // Compress & Save Customer Profile Photo (Local + Supabase Cloud Sync)
     function handleCustProfilePhotoUpload(event) {
       const file = event.target.files.item(0);
       if (!file || !currentUser) return;
@@ -4053,12 +3949,10 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
 
           const compressedDataUrl = canvas.toDataURL('image/jpeg', 0.65);
 
-          // 1. Save locally for instant UI display
           localStorage.setItem('mc_cust_photo_' + currentUser.phone, compressedDataUrl);
           currentUser.profile_pic = compressedDataUrl;
           applyCustProfilePhotoUI(currentUser.phone);
 
-          // 2. Sync to Supabase `customer_users` table (Visible in Vendor App too!)
           const sbClient = typeof db !== 'undefined' ? db : (typeof supabaseClient !== 'undefined' ? supabaseClient : null);
           if (sbClient) {
             const { error } = await sbClient
@@ -4080,7 +3974,6 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       reader.readAsDataURL(file);
     }
 
-    // Apply Saved Customer Photo (Checks LocalStorage first, then fetches from Supabase Cloud)
     async function applyCustProfilePhotoUI(phone) {
       if (!phone) return;
       let photoUrl = localStorage.getItem('mc_cust_photo_' + phone);
@@ -4145,316 +4038,319 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
       }
     }
 
-// Auto-hook into checkAuth, setupUserSession, openProfileModal & Hold/Unblock check without editing old functions!
-(function() {
-  function blockCustomerIfHeld(u) {
-    if (!u || !u.is_blocked) return false;
-    alert('⚠️ మీ కస్టమర్ అకౌంట్ Hold లో ఉంది.' + (u.block_reason ? '\nకారణం: ' + u.block_reason : ''));
-    if (typeof logoutCustomer === 'function') logoutCustomer();
-    return true;
-  }
-
-  async function checkLatestCustomerHoldByPhone(phone) {
-    if (!phone || typeof db === 'undefined') return false;
-    try {
-      const { data: freshCust } = await db
-        .from('customer_users')
-        .select('is_blocked, block_reason')
-        .eq('phone', phone)
-        .maybeSingle();
-      return blockCustomerIfHeld(freshCust);
-    } catch (e) {
-      return false;
-    }
-  }
-
-  if (typeof checkAuth === 'function') {
-    const _origCheckAuthPhoto = checkAuth;
-    window.checkAuth = function() {
-      _origCheckAuthPhoto();
-      const phone = (typeof currentUser !== 'undefined' && currentUser && currentUser.phone)
-        ? currentUser.phone
-        : ((typeof savedUserCache !== 'undefined' && savedUserCache && savedUserCache.phone) ? savedUserCache.phone : null);
-      if (phone && typeof applyCustProfilePhotoUI === 'function') {
-        applyCustProfilePhotoUI(phone);
+    (function() {
+      function blockCustomerIfHeld(u) {
+        if (!u || !u.is_blocked) return false;
+        alert('⚠️ మీ కస్టమర్ అకౌంట్ Hold లో ఉంది.' + (u.block_reason ? '\nకారణం: ' + u.block_reason : ''));
+        if (typeof logoutCustomer === 'function') logoutCustomer();
+        return true;
       }
-      if (typeof currentUser !== 'undefined' && blockCustomerIfHeld(currentUser)) return;
-      if (phone) checkLatestCustomerHoldByPhone(phone);
-    };
-  }
 
-  if (typeof setupUserSession === 'function') {
-    const _origSetupSessionPhoto = setupUserSession;
-    window.setupUserSession = async function(user, isNewUser) {
-      if (blockCustomerIfHeld(user)) return;
-      await _origSetupSessionPhoto(user, isNewUser);
-      const activeUser = (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) ? currentUser : user;
-      if (blockCustomerIfHeld(activeUser)) return;
-      if (activeUser && activeUser.phone && typeof applyCustProfilePhotoUI === 'function') {
-        await applyCustProfilePhotoUI(activeUser.phone);
-      }
-    };
-  }
-
-  if (typeof openProfileModal === 'function') {
-    const _origOpenProfilePhoto = openProfileModal;
-    window.openProfileModal = function() {
-      _origOpenProfilePhoto();
-      if (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) {
-        if (blockCustomerIfHeld(currentUser)) return;
-        checkLatestCustomerHoldByPhone(currentUser.phone);
-        if (typeof applyCustProfilePhotoUI === 'function') {
-          applyCustProfilePhotoUI(currentUser.phone);
+      async function checkLatestCustomerHoldByPhone(phone) {
+        if (!phone || typeof db === 'undefined') return false;
+        try {
+          const { data: freshCust } = await db
+            .from('customer_users')
+            .select('is_blocked, block_reason')
+            .eq('phone', phone)
+            .maybeSingle();
+          return blockCustomerIfHeld(freshCust);
+        } catch (e) {
+          return false;
         }
       }
-    };
-  }
 
-  if (typeof fetchMonthData === 'function') {
-    const _origFetchMonthHold = fetchMonthData;
-    window.fetchMonthData = async function(...args) {
-      const res = await _origFetchMonthHold.apply(this, args);
-      if (typeof currentUser !== 'undefined' && blockCustomerIfHeld(currentUser)) return;
-      return res;
-    };
-  }
-})();
-    
-    //<!-- JAVASCRIPT CUSTOMER NOTIFICATION  -->
-(function() {
-  function getCustNotifStorageKey() {
-    const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
-      ? getHouseUserId()
-      : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
-    return 'mc_cust_notifications_' + uid;
-  }
+      if (typeof checkAuth === 'function') {
+        const _origCheckAuthPhoto = checkAuth;
+        window.checkAuth = function() {
+          _origCheckAuthPhoto();
+          const phone = (typeof currentUser !== 'undefined' && currentUser && currentUser.phone)
+            ? currentUser.phone
+            : ((typeof savedUserCache !== 'undefined' && savedUserCache && savedUserCache.phone) ? savedUserCache.phone : null);
+          if (phone && typeof applyCustProfilePhotoUI === 'function') {
+            applyCustProfilePhotoUI(phone);
+          }
+          if (typeof currentUser !== 'undefined' && blockCustomerIfHeld(currentUser)) return;
+          if (phone) checkLatestCustomerHoldByPhone(phone);
+        };
+      }
 
-  function getCustNotifications() {
-    try {
-      return JSON.parse(localStorage.getItem(getCustNotifStorageKey()) || '[]');
-    } catch (e) {
-      return [];
-    }
-  }
+      if (typeof setupUserSession === 'function') {
+        const _origSetupSessionPhoto = setupUserSession;
+        window.setupUserSession = async function(user, isNewUser) {
+          if (blockCustomerIfHeld(user)) return;
+          await _origSetupSessionPhoto(user, isNewUser);
+          const activeUser = (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) ? currentUser : user;
+          if (blockCustomerIfHeld(activeUser)) return;
+          if (activeUser && activeUser.phone && typeof applyCustProfilePhotoUI === 'function') {
+            await applyCustProfilePhotoUI(activeUser.phone);
+          }
+        };
+      }
 
-  function saveCustNotifications(items) {
-    localStorage.setItem(getCustNotifStorageKey(), JSON.stringify(items.slice(0, 30)));
-    renderCustNotificationBadge();
-    renderCustNotificationsList();
-  }
-
-  function pushCustNotification(id, title, message, timeLabel) {
-    if (!id || !message) return;
-    const list = getCustNotifications();
-    if (list.some(n => n.id === id)) return;
-    list.unshift({
-      id,
-      title: title || 'MilkCount',
-      message,
-      time: timeLabel || new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
-      read: false
-    });
-    saveCustNotifications(list);
-    if (typeof triggerPhoneSystemBanner === 'function') {
-      triggerPhoneSystemBanner(title || 'MilkCount', message);
-    }
-  }
-
-  // 1. ఫోన్ సిస్టమ్ నోటిఫికేషన్ పర్మిషన్ తీసుకోవడానికి
-  window.enableCustSystemNotifications = async function() {
-    if (!('Notification' in window)) {
-      return alert('మీ బ్రౌజర్‌లో సిస్టమ్ నోటిఫికేషన్ సపోర్ట్ లేదు.');
-    }
-    const perm = await Notification.requestPermission();
-    if (perm === 'granted') {
-      showToast('ఫోన్ నోటిఫికేషన్లు ఆన్ అయ్యాయి! 🔔');
-    } else {
-      alert('ఫోన్ సెట్టింగ్స్‌లో Notification permission అనుమతించండి.');
-    }
-  };
-
-  // 2. కొత్త డెలివరీ/బిల్లు/సెలవు అప్‌డేట్ వచ్చినప్పుడు ఫోన్ నోటిఫికేషన్ బార్‌లో చూపించడానికి
-  function triggerPhoneSystemBanner(title, message) {
-    if (!('Notification' in window) || Notification.permission !== 'granted') return;
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.ready.then(reg => {
-        reg.showNotification(title, {
-          body: message,
-          icon: './logo-512.png',
-          badge: './favicon.png',
-          vibrate: [200, 100, 200]
-        });
-      }).catch(() => {
-        new Notification(title, { body: message, icon: './logo-512.png' });
-      });
-    } else {
-      new Notification(title, { body: message, icon: './logo-512.png' });
-    }
-  }
-
-  function renderCustNotificationBadge() {
-    const badge = document.getElementById('custNotifBadge');
-    if (!badge) return;
-    const unread = getCustNotifications().filter(n => !n.read).length;
-    if (unread > 0) {
-      badge.innerText = unread > 9 ? '9+' : String(unread);
-      badge.classList.remove('hidden-force');
-    } else {
-      badge.classList.add('hidden-force');
-    }
-  }
-
-    function renderCustNotificationsList() {
-    const container = document.getElementById('custNotificationsList');
-    if (!container) return;
-    const list = getCustNotifications();
-    if (!list.length) {
-      container.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
-      return;
-    }
-    container.innerHTML = list.map(n => `
-      <div class="border ${n.read ? 'border-slate-200 bg-slate-50/70' : 'border-sky-200 bg-sky-50/60'} rounded-xl p-2.5 space-y-1">
-        <div class="flex items-center justify-between gap-2">
-          <span class="font-extrabold text-slate-800 text-[11px]">${n.title}</span>
-          <div class="flex items-center gap-1.5 shrink-0">
-            <span class="text-[9px] text-slate-400">${n.time}</span>
-            ${n.read
-              ? `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md">✓ చదివారు</span>`
-              : `<button onclick="markSingleCustNotificationRead('${String(n.id).replace(/'/g, "\\'")}')" title="చదివినట్టు మార్క్ చేయండి" class="text-[10px] font-extrabold text-sky-800 bg-sky-100 hover:bg-sky-200 active:scale-95 px-1.5 py-0.5 rounded-md transition-all">✓</button>`
+      if (typeof openProfileModal === 'function') {
+        const _origOpenProfilePhoto = openProfileModal;
+        window.openProfileModal = function() {
+          _origOpenProfilePhoto();
+          if (typeof currentUser !== 'undefined' && currentUser && currentUser.phone) {
+            if (blockCustomerIfHeld(currentUser)) return;
+            checkLatestCustomerHoldByPhone(currentUser.phone);
+            if (typeof applyCustProfilePhotoUI === 'function') {
+              applyCustProfilePhotoUI(currentUser.phone);
             }
-          </div>
-        </div>
-        <p class="text-[11px] text-slate-700 leading-snug">${n.message}</p>
-      </div>
-    `).join('');
-  }
+          }
+        };
+      }
 
-  window.openCustNotificationsModal = function() {
-    renderCustNotificationsList();
-    const modal = document.getElementById('custNotificationsModal');
-    if (modal) modal.classList.remove('hidden-force');
-  };
+      if (typeof fetchMonthData === 'function') {
+        const _origFetchMonthHold = fetchMonthData;
+        window.fetchMonthData = async function(...args) {
+          const res = await _origFetchMonthHold.apply(this, args);
+          if (typeof currentUser !== 'undefined' && blockCustomerIfHeld(currentUser)) return;
+          return res;
+        };
+      }
+    })();
 
-  window.closeCustNotificationsModal = function() {
-    const modal = document.getElementById('custNotificationsModal');
-    if (modal) modal.classList.add('hidden-force');
-  };
+    // ==========================================
+    // JAVASCRIPT CUSTOMER NOTIFICATION SYSTEM
+    // ==========================================
+    (function() {
+      function getCustNotifStorageKey() {
+        const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
+          ? getHouseUserId()
+          : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
+        return 'mc_cust_notifications_' + uid;
+      }
 
-  window.markSingleCustNotificationRead = function(id) {
-    if (!id) return;
-    const updated = getCustNotifications().map(n =>
-      n.id === id ? Object.assign({}, n, { read: true }) : n
-    );
-    saveCustNotifications(updated);
-  };
-
-  window.markAllCustNotificationsRead = function() {
-    const updated = getCustNotifications().map(n => Object.assign({}, n, { read: true }));
-    saveCustNotifications(updated);
-  };
-
-  window.clearCustNotifications = function() {
-    const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
-      ? getHouseUserId()
-      : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
-    localStorage.removeItem('mc_cust_notifications_' + uid);
-    const badge = document.getElementById('custNotifBadge');
-    if (badge) badge.classList.add('hidden-force');
-    const listEl = document.getElementById('custNotificationsList');
-    if (listEl) listEl.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
-  };
-
-  function syncAlertsFromCurrentState() {
-    if (typeof currentViewingDate === 'undefined' || !currentViewingDate) return;
-    const y = currentViewingDate.getFullYear();
-    const m = currentViewingDate.getMonth();
-    const mKey = `${y}-${String(m + 1).padStart(2, '0')}`;
-
-    if (typeof monthRecords !== 'undefined' && monthRecords) {
-      Object.keys(monthRecords).forEach(dayStr => {
-        const rec = monthRecords[dayStr];
-        if (rec && rec.vendor_delivered) {
-          pushCustNotification(
-            `deliv_${mKey}_${dayStr}_${rec.liters}`,
-            '✅ పాలు డెలివరీ అయ్యాయి',
-            `${dayStr}వ తేదీన ${rec.liters}L పాలు డెలివరీ అయినట్లు వెండర్ అప్‌డేట్ చేశారు.`,
-            `${dayStr}/${m + 1}`
-          );
+      function getCustNotifications() {
+        try {
+          return JSON.parse(localStorage.getItem(getCustNotifStorageKey()) || '[]');
+        } catch (e) {
+          return [];
         }
-      });
-
-      const skippedDays = Object.keys(monthRecords)
-        .filter(dayStr => monthRecords[dayStr] && monthRecords[dayStr].status === 'skipped')
-        .map(dayStr => Number(dayStr))
-        .sort((a, b) => a - b);
-
-      if (skippedDays.length > 0) {
-        const firstDay = skippedDays[0];
-        const lastDay = skippedDays[skippedDays.length - 1];
-        const rangeLabel = (firstDay === lastDay)
-          ? `${firstDay}/${m + 1}`
-          : `${firstDay}/${m + 1} నుండి ${lastDay}/${m + 1} వరకు (${skippedDays.length} రోజులు)`;
-
-        pushCustNotification(
-          `vac_skip_${mKey}_${skippedDays.join('_')}`,
-          '✈️ సెలవులు / Vacation Skip',
-          `${rangeLabel} పాలు 'వద్దు (Skipped)' అని సెట్ చేయబడ్డాయి.`,
-          `${firstDay}/${m + 1}`
-        );
       }
-    }
 
-    if (typeof syncedVendorLedger !== 'undefined' && syncedVendorLedger) {
-      const paid = parseFloat(syncedVendorLedger.paid_amount) || 0;
-      const prevDue = parseFloat(syncedVendorLedger.prev_due) || 0;
-      if (paid > 0 || prevDue > 0) {
-        pushCustNotification(
-          `ledger_${mKey}_${paid}_${prevDue}`,
-          '💳 బిల్లు / పేమెంట్ అప్‌డేట్',
-          `${mKey} నెల లెడ్జర్: చెల్లించినది ₹${paid}, పాత బాకీ ₹${prevDue}.`,
-          mKey
-        );
+      function saveCustNotifications(items) {
+        localStorage.setItem(getCustNotifStorageKey(), JSON.stringify(items.slice(0, 30)));
+        renderCustNotificationBadge();
+        renderCustNotificationsList();
       }
-    }
 
-    const now = new Date();
-    const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-    if (tomorrow.getFullYear() === y && tomorrow.getMonth() === m && typeof monthRecords !== 'undefined') {
-      const tomRec = monthRecords[tomorrow.getDate()];
-      if (tomRec && tomRec.status === 'skipped') {
-        pushCustNotification(
-          `skip_tom_${y}_${m + 1}_${tomorrow.getDate()}`,
-          '⏸️ రేపు పాలు వద్దు (Skip)',
-          `రేపు (${tomorrow.getDate()}/${m + 1}) పాలు స్కిప్ అయినట్లు సెట్ అయి ఉంది.`,
-          'రేపు'
-        );
+      function pushCustNotification(id, title, message, timeLabel) {
+        if (!id || !message) return;
+        const list = getCustNotifications();
+        if (list.some(n => n.id === id)) return;
+        list.unshift({
+          id,
+          title: title || 'MilkCount',
+          message,
+          time: timeLabel || new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit' }),
+          read: false
+        });
+        saveCustNotifications(list);
+        if (typeof triggerPhoneSystemBanner === 'function') {
+          triggerPhoneSystemBanner(title || 'MilkCount', message);
+        }
       }
-    }
 
-    renderCustNotificationBadge();
-  }
+      window.enableCustSystemNotifications = async function() {
+        if (!('Notification' in window)) {
+          return alert('మీ బ్రౌజర్‌లో సిస్టమ్ నోటిఫికేషన్ సపోర్ట్ లేదు.');
+        }
+        const perm = await Notification.requestPermission();
+        if (perm === 'granted') {
+          showToast('ఫోన్ నోటిఫికేషన్లు ఆన్ అయ్యాయి! 🔔');
+        } else {
+          alert('ఫోన్ సెట్టింగ్స్‌లో Notification permission అనుమతించండి.');
+        }
+      };
 
-  if (typeof fetchMonthData === 'function') {
-    const _origFetchMonthDataNotif = fetchMonthData;
-    window.fetchMonthData = async function(...args) {
-      const res = await _origFetchMonthDataNotif.apply(this, args);
-      syncAlertsFromCurrentState();
-      return res;
-    };
-  }
+      function triggerPhoneSystemBanner(title, message) {
+        if (!('Notification' in window) || Notification.permission !== 'granted') return;
+        if ('serviceWorker' in navigator) {
+          navigator.serviceWorker.ready.then(reg => {
+            reg.showNotification(title, {
+              body: message,
+              icon: './logo-512.png',
+              badge: './favicon.png',
+              vibrate: [200, 100, 200]
+            });
+          }).catch(() => {
+            new Notification(title, { body: message, icon: './logo-512.png' });
+          });
+        } else {
+          new Notification(title, { body: message, icon: './logo-512.png' });
+        }
+      }
 
-  if (typeof renderApp === 'function') {
-    const _origRenderAppNotif = renderApp;
-    window.renderApp = function(...args) {
-      const res = _origRenderAppNotif.apply(this, args);
-      syncAlertsFromCurrentState();
-      return res;
-    };
-  }
+      function renderCustNotificationBadge() {
+        const badge = document.getElementById('custNotifBadge');
+        if (!badge) return;
+        const unread = getCustNotifications().filter(n => !n.read).length;
+        if (unread > 0) {
+          badge.innerText = unread > 9 ? '9+' : String(unread);
+          badge.classList.remove('hidden-force');
+        } else {
+          badge.classList.add('hidden-force');
+        }
+      }
 
-  renderCustNotificationBadge();
-})();
+      function renderCustNotificationsList() {
+        const container = document.getElementById('custNotificationsList');
+        if (!container) return;
+        const list = getCustNotifications();
+        if (!list.length) {
+          container.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
+          return;
+        }
+        container.innerHTML = list.map(n => `
+          <div class="border ${n.read ? 'border-slate-200 bg-slate-50/70' : 'border-sky-200 bg-sky-50/60'} rounded-xl p-2.5 space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="font-extrabold text-slate-800 text-[11px]">${n.title}</span>
+              <div class="flex items-center gap-1.5 shrink-0">
+                <span class="text-[9px] text-slate-400">${n.time}</span>
+                ${n.read
+                  ? `<span class="text-[9px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-md">✓ చదివారు</span>`
+                  : `<button onclick="markSingleCustNotificationRead('${String(n.id).replace(/'/g, "\\'")}')" title="చదివినట్టు మార్క్ చేయండి" class="text-[10px] font-extrabold text-sky-800 bg-sky-100 hover:bg-sky-200 active:scale-95 px-1.5 py-0.5 rounded-md transition-all">✓</button>`
+                }
+              </div>
+            </div>
+            <p class="text-[11px] text-slate-700 leading-snug">${n.message}</p>
+          </div>
+        `).join('');
+      }
 
+      window.openCustNotificationsModal = function() {
+        renderCustNotificationsList();
+        const modal = document.getElementById('custNotificationsModal');
+        if (modal) modal.classList.remove('hidden-force');
+      };
+
+      window.closeCustNotificationsModal = function() {
+        const modal = document.getElementById('custNotificationsModal');
+        if (modal) modal.classList.add('hidden-force');
+      };
+
+      window.markSingleCustNotificationRead = function(id) {
+        if (!id) return;
+        const updated = getCustNotifications().map(n =>
+          n.id === id ? Object.assign({}, n, { read: true }) : n
+        );
+        saveCustNotifications(updated);
+      };
+
+      window.markAllCustNotificationsRead = function() {
+        const updated = getCustNotifications().map(n => Object.assign({}, n, { read: true }));
+        saveCustNotifications(updated);
+      };
+
+      window.clearCustNotifications = function() {
+        const uid = (typeof getHouseUserId === 'function' && getHouseUserId())
+          ? getHouseUserId()
+          : ((typeof currentUser !== 'undefined' && currentUser && currentUser.id) ? currentUser.id : 'guest');
+        localStorage.removeItem('mc_cust_notifications_' + uid);
+        const badge = document.getElementById('custNotifBadge');
+        if (badge) badge.classList.add('hidden-force');
+        const listEl = document.getElementById('custNotificationsList');
+        if (listEl) listEl.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
+      };
+
+      function syncAlertsFromCurrentState() {
+        if (typeof currentViewingDate === 'undefined' || !currentViewingDate) return;
+        const y = currentViewingDate.getFullYear();
+        const m = currentViewingDate.getMonth();
+        const mKey = `${y}-${String(m + 1).padStart(2, '0')}`;
+
+        if (typeof monthRecords !== 'undefined' && monthRecords) {
+          Object.keys(monthRecords).forEach(dayStr => {
+            const dayNum = Number(dayStr);
+            if (!Number.isFinite(dayNum) || dayNum <= 0) return;
+
+            const rec = monthRecords[dayStr];
+            if (rec && rec.vendor_delivered) {
+              const litersVal = parseFloat(rec.liters) || 0;
+              pushCustNotification(
+                `deliv_${mKey}_${dayNum}_${litersVal}`,
+                '✅ పాలు డెలివరీ అయ్యాయి',
+                `${dayNum}/${m + 1}/${y} తేదీన ${litersVal}L పాలు డెలివరీ అయినట్లు వెండర్ అప్‌డేట్ చేశారు.`,
+                `${dayNum}/${m + 1}`
+              );
+            }
+          });
+
+          const skippedDays = Object.keys(monthRecords)
+            .filter(dayStr => monthRecords[dayStr] && monthRecords[dayStr].status === 'skipped')
+            .map(dayStr => Number(dayStr))
+            .filter(d => Number.isFinite(d) && d > 0)
+            .sort((a, b) => a - b);
+
+          if (skippedDays.length > 0) {
+            const firstDay = skippedDays[0];
+            const lastDay = skippedDays[skippedDays.length - 1];
+            const rangeLabel = (firstDay === lastDay)
+              ? `${firstDay}/${m + 1}`
+              : `${firstDay}/${m + 1} నుండి ${lastDay}/${m + 1} వరకు (${skippedDays.length} రోజులు)`;
+
+            pushCustNotification(
+              `vac_skip_${mKey}_${skippedDays.join('_')}`,
+              '✈️ సెలవులు / Vacation Skip',
+              `${rangeLabel} పాలు 'వద్దు (Skipped)' అని సెట్ చేయబడ్డాయి.`,
+              `${firstDay}/${m + 1}`
+            );
+          }
+        }
+
+        if (typeof syncedVendorLedger !== 'undefined' && syncedVendorLedger) {
+          const paid = parseFloat(syncedVendorLedger.paid_amount) || 0;
+          const prevDue = parseFloat(syncedVendorLedger.prev_due) || 0;
+          if (paid > 0 || prevDue > 0) {
+            pushCustNotification(
+              `ledger_${mKey}_${paid}_${prevDue}`,
+              '💳 బిల్లు / పేమెంట్ అప్‌డేట్',
+              `${mKey} నెల లెడ్జర్: చెల్లించినది ₹${paid}, పాత బాకీ ₹${prevDue}.`,
+              mKey
+            );
+          }
+        }
+
+        const now = new Date();
+        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+        if (tomorrow.getFullYear() === y && tomorrow.getMonth() === m && typeof monthRecords !== 'undefined') {
+          const tomRec = monthRecords[tomorrow.getDate()];
+          if (tomRec && tomRec.status === 'skipped') {
+            pushCustNotification(
+              `skip_tom_${y}_${m + 1}_${tomorrow.getDate()}`,
+              '⏸️ రేపు పాలు వద్దు (Skip)',
+              `రేపు (${tomorrow.getDate()}/${m + 1}) పాలు స్కిప్ అయినట్లు సెట్ అయి ఉంది.`,
+              'రేపు'
+            );
+          }
+        }
+
+        renderCustNotificationBadge();
+      }
+
+      if (typeof fetchMonthData === 'function') {
+        const _origFetchMonthDataNotif = fetchMonthData;
+        window.fetchMonthData = async function(...args) {
+          const res = await _origFetchMonthDataNotif.apply(this, args);
+          syncAlertsFromCurrentState();
+          return res;
+        };
+      }
+
+      if (typeof renderApp === 'function') {
+        const _origRenderAppNotif = renderApp;
+        window.renderApp = function(...args) {
+          const res = _origRenderAppNotif.apply(this, args);
+          syncAlertsFromCurrentState();
+          return res;
+        };
+      }
+
+      renderCustNotificationBadge();
+    })();
   </script>
 
 </body>

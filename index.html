@@ -3001,12 +3001,14 @@ function updateLiveDeliveryBanner() {
   } else if (todayRec && todayRec.vendor_delivered) {
     const mQ = parseFloat(todayRec.morning_qty) || 0;
     const eQ = parseFloat(todayRec.evening_qty) || 0;
+    const totalQ = parseFloat(todayRec.liters) || parseFloat((mQ + eQ).toFixed(2)) || 0;
+
     let shiftText = '';
     if (mQ > 0 && eQ > 0) shiftText = ' (🌅 ఉదయం & 🌇 సాయంత్రం)';
     else if (eQ > 0) shiftText = ' (🌇 సాయంత్రం)';
     else if (mQ > 0) shiftText = ' (🌅 ఉదయం)';
 
-    titleEl.innerText = `✅ ఈరోజు పాలు డెలివరీ అయ్యాయి${shiftText} • ${todayRec.liters}L`;
+    titleEl.innerText = `✅ ఈరోజు పాలు డెలివరీ అయ్యాయి${shiftText} • ${totalQ}L`;
     titleEl.className = 'text-xs font-extrabold text-emerald-800 truncate';
     iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
     iconEl.innerHTML = '<i class="ph-fill ph-check-circle text-base"></i>';

@@ -659,7 +659,7 @@
           </div>
 
           <!-- Days Grid -->
-          <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5"></div>
+          <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1"></div>
 
           <!-- Quota config link -->
           <div class="mt-3.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
@@ -3052,22 +3052,29 @@ function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDat
       btn.classList.remove('h-14');
       btn.classList.add('h-16');
       const box = btn.querySelector('div.my-auto');
-      const mTick = isVendorConfirmed && mQ > 0
+
+      const showMorningTick = isVendorConfirmed && mQ > 0;
+      const showEveningTick = isVendorConfirmed && eQ > 0;
+
+      const mTick = showMorningTick
         ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Morning Delivered"></i>'
         : '';
-      const eTick = isVendorConfirmed && eQ > 0
+      const eTick = showEveningTick
         ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Evening Delivered"></i>'
         : '';
 
+      const displayMQ = mQ > 0 ? mQ : morningQuota;
+      const displayEQ = eQ > 0 ? eQ : eveningQuota;
+
       if (box) {
-        if (mQ > 0 && eQ > 0) {
+        if (displayMQ > 0 && displayEQ > 0) {
           box.innerHTML =
-            '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + mQ + 'L</span>' + mTick + '</div>' +
-            '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + eQ + 'L</span>' + eTick + '</div>';
-        } else if (mQ > 0) {
-          box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + mQ + 'L</span>' + mTick + '</span>';
+            '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + displayMQ + 'L</span>' + mTick + '</div>' +
+            '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + displayEQ + 'L</span>' + eTick + '</div>';
+        } else if (displayMQ > 0) {
+          box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + displayMQ + 'L</span>' + mTick + '</span>';
         } else {
-          box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + eQ + 'L</span>' + eTick + '</span>';
+          box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + displayEQ + 'L</span>' + eTick + '</span>';
         }
       }
     }
@@ -3375,6 +3382,18 @@ function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDat
           </div>
         `
       },
+    contact: {
+      title: 'Contact Us (సంప్రదించండి)',
+      icon: 'ph-bold ph-envelope-simple text-amber-200',
+      html: `
+        <div class="space-y-3 text-center">
+          <p class="text-xs text-slate-600">ఏదైనా సమాచారం లేదా సహాయం కోసం మమ్మల్ని సంప్రదించండి:</p>
+          <a href="mailto:milkcount.saport@gmail.com" class="block bg-sky-50 border border-sky-200 rounded-xl p-3 text-xs font-extrabold text-sky-900 underline break-all select-all">
+            milkcount.saport@gmail.com
+          </a>
+        </div>
+      `
+    },
       contact: {
         title: 'Contact Us (సంప్రదించండి)',
         icon: 'ph-bold ph-envelope-simple text-amber-200',
@@ -3560,7 +3579,7 @@ function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDat
       const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
       userRegDate.setHours(0, 0, 0, 0);
 
-      // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) + Preserves Vendor Delivered Green Tick (✓)
+            // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) + Preserves Vendor Delivered Green Tick (✓)
       const grid = document.getElementById('calendarDaysGrid');
       if (grid) {
         grid.querySelectorAll('button').forEach(function(btn, idx) {
@@ -3581,27 +3600,30 @@ function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDat
           }
 
           if (isDel && (mQ > 0 || eQ > 0)) {
-            btn.classList.remove('h-14');
-            btn.classList.add('h-16');
+            btn.classList.remove('h-14', 'h-16');
+            btn.classList.add(mQ > 0 && eQ > 0 ? 'min-h-[60px]' : 'h-14');
             const box = btn.querySelector('div.my-auto');
-            const tickBadge = isVendorConfirmed
-              ? '<i class="ph-bold ph-check text-[10px] text-emerald-700 font-black" title="Vendor Delivered"></i>'
+            const mShiftTick = (isVendorConfirmed && mQ > 0)
+              ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Morning Delivered"></i>'
+              : '';
+            const eShiftTick = (isVendorConfirmed && eQ > 0)
+              ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Evening Delivered"></i>'
               : '';
             if (box) {
               if (mQ > 0 && eQ > 0) {
                 box.innerHTML =
-                  '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5">' + tickBadge + '<span>🌅 ' + mQ + 'L</span></div>' +
-                  '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap">🌇 ' + eQ + 'L</div>';
+                  '<div class="text-[8.5px] font-extrabold leading-none text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5 max-w-full overflow-hidden"><span>🌅 ' + mQ + 'L</span>' + mShiftTick + '</div>' +
+                  '<div class="text-[8.5px] font-extrabold leading-none text-sky-800 whitespace-nowrap inline-flex items-center gap-0.5 max-w-full overflow-hidden"><span>🌇 ' + eQ + 'L</span>' + eShiftTick + '</div>';
               } else if (mQ > 0) {
-                box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5">' + tickBadge + '<span>🌅 ' + mQ + 'L</span></span>';
+                box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + mQ + 'L</span>' + mShiftTick + '</span>';
               } else {
-                box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5">' + tickBadge + '<span>🌇 ' + eQ + 'L</span></span>';
+                box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + eQ + 'L</span>' + eShiftTick + '</span>';
               }
             }
           }
         });
       }
-
+    
       // 2. Shift-wise bill calculation
       let mDays = 0, eDays = 0, bothDays = 0, skipDays = 0, totM = 0, totE = 0;
       for (let d = 1; d <= daysInMonth; d++) {
@@ -4427,3 +4449,4 @@ renderCustNotificationBadge();
 
 </body>
 </html>
+

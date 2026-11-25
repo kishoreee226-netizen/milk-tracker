@@ -2976,45 +2976,102 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
     }
 
     // E5. LIVE VENDOR DELIVERY STATUS & 6-MONTH SPENDING GRAPH
-    function updateLiveDeliveryBanner() {
-      const now = new Date();
-      const year = now.getFullYear();
-      const month = now.getMonth();
-      const todayDay = now.getDate();
+    // A. Today Status Banner - Shift-wise "Delivered"
+function updateLiveDeliveryBanner() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const todayDay = now.getDate();
 
-      const bannerEl = document.getElementById('liveDeliveryStatusBanner');
-      const titleEl = document.getElementById('liveDeliveryTitle');
-      const subEl = document.getElementById('familySyncSubLabel');
-      const iconEl = document.getElementById('liveDeliveryIcon');
-      if (!titleEl || !subEl || !iconEl) return;
+  const bannerEl = document.getElementById('liveDeliveryStatusBanner');
+  const titleEl = document.getElementById('liveDeliveryTitle');
+  const subEl = document.getElementById('familySyncSubLabel');
+  const iconEl = document.getElementById('liveDeliveryIcon');
+  if (!titleEl || !subEl || !iconEl) return;
 
-      const isViewingCurrentMonth = (currentViewingDate.getFullYear() === year && currentViewingDate.getMonth() === month);
-      const todayRec = isViewingCurrentMonth ? monthRecords[todayDay] : null;
+  const isViewingCurrentMonth = (currentViewingDate.getFullYear() === year && currentViewingDate.getMonth() === month);
+  const todayRec = isViewingCurrentMonth ? monthRecords[todayDay] : null;
 
-      if (todayRec && todayRec.status === 'skipped') {
-        titleEl.innerText = 'ఈరోజు పాలు: వద్దు (Skipped)';
-        titleEl.className = 'text-xs font-extrabold text-rose-800 truncate';
-        iconEl.className = 'w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0';
-        iconEl.innerHTML = '<i class="ph-bold ph-prohibit text-base"></i>';
-        if (bannerEl) bannerEl.className = 'bg-rose-50/40 border border-rose-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
-      } else if (todayRec && todayRec.vendor_delivered) {
-        titleEl.innerText = `✅ ఈరోజు పాలు డెలివరీ అయ్యాయి (${todayRec.liters}L)`;
-        titleEl.className = 'text-xs font-extrabold text-emerald-800 truncate';
-        iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
-        iconEl.innerHTML = '<i class="ph-fill ph-check-circle text-base"></i>';
-        if (bannerEl) bannerEl.className = 'bg-emerald-50/70 border border-emerald-300 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
-      } else {
-        titleEl.innerText = 'ఈరోజు డెలివరీ: షెడ్యూల్ / పెండింగ్';
-        titleEl.className = 'text-xs font-extrabold text-slate-800 truncate';
-        iconEl.className = 'w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0';
-        iconEl.innerHTML = '<i class="ph-bold ph-clock text-base"></i>';
-        if (bannerEl) bannerEl.className = 'bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
-      }
+  if (todayRec && todayRec.status === 'skipped') {
+    titleEl.innerText = 'ఈరోజు పాలు: వద్దు (Skipped)';
+    titleEl.className = 'text-xs font-extrabold text-rose-800 truncate';
+    iconEl.className = 'w-8 h-8 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center shrink-0';
+    iconEl.innerHTML = '<i class="ph-bold ph-prohibit text-base"></i>';
+    if (bannerEl) bannerEl.className = 'bg-rose-50/40 border border-rose-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
+  } else if (todayRec && todayRec.vendor_delivered) {
+    const mQ = parseFloat(todayRec.morning_qty) || 0;
+    const eQ = parseFloat(todayRec.evening_qty) || 0;
+    let shiftText = '';
+    if (mQ > 0 && eQ > 0) shiftText = ' (🌅 ఉదయం & 🌇 సాయంత్రం)';
+    else if (eQ > 0) shiftText = ' (🌇 సాయంత్రం)';
+    else if (mQ > 0) shiftText = ' (🌅 ఉదయం)';
 
-      subEl.innerText = currentUser.family_head_id
-        ? '👨‍👩‍👧‍👦 Family Sync Active • ఒకే ఇంటి లెక్క'
-        : (currentUser.vendor_phone ? `వెండర్ లింక్: ${currentUser.vendor_phone}` : 'వెండర్ నంబర్ లింక్ చేయండి');
+    titleEl.innerText = `✅ ఈరోజు పాలు డెలివరీ అయ్యాయి${shiftText} • ${todayRec.liters}L`;
+    titleEl.className = 'text-xs font-extrabold text-emerald-800 truncate';
+    iconEl.className = 'w-8 h-8 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center shrink-0';
+    iconEl.innerHTML = '<i class="ph-fill ph-check-circle text-base"></i>';
+    if (bannerEl) bannerEl.className = 'bg-emerald-50/70 border border-emerald-300 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
+  } else {
+    titleEl.innerText = 'ఈరోజు డెలివరీ: షెడ్యూల్ / పెండింగ్';
+    titleEl.className = 'text-xs font-extrabold text-slate-800 truncate';
+    iconEl.className = 'w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center shrink-0';
+    iconEl.innerHTML = '<i class="ph-bold ph-clock text-base"></i>';
+    if (bannerEl) bannerEl.className = 'bg-white border border-sky-200 rounded-2xl p-3 shadow-2xs flex items-center justify-between gap-2 transition-colors';
+  }
+
+  subEl.innerText = currentUser.family_head_id
+    ? '👨‍👩‍👧‍👦 Family Sync Active • ఒకే ఇంటి లెక్క'
+    : (currentUser.vendor_phone ? `వెండర్ లింక్: ${currentUser.vendor_phone}` : 'వెండర్ నంబర్ లింక్ చేయండి');
+}
+
+// B. Calendar Shift-Wise Tick (🌅 & 🌇 పక్కన విడివిడిగా Tick)
+function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDate) {
+  const grid = document.getElementById('calendarDaysGrid');
+  if (!grid) return;
+
+  grid.querySelectorAll('button').forEach(function(btn, idx) {
+    const day = idx + 1;
+    const item = monthRecords[day];
+    const cDate = new Date(year, month, day);
+    let mQ = 0, eQ = 0, isDel = false;
+    const isVendorConfirmed = Boolean(item && item.vendor_delivered);
+
+    if (item && item.status === 'delivered' && item.liters > 0 && cDate <= now) {
+      isDel = true;
+      mQ = item.morning_qty !== undefined ? parseFloat(item.morning_qty) : item.liters;
+      eQ = item.evening_qty !== undefined ? parseFloat(item.evening_qty) : 0;
+    } else if (!item && cDate <= now && cDate >= userRegDate && isAutoModeOnDate(cDate)) {
+      isDel = true;
+      mQ = morningQuota;
+      eQ = eveningQuota;
     }
+
+    if (isDel && (mQ > 0 || eQ > 0)) {
+      btn.classList.remove('h-14');
+      btn.classList.add('h-16');
+      const box = btn.querySelector('div.my-auto');
+      const mTick = isVendorConfirmed && mQ > 0
+        ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Morning Delivered"></i>'
+        : '';
+      const eTick = isVendorConfirmed && eQ > 0
+        ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Evening Delivered"></i>'
+        : '';
+
+      if (box) {
+        if (mQ > 0 && eQ > 0) {
+          box.innerHTML =
+            '<div class="text-[9px] font-extrabold leading-tight text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + mQ + 'L</span>' + mTick + '</div>' +
+            '<div class="text-[9px] font-extrabold leading-tight text-sky-800 whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + eQ + 'L</span>' + eTick + '</div>';
+        } else if (mQ > 0) {
+          box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + mQ + 'L</span>' + mTick + '</span>';
+        } else {
+          box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + eQ + 'L</span>' + eTick + '</span>';
+        }
+      }
+    }
+  });
+}
+
 
     async function renderSixMonthSpendingChart() {
       const chartEl = document.getElementById('sixMonthSpendingChart');
@@ -4256,100 +4313,113 @@ ${qualityWaLines ? qualityWaLines + '\n' : ''}_MilkCount యాప్ ద్వ�
         if (listEl) listEl.innerHTML = '<p class="text-center text-slate-400 py-6">కొత్త నోటిఫికేషన్లు ఏవీ లేవు.</p>';
       };
 
-      function syncAlertsFromCurrentState() {
-        if (typeof currentViewingDate === 'undefined' || !currentViewingDate) return;
-        const y = currentViewingDate.getFullYear();
-        const m = currentViewingDate.getMonth();
-        const mKey = `${y}-${String(m + 1).padStart(2, '0')}`;
+     function syncAlertsFromCurrentState() {
+  if (typeof currentViewingDate === 'undefined' || !currentViewingDate) return;
+  const y = currentViewingDate.getFullYear();
+  const m = currentViewingDate.getMonth();
+  const mKey = `${y}-${String(m + 1).padStart(2, '0')}`;
 
-        if (typeof monthRecords !== 'undefined' && monthRecords) {
-          Object.keys(monthRecords).forEach(dayStr => {
-            const dayNum = Number(dayStr);
-            if (!Number.isFinite(dayNum) || dayNum <= 0) return;
+  if (typeof monthRecords !== 'undefined' && monthRecords) {
+    Object.keys(monthRecords).forEach(dayStr => {
+      const dayNum = Number(dayStr);
+      if (!Number.isFinite(dayNum) || dayNum <= 0) return;
 
-            const rec = monthRecords[dayStr];
-            if (rec && rec.vendor_delivered) {
-              const litersVal = parseFloat(rec.liters) || 0;
-              pushCustNotification(
-                `deliv_${mKey}_${dayNum}_${litersVal}`,
-                '✅ పాలు డెలివరీ అయ్యాయి',
-                `${dayNum}/${m + 1}/${y} తేదీన ${litersVal}L పాలు డెలివరీ అయినట్లు వెండర్ అప్‌డేట్ చేశారు.`,
-                `${dayNum}/${m + 1}`
-              );
-            }
-          });
+      const rec = monthRecords[dayStr];
+      if (rec && rec.vendor_delivered) {
+        const mQ = parseFloat(rec.morning_qty) || 0;
+        const eQ = parseFloat(rec.evening_qty) || 0;
 
-          const skippedDays = Object.keys(monthRecords)
-            .filter(dayStr => monthRecords[dayStr] && monthRecords[dayStr].status === 'skipped')
-            .map(dayStr => Number(dayStr))
-            .filter(d => Number.isFinite(d) && d > 0)
-            .sort((a, b) => a - b);
-
-          if (skippedDays.length > 0) {
-            const firstDay = skippedDays[0];
-            const lastDay = skippedDays[skippedDays.length - 1];
-            const rangeLabel = (firstDay === lastDay)
-              ? `${firstDay}/${m + 1}`
-              : `${firstDay}/${m + 1} నుండి ${lastDay}/${m + 1} వరకు (${skippedDays.length} రోజులు)`;
-
-            pushCustNotification(
-              `vac_skip_${mKey}_${skippedDays.join('_')}`,
-              '✈️ సెలవులు / Vacation Skip',
-              `${rangeLabel} పాలు 'వద్దు (Skipped)' అని సెట్ చేయబడ్డాయి.`,
-              `${firstDay}/${m + 1}`
-            );
-          }
+        if (mQ > 0) {
+          pushCustNotification(
+            `deliv_m_${mKey}_${dayNum}_${mQ}`,
+            '🌅 ఉదయం పాలు డెలివరీ అయ్యాయి',
+            `${dayNum}/${m + 1}/${y} ఉదయం ${mQ}L పాలు డెలివరీ అయినట్లు వెండర్ అప్‌డేట్ చేశారు.`,
+            `${dayNum}/${m + 1}`
+          );
         }
-
-        if (typeof syncedVendorLedger !== 'undefined' && syncedVendorLedger) {
-          const paid = parseFloat(syncedVendorLedger.paid_amount) || 0;
-          const prevDue = parseFloat(syncedVendorLedger.prev_due) || 0;
-          if (paid > 0 || prevDue > 0) {
-            pushCustNotification(
-              `ledger_${mKey}_${paid}_${prevDue}`,
-              '💳 బిల్లు / పేమెంట్ అప్‌డేట్',
-              `${mKey} నెల లెడ్జర్: చెల్లించినది ₹${paid}, పాత బాకీ ₹${prevDue}.`,
-              mKey
-            );
-          }
+        if (eQ > 0) {
+          pushCustNotification(
+            `deliv_e_${mKey}_${dayNum}_${eQ}`,
+            '🌇 సాయంత్రం పాలు డెలివరీ అయ్యాయి',
+            `${dayNum}/${m + 1}/${y} సాయంత్రం ${eQ}L పాలు డెలివరీ అయినట్లు వెండర్ అప్‌డేట్ చేశారు.`,
+            `${dayNum}/${m + 1}`
+          );
         }
-
-        const now = new Date();
-        const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
-        if (tomorrow.getFullYear() === y && tomorrow.getMonth() === m && typeof monthRecords !== 'undefined') {
-          const tomRec = monthRecords[tomorrow.getDate()];
-          if (tomRec && tomRec.status === 'skipped') {
-            pushCustNotification(
-              `skip_tom_${y}_${m + 1}_${tomorrow.getDate()}`,
-              '⏸️ రేపు పాలు వద్దు (Skip)',
-              `రేపు (${tomorrow.getDate()}/${m + 1}) పాలు స్కిప్ అయినట్లు సెట్ అయి ఉంది.`,
-              'రేపు'
-            );
-          }
-        }
-
-        renderCustNotificationBadge();
       }
+    });
 
-      if (typeof fetchMonthData === 'function') {
-        const _origFetchMonthDataNotif = fetchMonthData;
-        window.fetchMonthData = async function(...args) {
-          const res = await _origFetchMonthDataNotif.apply(this, args);
-          syncAlertsFromCurrentState();
-          return res;
-        };
-      }
+    const skippedDays = Object.keys(monthRecords)
+      .filter(dayStr => monthRecords[dayStr] && monthRecords[dayStr].status === 'skipped')
+      .map(dayStr => Number(dayStr))
+      .filter(d => Number.isFinite(d) && d > 0)
+      .sort((a, b) => a - b);
 
-      if (typeof renderApp === 'function') {
-        const _origRenderAppNotif = renderApp;
-        window.renderApp = function(...args) {
-          const res = _origRenderAppNotif.apply(this, args);
-          syncAlertsFromCurrentState();
-          return res;
-        };
-      }
+    if (skippedDays.length > 0) {
+      const firstDay = skippedDays[0];
+      const lastDay = skippedDays[skippedDays.length - 1];
+      const rangeLabel = (firstDay === lastDay)
+        ? `${firstDay}/${m + 1}`
+        : `${firstDay}/${m + 1} నుండి ${lastDay}/${m + 1} వరకు (${skippedDays.length} రోజులు)`;
 
-      renderCustNotificationBadge();
+      pushCustNotification(
+        `vac_skip_${mKey}_${skippedDays.join('_')}`,
+        '✈️ సెలవులు / Vacation Skip',
+        `${rangeLabel} పాలు 'వద్దు (Skipped)' అని సెట్ చేయబడ్డాయి.`,
+        `${firstDay}/${m + 1}`
+      );
+    }
+  }
+
+  if (typeof syncedVendorLedger !== 'undefined' && syncedVendorLedger) {
+    const paid = parseFloat(syncedVendorLedger.paid_amount) || 0;
+    const prevDue = parseFloat(syncedVendorLedger.prev_due) || 0;
+    if (paid > 0 || prevDue > 0) {
+      pushCustNotification(
+        `ledger_${mKey}_${paid}_${prevDue}`,
+        '💳 బిల్లు / పేమెంట్ అప్‌డేట్',
+        `${mKey} నెల లెడ్జర్: చెల్లించినది ₹${paid}, పాత బాకీ ₹${prevDue}.`,
+        mKey
+      );
+    }
+  }
+
+  const now = new Date();
+  const tomorrow = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1);
+  if (tomorrow.getFullYear() === y && tomorrow.getMonth() === m && typeof monthRecords !== 'undefined') {
+    const tomRec = monthRecords[tomorrow.getDate()];
+    if (tomRec && tomRec.status === 'skipped') {
+      pushCustNotification(
+        `skip_tom_${y}_${m + 1}_${tomorrow.getDate()}`,
+        '⏸️ రేపు పాలు వద్దు (Skip)',
+        `రేపు (${tomorrow.getDate()}/${m + 1}) పాలు స్కిప్ అయినట్లు సెట్ అయి ఉంది.`,
+        'రేపు'
+      );
+    }
+  }
+
+  renderCustNotificationBadge();
+}
+
+if (typeof fetchMonthData === 'function') {
+  const _origFetchMonthDataNotif = fetchMonthData;
+  window.fetchMonthData = async function(...args) {
+    const res = await _origFetchMonthDataNotif.apply(this, args);
+    syncAlertsFromCurrentState();
+    return res;
+  };
+}
+
+if (typeof renderApp === 'function') {
+  const _origRenderAppNotif = renderApp;
+  window.renderApp = function(...args) {
+    const res = _origRenderAppNotif.apply(this, args);
+    syncAlertsFromCurrentState();
+    return res;
+  };
+}
+
+renderCustNotificationBadge();
+
     })();
   </script>
 

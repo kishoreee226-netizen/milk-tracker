@@ -3579,7 +3579,7 @@ function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDat
       const userRegDate = currentUser.created_at ? new Date(currentUser.created_at) : new Date(0);
       userRegDate.setHours(0, 0, 0, 0);
 
-            // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) + Preserves Vendor Delivered Green Tick (✓)
+              // 1. Calendar cells: Shows Morning (🌅) & Evening (🌇) + Preserves Vendor Delivered Green Tick (✓)
       const grid = document.getElementById('calendarDaysGrid');
       if (grid) {
         grid.querySelectorAll('button').forEach(function(btn, idx) {
@@ -3600,29 +3600,33 @@ function applyShiftTicksToCalendarGrid(year, month, daysInMonth, now, userRegDat
           }
 
           if (isDel && (mQ > 0 || eQ > 0)) {
-            btn.classList.remove('h-14', 'h-16');
-            btn.classList.add(mQ > 0 && eQ > 0 ? 'min-h-[60px]' : 'h-14');
-            const box = btn.querySelector('div.my-auto');
+            btn.classList.remove('h-14', 'h-16', 'h-[50px]', 'h-[52px]', 'p-0.5', 'p-1', 'p-1.5', 'min-h-[52px]', 'min-h-[54px]', 'min-h-[58px]', 'min-h-[60px]', 'min-h-[64px]');
+            btn.classList.add(mQ > 0 && eQ > 0 ? 'min-h-[58px]' : 'h-[54px]', 'p-1');
+            const box = btn.querySelector('div.my-auto') || btn.querySelector('div.py-0');
             const mShiftTick = (isVendorConfirmed && mQ > 0)
-              ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Morning Delivered"></i>'
+              ? '<i class="ph-bold ph-check text-[8px] text-emerald-700 font-black" title="Morning Delivered"></i>'
               : '';
             const eShiftTick = (isVendorConfirmed && eQ > 0)
-              ? '<i class="ph-bold ph-check text-[9px] text-emerald-700 font-black" title="Evening Delivered"></i>'
+              ? '<i class="ph-bold ph-check text-[8px] text-emerald-700 font-black" title="Evening Delivered"></i>'
               : '';
             if (box) {
+              box.className = 'my-auto py-0 flex flex-col items-center justify-center text-center';
               if (mQ > 0 && eQ > 0) {
                 box.innerHTML =
-                  '<div class="text-[8.5px] font-extrabold leading-none text-amber-800 whitespace-nowrap inline-flex items-center gap-0.5 max-w-full overflow-hidden"><span>🌅 ' + mQ + 'L</span>' + mShiftTick + '</div>' +
-                  '<div class="text-[8.5px] font-extrabold leading-none text-sky-800 whitespace-nowrap inline-flex items-center gap-0.5 max-w-full overflow-hidden"><span>🌇 ' + eQ + 'L</span>' + eShiftTick + '</div>';
+                  '<div class="flex flex-col items-center justify-center gap-[2px]" style="line-height: 0.95;">' +
+                    '<div class="text-[8px] font-extrabold text-amber-800 whitespace-nowrap inline-flex items-center gap-0 max-w-full overflow-hidden"><span>🌅' + mQ + 'L</span>' + mShiftTick + '</div>' +
+                    '<div class="text-[8px] font-extrabold text-sky-800 whitespace-nowrap inline-flex items-center gap-0 max-w-full overflow-hidden"><span>🌇' + eQ + 'L</span>' + eShiftTick + '</div>' +
+                  '</div>';
               } else if (mQ > 0) {
-                box.innerHTML = '<span class="text-[9px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅 ' + mQ + 'L</span>' + mShiftTick + '</span>';
+                box.innerHTML = '<span class="text-[8.5px] font-extrabold text-emerald-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌅' + mQ + 'L</span>' + mShiftTick + '</span>';
               } else {
-                box.innerHTML = '<span class="text-[9px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇 ' + eQ + 'L</span>' + eShiftTick + '</span>';
+                box.innerHTML = '<span class="text-[8.5px] font-extrabold text-sky-700 leading-none whitespace-nowrap inline-flex items-center gap-0.5"><span>🌇' + eQ + 'L</span>' + eShiftTick + '</span>';
               }
             }
           }
         });
       }
+      
     
       // 2. Shift-wise bill calculation
       let mDays = 0, eDays = 0, bothDays = 0, skipDays = 0, totM = 0, totE = 0;

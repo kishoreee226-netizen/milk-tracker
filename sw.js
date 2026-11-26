@@ -1,4 +1,4 @@
-const CACHE_NAME = 'milkcount-v15';
+const CACHE_NAME = 'milkcount-v16';
 const ASSETS = [
   './',
   './index.html',
@@ -34,4 +34,29 @@ self.addEventListener('fetch', (e) => {
       })
       .catch(() => caches.match(e.request))
   );
+});
+
+// Background Sync Listener
+self.addEventListener('sync', event => {
+  if (event.tag === 'milkcount-customer-sync') {
+    event.waitUntil(Promise.resolve());
+  }
+});
+
+// Periodic Background Sync Listener
+self.addEventListener('periodicsync', event => {
+  if (event.tag === 'milkcount-customer-periodic') {
+    event.waitUntil(Promise.resolve());
+  }
+});
+
+// Push Notifications Listener
+self.addEventListener('push', event => {
+  const title = 'MilkCount - పాల లెక్కలు';
+  const options = {
+    body: event.data ? event.data.text() : 'మీ పాల డెలివరీ అప్‌డేట్ వచ్చింది!',
+    icon: './logo-192.png',
+    badge: './logo-192.png'
+  };
+  event.waitUntil(self.registration.showNotification(title, options));
 });
